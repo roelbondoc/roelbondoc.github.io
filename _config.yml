@@ -2,7 +2,7 @@
 title:               RB
 tagline:             ''
 description:         'A collection of articles written by Roel Bondoc'
-url:                 https://roelbondoc.com
+url:                 https://blog.roelbondoc.com
 baseurl:             ''
 paginate:            5
 permalink:           pretty
@@ -11,7 +11,7 @@ permalink:           pretty
 author:
   name:              Roel Bondoc
   url:               https://twitter.com/roelbondoc
-  email:             rsbondoc@gmail.com
+  email:             me@roelbondoc.com
 
 # Gems
 plugins:
