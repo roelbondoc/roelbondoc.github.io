@@ -2,7 +2,7 @@
 title:               RB
 tagline:             ''
 description:         'A collection of articles written by Roel Bondoc'
-url:                 https://blog.roelbondoc.com
+url:                 https://roelbondoc.com
 baseurl:             ''
 paginate:            5
 permalink:           pretty
