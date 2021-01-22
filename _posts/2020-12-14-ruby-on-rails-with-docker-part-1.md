@@ -71,7 +71,7 @@ You should become familiar with being able to run commands using docker and dock
 With the `app` service defined, you can start building that new Ruby on Rails app. Issue the following command in a shell within the container:
 
 ```
-apk --update add nodejs yarn build-base ruby-dev tzdata git sqlite-libs
+apk --update add nodejs yarn build-base ruby-dev tzdata git sqlite-dev
 gem install rails
 ```
 
@@ -91,7 +91,7 @@ Create a new file in your project directory called `Dockerfile` with the followi
 ```
 FROM ruby:alpine
 
-RUN apk --update add nodejs yarn build-base ruby-dev tzdata git sqlite-libs
+RUN apk --update add nodejs yarn build-base ruby-dev tzdata git sqlite-dev
 
 RUN mkdir /app
 WORKDIR /app
