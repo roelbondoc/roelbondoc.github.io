@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="en-us">
   {% include head.html %}
-  <body>
+  <body class="theme-base-0c">
     <div class="masthead">
       <div class="container">
         <h3 class="masthead-title">
           <a href="{{ site.baseurl }}/" title="Home">{{ site.title }}</a>
-          <small><a href="https://twitter.com/roelbondoc">@roelbondoc</a></small>
+          |
+          <small><a href="{{ site.baseurl }}/">Posts</a></small>
+          |
+          <small><a href="https://twitter.com/roelbondoc" target="_blank">Twitter</a></small>
         </h3>
       </div>
     </div>
 
     <div class="container content">
       {{ content }}
+
+      <p><small>Find me on Twitter &mdash; <a href="https://twitter.com/roelbondoc" target="_blank">@roelbondoc</a></small></p>
     </div>
   </body>
 </html>
