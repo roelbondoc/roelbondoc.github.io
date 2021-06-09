@@ -31,4 +31,4 @@ Sometimes the lack of resources becomes a problem, especially in the memory depa
 
 If all goes well, and your software was in fact failing because of a memory issue, the OS should start to use this swap file when it starts to run out of memory.
 
-This isn’t a recommended permanent solution, but a easy way to find out if memory is the root of your issue. If it is, I’d recommend allocating more larger EC2 machine, or permanently enabling swap.
+This isn’t a recommended permanent solution, but an easy way to find out if memory is the root of your issue. If it is, I’d recommend allocating a larger EC2 machine, or permanently enabling swap.
