@@ -70,7 +70,7 @@ Using ERB, a user loads a page that will display the progress for a long running
 ```
 <%= turbo_stream_from @payroll %>
 <div id=“progress-bar”>
-	Please wait, running payroll.
+  Please wait, running payroll.
   <progress class="progress" value="0" max="<%= @payroll.employees.count %>">0%</progress>
 </div>
 ```
