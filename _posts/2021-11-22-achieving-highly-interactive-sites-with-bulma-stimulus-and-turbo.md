@@ -126,7 +126,7 @@ First you’ll define a form that will gather your input from the user, along wi
 ```
 <%= form_with url: results_path,
               data: {
-                target: ‘results’,
+                turbo_frame: ‘results’,
                 controller: ‘auto-submit’,
                 auto_submit_target: 'form'
               } do %>
