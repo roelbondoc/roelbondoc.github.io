@@ -30,13 +30,17 @@ A very useful UI design pattern is a modal. Modals provide a good way to show mo
 
 ```
 <div data-controller=“modal”>
-  <button class=“button” data-action=“modal#open”>Open Modal</button>
+  <button class=“button” data-action=“modal#open”>
+    Open Modal
+  </button>
   <div class="modal" data-modal-target=“modal”>
     <div class="modal-background"></div>
     <div class="modal-content">
       Content goes here.
     </div>
-    <button class="modal-close is-large" aria-label="close" data-action=“modal#close”></button>
+    <button class="modal-close is-large"
+            aria-label="close"
+            data-action=“modal#close”></button>
   </div>
 </div>
 ```
@@ -51,11 +55,11 @@ export default class extends Controller {
   static targets = ["modal”];
 
   open() {
-    this.modalTarget.classList.add(‘is-active’);
+    this.modalTarget.classList.add("is-active");
   }
 
   close() {
-    this.modalTarget.classList.remove(‘is-active’);
+    this.modalTarget.classList.remove("is-active");
   }
 }
 ```
@@ -71,7 +75,9 @@ Using ERB, a user loads a page that will display the progress for a long running
 <%= turbo_stream_from @payroll %>
 <div id=“progress-bar”>
   Please wait, running payroll.
-  <progress class="progress" value="0" max="<%= @payroll.employees.count %>">0%</progress>
+  <progress class="progress"
+            value="0"
+            max="<%= @payroll.employees.count %>">0%</progress>
 </div>
 ```
 
@@ -84,7 +90,11 @@ class PayrollJob < ApplicationJob
     payroll.employees.each_with_index do |employee, index|
       if PaymentMaker.pay(employee)
         payroll.update(completed: index + 1)
-        payroll.broadcast_replace_to(payroll, target: 'progress-bar', partial: 'payrolls/progress_bar_update')
+        payroll.broadcast_replace_to(
+          payroll,
+          target: 'progress-bar',
+          partial: 'payrolls/progress_bar_update'
+        )
       end
     end
   end
@@ -96,7 +106,11 @@ The `PaymentMaker.pay` call is a long running call and the code will broadcast e
 ```
 <% if payroll.incomplete %>
   Please wait, running payroll.
-  <progress class="progress" value="<%= payroll.completed %>" max="<%= payroll.employees.count %>"><%= (payroll.completed / payroll.employees.count * 100).round %>%</progress>
+  <progress class="progress"
+            value="<%= payroll.completed %>"
+            max="<%= payroll.employees.count %>">
+              <%= (payroll.completed / payroll.employees.count * 100).round %>%
+  </progress>
 <% else %>
   Payroll run has been completed!
 <% end %>
@@ -110,7 +124,12 @@ Updating content in a container after entering information from a form is a comm
 First you’ll define a form that will gather your input from the user, along with a container to display your results:
 
 ```
-<%= form_with url: results_path, data: { target: ‘results’, controller: ‘auto-submit’, auto_submit_target: 'form' } do %>
+<%= form_with url: results_path,
+              data: {
+                target: ‘results’,
+                controller: ‘auto-submit’,
+                auto_submit_target: 'form'
+              } do %>
   <%= text_field_tag :query, data: { action: 'auto-submit#submit' } %>
 <% end %>
 <%= turbo_frame_tag ‘results’ %>
@@ -131,7 +150,7 @@ This will render each of the results found. The `turbo_frame_tag` will replace t
 ```
 // auto_submit_controller.js
 import { Controller } from "stimulus";
-import Rails from '@rails/ujs';
+import Rails from "@rails/ujs";
 
 export default class extends Controller {
   static targets = ["form”];
