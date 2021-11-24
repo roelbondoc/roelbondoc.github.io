@@ -6,10 +6,8 @@
       <div class="container">
         <h3 class="masthead-title">
           <a href="{{ site.baseurl }}/" title="Home">{{ site.title }}</a>
-          |
-          <a href="{{ site.baseurl }}/">posts</a>
-          |
-          <a href="https://twitter.com/roelbondoc" target="_blank">twitter</a>
+          <a href="{{ site.baseurl }}/">:posts</a>
+          <a href="https://twitter.com/roelbondoc" target="_blank">:twitter</a>
         </h3>
       </div>
     </div>
@@ -17,7 +15,8 @@
     <div class="container content">
       {{ content }}
 
-      <p><small>Find me on Twitter &mdash; <a href="https://twitter.com/roelbondoc" target="_blank">@roelbondoc</a></small></p>
+      <p><small>Find me on Twitter:</small></p>
+      <p><small><a href="https://twitter.com/roelbondoc" target="_blank">@roelbondoc</a></small></p>
 
       <form action="https://buttondown.email/api/emails/embed-subscribe/rb" method="post" target="popupwindow" onsubmit="window.open('https://buttondown.email/rb', 'popupwindow')" class="embeddable-buttondown-form">
         <input type="hidden" value="1" name="embed" />
@@ -25,6 +24,8 @@
         <input type="email" name="email" id="bd-email" placeholder="Email address" style="border: 1px solid #555; width: 50%; font-size: 19px; padding: 8px;" />
         <input type="submit" value="Subscribe" style="border: 1px solid #555; font-size: 19px; padding: 8px;"/>
       </form>
+
+      <p></p>
     </div>
   </body>
 </html>
