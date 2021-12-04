@@ -3,7 +3,7 @@ layout: post
 title: My `app` GitHub Repo
 ---
 
-I often enjoy starting and building new hobby projects. My ideas can come from different places. Sometimes there is an itch I need to scratch, or sometimes I just want to build something to see if it’s possible. In any case, I’ve been able to distill my process to a few general steps. Most, if not all, of my projects start off with a similar foundation. Usually they involve a combination of a Docker container with a Ruby on Rails application. I’ve taken this one step further and I’m releasing the basic structure of my application from which I start all my projects with.
+I often enjoy starting and building new hobby projects. My ideas can come from different places. Sometimes there is an itch I need to scratch, or sometimes I just want to build something to see if it’s possible. In any case, I’ve been able to distill my process to a few general steps. Most, if not all, of my projects start off with similar architecture. Usually they involve a combination of a Docker container with a Ruby on Rails application. I’ve taken this one step further and I’m releasing the basic structure of my application from which I start all my projects with.
 
 Take a look at it here: [https://github.com/roelbondoc/app](https://github.com/roelbondoc/app)
 
