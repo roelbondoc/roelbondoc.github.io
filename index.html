@@ -7,14 +7,14 @@ title: Home
   {% for post in paginator.posts %}
   <div class="post">
     <h1 class="post-title">
-      <a href="{{ post.url | absolute_url }}">
-        {{ post.title }}
-      </a>
+      {{ post.title }}
     </h1>
 
     <span class="post-date">{{ post.date | date_to_string }}</span>
 
     {{ post.excerpt }}
+
+    <p><a href="{{ post.url | absolute_url }}">Read</a></p>
   </div>
   {% endfor %}
 </div>
