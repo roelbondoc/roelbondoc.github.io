@@ -27,7 +27,11 @@ docker-compose up
 ```
 docker-compose run —-rm app bin/rails db:create
 ```
-4. Navigate to [http://localhost:3000](http://localhost:3000) with your web browser.
+4. Create the credentials store and key
+```
+docker-compose run -e EDITOR=vi --rm app bin/rails credentials:edit --environment production
+```
+5. Navigate to [http://localhost:3000](http://localhost:3000) with your web browser.
 
 This should give you with a good starting point for building your application. Now this requires that you have both `docker` and `git` installed on your computer. If don’t have any of these installed, not to worry! `app` is already setup to run with GitHub codespaces, check it out here: [https://github.com/codespaces](https://github.com/codespaces). Then you can start with step 2 from the above process.
 
