@@ -37,5 +37,3 @@ The argument passed specifies to mount `/home/username/files` from my local file
 
 ## There’s more out there
 There are tons of Docker images out there to choose from. Head on over to [https://hub.docker.com](https://hub.docker.com) to explore. I would also encourage you to explore the command line options available to in docker. So, the next time you are about to install a new application through your package manager, take a quick peek and see if there is a docker image available instead. You be glad in the long run as you can keep your computer neat and tidy.
-
-#razeware #blog
