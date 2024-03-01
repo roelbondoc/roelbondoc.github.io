@@ -3,6 +3,8 @@ layout: page
 title: Now
 ---
 
+Find out what I'm up to!
+
 ## Work
 
 I'm a software developer working at [Honeybadger](https://www.honeybadger.io).
@@ -17,8 +19,8 @@ email application. I'm hoping to open source it soon, but I use it every day as
 my daily driver for email.
 
 I've also recently taken an interest in road cycling. In 2023 I put in the most
-mileage I've ever had on my bike. This year I'm hoping to break that record and
-join more cycling events.
+mileage I've ever had on my bike. This year I'm hoping to break that record by
+getting out more solo as well as joining more cycling events.
 
 I also still enjoy playing competitive videos games, especially
 [Heroes of the Storm](https://heroesofthestorm.blizzard.com/en-us/). Hit me up
