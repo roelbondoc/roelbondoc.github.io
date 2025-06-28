@@ -7,27 +7,23 @@ Find out what I'm up to!
 
 ## Work
 
-I'm a software developer working at [Honeybadger](https://www.honeybadger.io).
-This has probably been the smallest company I've worked for with a 5 person
-headcount. Even though we are small, I'm amazed every day with how much we can
-accomplish.
+I'm currently looking for my next opportunity!
 
 ## Fun
 
-On the side, I'm hacking away at my side project. Right now it's a personal
-email application. I'm hoping to open source it soon, but I use it every day as
-my daily driver for email.
+On the side, I'm hacking away at my side project. It's called
+[Discode](https://rubyup.dev/discode). Discode helps you turn a Rails app into
+something you can sell and ship with a single command. I even use it to sell
+Discode itself.
 
-I've also recently taken an interest in road cycling. In 2023 I put in the most
-mileage I've ever had on my bike. This year I'm hoping to break that record by
-getting out more solo as well as joining more cycling events.
+I've been enjoying cycling and breadmaking during my free time.
 
-I also still enjoy playing competitive videos games, especially
+I also enjoy playing competitive videos games, especially
 [Heroes of the Storm](https://heroesofthestorm.blizzard.com/en-us/). Hit me up
 if you ever want to play!
 
 ## Family
 
-My wife and I have 3 kids, ages nine, six, and two. Time has just been flying
+My wife and I have 3 kids, ages 11, 8, and 3. Time has just been flying
 by so fast, so I've been trying to be more mindful of the moment and enjoy
 every second I have with them.
