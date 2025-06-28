@@ -38,24 +38,22 @@ The script asks for your domain name, installs dependencies, configures HTTPS wi
 
 ## Selling your first app
 
-Inside the Discode dashboard:
+Inside Discode, selling your app is easy:
 
-1. Click **New App** and fill in the name and a short tagline.
+1. Create a new app.
 2. Push your Rails app to the git repo.
-3. Set a price or mark it free while you test.
-4. Copy the generated install command and share it with a customer.
+3. Create a release.
+4. Share your apps sales page with customers.
 
-Your customer ends up with a clean, running copy of your app on their own server.
+When customers purchase your app, they get a one‑line installer that sets up your app on their own server.
 
 ## See it in action
 
 I recorded two short videos that walk through the whole flow:
 
-* **Installing Discode** — the single‑command setup and first login
-  [https://www.youtube.com/watch?v=N0ZxADS3SpQ](https://www.youtube.com/watch?v=N0ZxADS3SpQ)
+* **Installing Discode** [https://www.youtube.com/watch?v=N0ZxADS3SpQ](https://www.youtube.com/watch?v=N0ZxADS3SpQ)
 
-* **Selling a Rails app with Discode** — creating an app entry, uploading code, and generating the installer
-  [https://www.youtube.com/watch?v=t2D8ZmOMNEM](https://www.youtube.com/watch?v=t2D8ZmOMNEM)
+* **Selling a Rails app with Discode** [https://www.youtube.com/watch?v=t2D8ZmOMNEM](https://www.youtube.com/watch?v=t2D8ZmOMNEM)
 
 ## Try Discode
 
