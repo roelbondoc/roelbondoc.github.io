@@ -3,9 +3,9 @@ layout: post
 title: How Discode Performs Zero-Downtime Updates with Kamal Proxy
 ---
 
-When I was building Discode, I needed a reliable way for customers to update their applications without downtime. Traditional deployment approaches often require stopping the old version before starting the new one, creating service interruptions that can be problematic for production systems.
+When I was building [Discode](https://rubyup.dev/discode), I needed a reliable way for customers to update their applications without downtime. Traditional deployment approaches often require stopping the old version before starting the new one, creating service interruptions that can be problematic for production systems.
 
-Then I was inspired by the deployment tool Kamal. Behind the scenes, Kamal uses a lightweight reverse proxy called kamal-proxy to handle zero-downtime updates. This approach allows applications to be updated without any service interruption. This was exactly what I needed for Discode.
+Then I was inspired by the deployment tool [Kamal](https://kamal-deploy.org/). Behind the scenes, Kamal uses a lightweight reverse proxy called [kamal-proxy](https://github.com/basecamp/kamal-proxy) to handle zero-downtime updates. This approach allows applications to be updated without any service interruption. This was exactly what I needed for Discode.
 
 ## The Problem with Traditional Updates
 
@@ -75,3 +75,7 @@ This approach provides several advantages for Discode customers. Customers don't
 Now, when you use Discode to sell and distribute self-hosted Rails applications, you can provide your customers with a seamless update experience. They can deploy new versions of their applications without worrying about downtime or complex deployment procedures.
 
 If you're building a self-hosted application and struggling with deployment complexity, I highly recommend exploring  kamal and kamal-proxy. Being able to dive into the details has been very insightful for Discode, and I hope it can help you too.
+
+## Try it Out
+
+If you'd like to see how Discode works, I created a free web snapshotting service called [Webcap](https://rubyup.dev/webcap) that you can try out!
