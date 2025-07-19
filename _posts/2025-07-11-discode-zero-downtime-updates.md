@@ -1,6 +1,7 @@
 ---
 layout: post
 title: How Discode Performs Zero-Downtime Updates with Kamal Proxy
+description: Learn how Discode uses Kamal Proxy to enable zero-downtime application updates, eliminating service interruptions during deployments.
 ---
 
 When I was building [Discode](https://rubyup.dev/discode), I needed a reliable way for customers to update their applications without downtime. Traditional deployment approaches often require stopping the old version before starting the new one, creating service interruptions that can be problematic for production systems.
