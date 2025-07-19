@@ -1,37 +1,44 @@
 ---
 layout: default
 title: Home
+description: A collection of technical articles by Roel Bondoc covering Ruby on Rails, Docker, deployment strategies, and software development best practices.
 ---
 
-<div class="posts">
+<header>
+  <h1>Recent Posts</h1>
+</header>
+
+<main class="posts">
   {% for post in paginator.posts %}
-  <div class="post">
-    <h1 class="post-title">
-      {{ post.title }}
-    </h1>
+  <article class="post">
+    <h2 class="post-title">
+      <a href="{{ post.url | absolute_url }}">{{ post.title }}</a>
+    </h2>
 
-    <span class="post-date">{{ post.date | date_to_string }}</span>
+    <time class="post-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date_to_string }}</time>
 
-    {{ post.excerpt }}
+    <div class="post-excerpt">
+      {{ post.excerpt }}
+    </div>
 
-    <p><a href="{{ post.url | absolute_url }}">Read</a></p>
-  </div>
+    <p><a href="{{ post.url | absolute_url }}" aria-label="Read full article: {{ post.title }}">Read more</a></p>
+  </article>
   {% endfor %}
-</div>
+</main>
 
-<div class="pagination">
+<nav class="pagination" aria-label="Posts pagination">
   {% if paginator.next_page %}
-    <a class="pagination-item older" href="{{ paginator.next_page_path | absolute_url }}">Older</a>
+    <a class="pagination-item older" href="{{ paginator.next_page_path | absolute_url }}" aria-label="View older posts">Older</a>
   {% else %}
-    <span class="pagination-item older">Older</span>
+    <span class="pagination-item older" aria-hidden="true">Older</span>
   {% endif %}
   {% if paginator.previous_page %}
     {% if paginator.page == 2 %}
-      <a class="pagination-item newer" href="{{ '/' | absolute_url }}">Newer</a>
+      <a class="pagination-item newer" href="{{ '/' | absolute_url }}" aria-label="View newer posts">Newer</a>
     {% else %}
-      <a class="pagination-item newer" href="{{ paginator.previous_page_path | absolute_url }}">Newer</a>
+      <a class="pagination-item newer" href="{{ paginator.previous_page_path | absolute_url }}" aria-label="View newer posts">Newer</a>
     {% endif %}
   {% else %}
-    <span class="pagination-item newer">Newer</span>
+    <span class="pagination-item newer" aria-hidden="true">Newer</span>
   {% endif %}
-</div>
+</nav>

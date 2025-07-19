@@ -2,30 +2,33 @@
 <html lang="en-us" prefix="og: http://ogp.me/ns#">
   {% include head.html %}
   <body>
-    <div class="masthead">
+    <header class="masthead">
       <div class="container">
-        <h3 class="masthead-title">
-          <a href="{{ site.baseurl }}/">posts</a>
-          <a href="{{ site.baseurl }}/now">now</a>
-          <a rel="me" href="https://ruby.social/@roel" target="_blank">social</a>
+        <nav class="masthead-title" role="navigation" aria-label="Main navigation">
+          <a href="{{ site.baseurl }}/" aria-label="Home - Blog posts">posts</a>
+          <a href="{{ site.baseurl }}/now" aria-label="What I'm doing now">now</a>
+          <a rel="me" href="https://ruby.social/@roel" target="_blank" aria-label="Follow me on Mastodon">social</a>
           |
-          <a href="https://rubyup.dev" target="_blank">RubyUp</a>
+          <a href="https://rubyup.dev" target="_blank" aria-label="RubyUp - Ruby development services">RubyUp</a>
           <small> | Roel Bondoc</small>
-        </h3>
+        </nav>
       </div>
-    </div>
+    </header>
 
     <div class="container content">
       {{ content }}
 
       <hr>
 
-      <form action="https://buttondown.email/api/emails/embed-subscribe/rb" method="post" target="popupwindow" onsubmit="window.open('https://buttondown.email/rb', 'popupwindow')" class="embeddable-buttondown-form">
-        <input type="hidden" value="1" name="embed" />
-        <small>Subscribe to my newsletter:</small><br>
-        <input type="email" name="email" id="bd-email" placeholder="Email address" style="border: 1px solid #555; width: 50%; font-size: 19px; padding: 8px;" />
-        <input type="submit" value="Subscribe" style="border: 1px solid #555; font-size: 19px; padding: 8px;"/>
-      </form>
+      <aside class="newsletter-signup">
+        <form action="https://buttondown.email/api/emails/embed-subscribe/rb" method="post" target="popupwindow" onsubmit="window.open('https://buttondown.email/rb', 'popupwindow')" class="embeddable-buttondown-form">
+          <input type="hidden" value="1" name="embed" />
+          <label for="bd-email"><small>Subscribe to my newsletter:</small></label><br>
+          <input type="email" name="email" id="bd-email" placeholder="Email address" style="border: 1px solid #555; width: 50%; font-size: 19px; padding: 8px;" required aria-describedby="newsletter-desc" />
+          <input type="submit" value="Subscribe" style="border: 1px solid #555; font-size: 19px; padding: 8px;"/>
+          <div id="newsletter-desc" class="sr-only">Get updates on new technical articles and projects</div>
+        </form>
+      </aside>
 
       <p></p>
     </div>
