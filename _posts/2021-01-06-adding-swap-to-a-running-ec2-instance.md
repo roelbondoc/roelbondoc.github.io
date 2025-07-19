@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Adding swap space to a running EC2 instance
+description: Quick guide to adding swap space to an EC2 instance without stopping it, helping resolve memory issues on resource-constrained servers.
 ---
 
 Sometimes you want to run some trivial software on an EC2 instance. You don’t really pay attention to what the requirements are or have any performance concerns. So you end up spinning up something with very minimal resources. The software hums along nicely and you think nothing of it. It runs for several days, unnoticed. Then you realize the software stops running for some reason requiring you to restart it. Since you somewhat need the software to run, it becomes a bit annoying. Not annoying enough for a full out solution, but annoying enough you want to have to stop intervening. 

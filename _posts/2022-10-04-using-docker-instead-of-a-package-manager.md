@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Using Docker instead of a package manager
+description: Discover how to use Docker containers as a clean alternative to traditional package managers for running databases, programming languages, and development tools.
 ---
 
 Docker is a widely known containerization strategy. One of its main use is to provide developers with a consistent environment for building, packaging, and deploying applications. I've used Docker containers to build and deploy many service oriented architectures. Most containers are based on the ruby:3.1-alpine image (and other close variants). While there are many resources describing how Ruby on Rails projects can be setup and run using Docker, I'd like to talk about it's other uses.

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Creating a new Ruby on Rails project with docker-compose
+description: Learn how to set up a new Ruby on Rails project using Docker and docker-compose for better infrastructure management and smoother production deployment.
 ---
 
 There’s nothing like starting with a clean slate on a new Ruby on Rails project. Creating a new project on the latest version of Ruby and Rails is a great way to keep your skills sharp. Using docker and docker-compose to create a new Rails app has never been simpler. In addition, you are defining your infrastructure from the start. This will ensure a smoother transition to production, and increase the maintainability of your project.

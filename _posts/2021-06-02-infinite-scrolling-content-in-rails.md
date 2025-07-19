@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Infinite Scrolling Content in Rails — Without Writing Any Javascript
+description: Implement infinite scroll pagination in Rails using Hotwire and Turbo without writing custom JavaScript code.
 ---
 
 In web development, you’ll often come across the term “pagination”. This is a technique that allows you to divide your content into separate pages so that your user can navigate through the content page by page. This is usually done by providing ‘forward’ and ‘back’ links, as well as links to specific pages. Another technique of pagination is an “infinite scroll” design. Instead of having the user navigate from page to page, they continuously scroll to the bottom of the page and your application automatically loads the next page below.

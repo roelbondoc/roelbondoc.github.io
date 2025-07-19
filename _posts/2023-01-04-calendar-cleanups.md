@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Calendar Cleanups
+description: Why company-wide calendar purges are a band-aid solution and how to build a meeting-adverse culture to improve workplace efficiency.
 ---
 
 Recently an increasing number of companies have been on a hunt to remove unnecessary meetings from employee calendars. All of this is done to protect the time of employees and improve efficiency of the businesses. The thought being is that some recurring meetings were created, eventually become unnecessary, but never purged.

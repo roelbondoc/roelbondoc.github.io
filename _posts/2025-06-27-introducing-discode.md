@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Introducing Discode
+description: Launch and sell self-hosted Ruby on Rails applications with Discode - a platform for distributing Rails apps with licensing, updates, and customer management.
 ---
 
 For years I have had a small collection of Rails projects sitting in private GitHub repos. Some were weekend experiments, other launched without any marketing before I moved on to the next idea. They all shared the same fate: running nowhere and earning nothing. Earlier this year I finally decided to solve my own problem and give those projects a second life. The result is **Discode**.

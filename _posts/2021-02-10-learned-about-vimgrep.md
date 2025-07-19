@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Learned about vimgrep
+description: Discover how to use Vim's built-in vimgrep command to search patterns across multiple files and edit them without leaving your editor.
 ---
 
 I learned a neat vim trick the other day.

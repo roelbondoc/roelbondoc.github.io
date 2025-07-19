@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Adding external services to a Ruby on Rails project with docker-compose
+description: Extend your dockerized Rails application by adding PostgreSQL database and web servers using docker-compose for a complete development environment.
 ---
 
 The first part in this series went over the basics of setting up a new Rails app using Docker. Part one also showed how to leverage `docker-compose` in setting up your application to be run. This second part of the series will take a deeper look into taking `docker-compose` further to architect a more complex Rails application. Most Rails applications utitlize several external services to augment the core Rails service. Follow along to see how to add databases and web servers to create a more complete package.

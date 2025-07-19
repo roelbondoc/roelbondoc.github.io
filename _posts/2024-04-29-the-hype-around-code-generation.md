@@ -1,6 +1,7 @@
 ---
 layout: post
 title: The Hype Around Code Generation
+description: A critical perspective on AI code generation tools like GitHub Copilot and why developers need less code, not more automated code generation.
 ---
 
 Today I read about GitHub's release about their "GitHub Copilot Workspace".

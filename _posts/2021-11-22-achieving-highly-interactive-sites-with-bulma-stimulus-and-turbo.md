@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Achieving Highly Interactive Sites with Bulma, Stimulus, and Turbo
+description: Build highly interactive web applications with minimal frontend knowledge by combining Bulma CSS, Stimulus, and Turbo with Ruby on Rails.
 ---
 
 Part of being a Fullstack Developer means building features that touch every layer of your application stack. If you’re like me, with a background and preference for server side development, you may not have strong front end development skills. To overcome these shortcomings, it’s worthwhile to leverage pre-built frameworks that compress the underlying knowledge needed to create highly interactive features.
