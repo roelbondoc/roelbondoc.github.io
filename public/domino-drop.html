@@ -410,16 +410,25 @@ permalink: /domino-drop/
   .tray {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 0px;
     justify-content: center;
     align-items: center;
-    padding: 12px;
+    align-content: flex-start;
+    padding: 2px;
     background: var(--bg2);
     border-radius: 14px;
     border: 1px solid rgba(255,255,255,0.06);
-    min-height: 80px;
+    min-height: 60px;
     touch-action: none;
     transition: width 0.15s;
+  }
+
+  .tray .domino {
+    transform: scale(0.9);
+    transform-origin: center;
+  }
+  .tray .domino:hover {
+    transform: scale(0.95);
   }
 
   .tray-label {
@@ -672,7 +681,7 @@ permalink: /domino-drop/
     .app { padding: 12px 16px; }
     h1 { font-size: 1.5rem; }
     .btn { padding: 6px 12px; font-size: 0.7rem; }
-    .tray { gap: 6px; padding: 8px; }
+    .tray { gap: 0px; padding: 1px; }
     .modal-card { padding: 20px; margin: 10px; }
   }
 
@@ -971,7 +980,6 @@ permalink: /domino-drop/
       <div id="badges"></div>
     </div>
     <div class="tray" id="tray">
-      <div class="tray-label">Dominoes</div>
     </div>
   </div>
 </div>
@@ -1159,9 +1167,9 @@ const CONSTRAINT_COLORS = {
 };
 
 const CONFIGS = {
-  easy:   { rows:6, cols:6, dominoes:8 },
-  medium: { rows:8, cols:8, dominoes:14 },
-  hard:   { rows:10, cols:11, dominoes:18 },
+  easy:   { rows:4, cols:6, dominoes:8 },
+  medium: { rows:6, cols:8, dominoes:14 },
+  hard:   { rows:8, cols:11, dominoes:18 },
   custom: { rows:6, cols:7, dominoes:7 },
 };
 
@@ -1715,13 +1723,12 @@ function generatePuzzle() {
     regions[i].constraint = chosen;
   }
 
-  // 7) Create domino pieces with random orientations (4 directions)
-  const orientations = ['right','down','left','up'];
+  // 7) Create domino pieces — all start vertical (down orientation)
   dominoes = placed.map((p,i) => ({
     id: i,
     a: p.a,
     b: p.b,
-    orientation: orientations[rand(4)],
+    orientation: 'down',
     placed: false,
     placedAt: null,
   }));
@@ -2011,7 +2018,7 @@ function renderBadges() {
 
 function renderTray() {
   const tray = document.getElementById('tray');
-  tray.innerHTML = '<div class="tray-label">Dominoes</div>';
+  tray.innerHTML = '';
 
   const unplaced = dominoes.filter(d => !d.placed);
   if(unplaced.length === 0) {
