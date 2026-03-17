@@ -1797,8 +1797,27 @@ function getAllViolations() {
 // ════════════════════════════════════
 //  RENDERING
 // ════════════════════════════════════
+// Track the trimmed bounding box for the board
+let boardMinR=0, boardMaxR=0, boardMinC=0, boardMaxC=0, boardUsedCols=1, boardUsedRows=1;
+
 function fitCellSize() {
   if(!boardRows || !boardCols) return;
+
+  // Find bounding box of actual cells
+  let minR=boardRows, maxR=0, minC=boardCols, maxC=0;
+  let hasCells = false;
+  for(let r=0;r<boardRows;r++) for(let c=0;c<boardCols;c++) {
+    if(boardData[r]?.[c]) {
+      if(r<minR) minR=r; if(r>maxR) maxR=r;
+      if(c<minC) minC=c; if(c>maxC) maxC=c;
+      hasCells = true;
+    }
+  }
+  if(!hasCells) return;
+
+  boardMinR=minR; boardMaxR=maxR; boardMinC=minC; boardMaxC=maxC;
+  boardUsedCols = maxC - minC + 1;
+  boardUsedRows = maxR - minR + 1;
 
   const gap = 2;
   const containerPad = 24; // 12px * 2
@@ -1807,45 +1826,39 @@ function fitCellSize() {
   // Shrink cells so game-area collapses to CSS-constrained width
   document.documentElement.style.setProperty('--cell-size', '1px');
 
-  // Measure available space from CSS-constrained game-area
+  // Measure available space
   const gameArea = document.querySelector('.game-area');
-  let maxW = gameArea.clientWidth;
+  let availW = gameArea.clientWidth;
+  if(isWide) availW = availW - 200 - 16;
 
-  // On wide screens, subtract tray width + gap from available board width
-  if(isWide) {
-    maxW = maxW - 200 - 16; // tray width + gap
-  }
-
-  // Available height for the board
   const header = document.querySelector('header');
   const stats = document.querySelector('.stats');
   const menuPanel = document.getElementById('menuPanel');
   const chromeH = (header?.offsetHeight || 40) + (stats?.offsetHeight || 30)
     + (menuPanel?.classList.contains('open') ? (menuPanel.offsetHeight || 0) : 0)
     + 16;
-  // On wide screens, tray is beside not below, so no tray height deduction
   const trayEstimate = isWide ? 0 : 90;
   const gameGaps = isWide ? 16 : 28;
-  const maxH = window.innerHeight - chromeH - trayEstimate - gameGaps;
-
-  // Square side = smaller of available width and height
-  const squareSide = Math.min(maxW, maxH);
+  let availH = window.innerHeight - chromeH - trayEstimate - gameGaps;
 
   // Inner space after container padding
-  const innerSide = squareSide - containerPad;
+  const innerW = availW - containerPad;
+  const innerH = availH - containerPad;
 
-  // Cell size: fit both cols and rows inside the square, take the smaller
-  const cellFromCols = Math.floor((innerSide - (boardCols - 1) * gap) / boardCols);
-  const cellFromRows = Math.floor((innerSide - (boardRows - 1) * gap) / boardRows);
+  // Size cells independently for width and height based on USED cols/rows only
+  const cellFromCols = Math.floor((innerW - (boardUsedCols - 1) * gap) / boardUsedCols);
+  const cellFromRows = Math.floor((innerH - (boardUsedRows - 1) * gap) / boardUsedRows);
   const ideal = Math.min(cellFromCols, cellFromRows);
   const clamped = Math.max(24, Math.min(72, ideal));
 
   document.documentElement.style.setProperty('--cell-size', clamped + 'px');
 
-  // Set container to exact square size
+  // Size the container to exactly fit the trimmed grid content
+  const contentW = boardUsedCols * clamped + (boardUsedCols - 1) * gap;
+  const contentH = boardUsedRows * clamped + (boardUsedRows - 1) * gap;
   const container = document.querySelector('.board-container');
-  container.style.width = squareSide + 'px';
-  container.style.height = squareSide + 'px';
+  container.style.width = (contentW + containerPad) + 'px';
+  container.style.height = (contentH + containerPad) + 'px';
 
   const dotSize = Math.max(3, Math.round(clamped * 0.14));
   const dotContainerSize = Math.max(16, Math.round(clamped * 0.64));
@@ -1884,13 +1897,14 @@ function syncWidths() {
 function renderBoard() {
   const board = document.getElementById('board');
   board.innerHTML = '';
-  board.style.gridTemplateColumns = `repeat(${boardCols}, var(--cell-size))`;
-  board.style.gridTemplateRows = `repeat(${boardRows}, var(--cell-size))`;
+  // Only render the trimmed bounding box
+  board.style.gridTemplateColumns = `repeat(${boardUsedCols}, var(--cell-size))`;
+  board.style.gridTemplateRows = `repeat(${boardUsedRows}, var(--cell-size))`;
 
   const { violatedCells } = getAllViolations();
 
-  for(let r=0;r<boardRows;r++) {
-    for(let c=0;c<boardCols;c++) {
+  for(let r=boardMinR;r<=boardMaxR;r++) {
+    for(let c=boardMinC;c<=boardMaxC;c++) {
       const cell = document.createElement('div');
       cell.className = 'cell';
       cell.dataset.row = r;
@@ -1989,8 +2003,8 @@ function renderBadges() {
     if(status === 'satisfied') badge.classList.add('satisfied');
     if(status === 'violated') badge.classList.add('violated');
 
-    badge.style.left = (maxC * (cellSize + gap) + cellSize - 4) + 'px';
-    badge.style.top = (maxR * (cellSize + gap) + cellSize - 8) + 'px';
+    badge.style.left = ((maxC - boardMinC) * (cellSize + gap) + cellSize - 4) + 'px';
+    badge.style.top = ((maxR - boardMinR) * (cellSize + gap) + cellSize - 8) + 'px';
     container.appendChild(badge);
   }
 }
@@ -2202,8 +2216,13 @@ function getCellUnderPoint(x, y) {
   const gap = 2;
   const step = cellSize + gap;
 
-  const col = Math.floor((x - rect.left) / step);
-  const row = Math.floor((y - rect.top) / step);
+  // Grid position within the trimmed grid
+  const gridCol = Math.floor((x - rect.left) / step);
+  const gridRow = Math.floor((y - rect.top) / step);
+
+  // Map back to actual board coordinates
+  const row = gridRow + boardMinR;
+  const col = gridCol + boardMinC;
 
   if(row >= 0 && row < boardRows && col >= 0 && col < boardCols) return [row, col];
   return null;
