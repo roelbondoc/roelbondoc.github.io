@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Domino Drop</title>
+<link href="https://fonts.googleapis.com/css2?family=Righteous&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a1a2e;
+    --bg2: #16213e;
+    --surface: #0f3460;
+    --accent1: #e94560;
+    --accent2: #533483;
+    --accent3: #0ea5e9;
+    --accent4: #10b981;
+    --accent5: #f59e0b;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --cell-size: 56px;
+    --gap: 2px;
+    --dot-size: 8px;
+    --dot-container-size: 36px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 16px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 8px;
+    width: 100%;
+    max-width: 600px;
+  }
+
+  h1 {
+    font-family: 'Righteous', cursive;
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--accent1), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-top: 2px;
+  }
+
+  .controls {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 8px 0;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 8px 18px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .btn-diff {
+    background: var(--bg2);
+    color: var(--text-dim);
+    border-color: rgba(255,255,255,0.08);
+  }
+  .btn-diff.active {
+    border-color: var(--accent3);
+    color: var(--accent3);
+    box-shadow: 0 0 12px rgba(14,165,233,0.3);
+  }
+  .btn-diff:hover { border-color: var(--accent3); color: var(--text); }
+
+  .btn-action {
+    background: var(--accent1);
+    color: white;
+    border-color: var(--accent1);
+  }
+  .btn-action:hover { background: #d13350; transform: scale(1.03); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-dim);
+    border-color: rgba(255,255,255,0.15);
+  }
+  .btn-secondary:hover { border-color: var(--accent5); color: var(--accent5); }
+  .btn-secondary.active { border-color: var(--accent3); color: var(--accent3); }
+
+  .stats {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 6px 0;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+  .stats span { color: var(--accent3); font-weight: 700; }
+
+  .game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    max-width: 700px;
+  }
+
+  .board-container {
+    position: relative;
+    background: var(--bg2);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.06);
+    overflow: visible;
+    touch-action: none;
+  }
+
+  .board {
+    display: grid;
+    gap: var(--gap);
+    position: relative;
+  }
+
+  .cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .cell.empty {
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .cell.slot {
+    background: rgba(255,255,255,0.04);
+    border: 2px dashed rgba(255,255,255,0.1);
+  }
+
+  .cell.slot.highlight-valid {
+    border-color: var(--accent4) !important;
+    background: rgba(16,185,129,0.15) !important;
+    box-shadow: inset 0 0 12px rgba(16,185,129,0.2);
+  }
+
+  .cell.slot.highlight-invalid {
+    border-color: var(--accent1) !important;
+    background: rgba(233,69,96,0.12) !important;
+    box-shadow: inset 0 0 8px rgba(233,69,96,0.15);
+  }
+
+  .cell.filled {
+    border: none;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.3);
+    cursor: pointer;
+  }
+
+  .cell.violation {
+    box-shadow: inset 0 0 0 2px var(--accent1), 0 0 8px rgba(233,69,96,0.3) !important;
+    animation: pulse-violation 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-violation {
+    0%, 100% { box-shadow: inset 0 0 0 2px var(--accent1), 0 0 8px rgba(233,69,96,0.3); }
+    50% { box-shadow: inset 0 0 0 2px var(--accent1), 0 0 16px rgba(233,69,96,0.5); }
+  }
+
+  .dot-container {
+    display: grid;
+    width: var(--dot-container-size);
+    height: var(--dot-container-size);
+    padding: 3px;
+    grid-template-columns: repeat(3,1fr);
+    grid-template-rows: repeat(3,1fr);
+  }
+
+  .dot {
+    width: var(--dot-size);
+    height: var(--dot-size);
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    place-self: center;
+  }
+
+  .dot-spacer { place-self: center; }
+
+  .constraint-badge {
+    position: absolute;
+    z-index: 10;
+    font-family: 'Righteous', cursive;
+    font-size: 0.72rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+    color: white;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    line-height: 1.3;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+
+  .constraint-badge.satisfied {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+
+  .constraint-badge.violated {
+    animation: badge-shake 0.4s ease-in-out;
+  }
+
+  @keyframes badge-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+  }
+
+  .tray {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+    background: var(--bg2);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+    min-height: 80px;
+    touch-action: none;
+    transition: width 0.15s;
+  }
+
+  .tray-label {
+    width: 100%;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+
+  .tray-empty {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    opacity: 0.5;
+  }
+
+  .domino {
+    display: grid;
+    gap: 2px;
+    cursor: grab;
+    touch-action: none;
+    border-radius: 10px;
+    padding: 3px;
+    background: rgba(255,255,255,0.06);
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+  }
+
+  .domino:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+
+  .domino.horizontal { grid-template-columns: 1fr 1fr; }
+  .domino.vertical { grid-template-columns: 1fr; }
+
+  .domino.dragging {
+    opacity: 0.9;
+    position: fixed;
+    z-index: 1000;
+    pointer-events: none;
+    transform: scale(1.1);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+    cursor: grabbing;
+  }
+
+  .domino .half {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border-radius: 7px;
+    background: rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .domino .half .dot { width: var(--dot-size); height: var(--dot-size); }
+
+  .rotate-hint {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 20px;
+    height: 20px;
+    background: var(--accent5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .domino:hover .rotate-hint { opacity: 1; }
+
+  .region-border-top { border-top: 2.5px dashed !important; }
+  .region-border-bottom { border-bottom: 2.5px dashed !important; }
+  .region-border-left { border-left: 2.5px dashed !important; }
+  .region-border-right { border-right: 2.5px dashed !important; }
+
+  .win-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(6px);
+    animation: fadeIn 0.3s;
+  }
+
+  .win-card {
+    background: var(--bg2);
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    border: 2px solid var(--accent4);
+    box-shadow: 0 0 60px rgba(16,185,129,0.3);
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .win-card h2 {
+    font-family: 'Righteous', cursive;
+    font-size: 2rem;
+    color: var(--accent4);
+    margin-bottom: 8px;
+  }
+
+  .win-card p { color: var(--text-dim); margin-bottom: 6px; }
+  .win-card .win-stats { color: var(--accent3); font-weight: 700; margin-bottom: 20px; font-size: 0.9rem; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  .instructions {
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    text-align: center;
+    max-width: 520px;
+    line-height: 1.5;
+    margin-top: 2px;
+  }
+  .instructions span { color: var(--accent3); font-weight: 700; }
+
+  .share-panel {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.25s ease, margin 0.3s ease;
+    margin: 0;
+    width: 100%;
+    max-width: 520px;
+  }
+  .share-panel.open {
+    max-height: 100px;
+    opacity: 1;
+    margin: 6px 0;
+  }
+  .share-row {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+  }
+  .share-input {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    padding: 8px 10px;
+    outline: none;
+    min-width: 0;
+  }
+  .share-input:focus { border-color: var(--accent3); }
+  .btn-copy { flex-shrink: 0; }
+  .share-hint {
+    color: var(--text-dim);
+    font-size: 0.7rem;
+    text-align: center;
+    margin-top: 4px;
+    transition: color 0.2s;
+  }
+  .share-hint.copied { color: var(--accent4); }
+
+  .btn-help {
+    font-family: 'Righteous', cursive;
+    font-size: 1rem;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.15);
+    background: var(--bg2);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 4px 0;
+  }
+  .btn-help:hover, .btn-help.active {
+    border-color: var(--accent3);
+    color: var(--accent3);
+    box-shadow: 0 0 10px rgba(14,165,233,0.25);
+  }
+
+  .help-panel {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.25s ease, margin 0.3s ease;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .help-panel.open {
+    max-height: 200px;
+    opacity: 1;
+    margin: 6px 0;
+  }
+
+  .legend {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .legend-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    color: white;
+    font-family: 'Righteous', cursive;
+  }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 1.5rem; }
+    .btn { padding: 6px 12px; font-size: 0.7rem; }
+    .tray { gap: 6px; padding: 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header>
+    <h1>DOMINO DROP</h1>
+    <p class="subtitle">Place all dominoes to satisfy the constraints</p>
+  </header>
+
+  <div class="controls">
+    <button class="btn btn-diff active" data-diff="easy" onclick="setDifficulty('easy')">Easy</button>
+    <button class="btn btn-diff" data-diff="medium" onclick="setDifficulty('medium')">Medium</button>
+    <button class="btn btn-diff" data-diff="hard" onclick="setDifficulty('hard')">Hard</button>
+    <button class="btn btn-action" onclick="newGame()">New Game</button>
+    <button class="btn btn-secondary" onclick="undoLast()">Undo</button>
+    <button class="btn btn-secondary" onclick="clearBoard()">Clear</button>
+    <button class="btn btn-secondary" id="helpToggle" onclick="toggleHelp()">Info</button>
+    <button class="btn btn-secondary" id="shareToggle" onclick="toggleShare()">Share</button>
+  </div>
+
+  <div class="share-panel" id="sharePanel">
+    <div class="share-row">
+      <input type="text" class="share-input" id="shareInput" readonly>
+      <button class="btn btn-secondary btn-copy" onclick="copyShareLink()">Copy</button>
+    </div>
+    <p class="share-hint" id="shareHint">Send this link to a friend to challenge them!</p>
+  </div>
+
+  <div class="stats">
+    <div>Moves: <span id="moveCount">0</span></div>
+    <div>Placed: <span id="placedCount">0</span> / <span id="totalCount">0</span></div>
+    <div>Time: <span id="timer">0:00</span></div>
+  </div>
+
+  <div class="help-panel" id="helpPanel">
+    <p class="instructions">Drag dominoes onto the board. <span>Tap/click</span> to rotate. <span>Double-tap</span> placed domino to return it.</p>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="game-area">
+    <div class="board-container">
+      <div class="board" id="board"></div>
+      <div id="badges"></div>
+    </div>
+    <div class="tray" id="tray">
+      <div class="tray-label">Dominoes</div>
+    </div>
+  </div>
+</div>
+
+<div class="win-overlay" id="winOverlay" style="display:none">
+  <div class="win-card">
+    <h2>Puzzle Solved!</h2>
+    <p>All constraints satisfied!</p>
+    <div class="win-stats" id="winStats"></div>
+    <button class="btn btn-action" onclick="newGame()">Play Again</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════
+//  GLOBALS
+// ════════════════════════════════════
+let difficulty = 'easy';
+let boardData = [];
+let regions = [];
+let dominoes = [];
+let dragState = null;
+let boardRows, boardCols;
+let moveCount = 0;
+let undoStack = [];
+let timerInterval = null;
+let elapsedSeconds = 0;
+let gameWon = false;
+let currentSeed = 0;
+
+const REGION_COLORS = [
+  {bg:'rgba(168,130,214,0.22)', border:'#a882d6'},
+  {bg:'rgba(233,69,96,0.18)',   border:'#e94560'},
+  {bg:'rgba(14,165,233,0.18)',  border:'#0ea5e9'},
+  {bg:'rgba(245,158,11,0.18)',  border:'#f59e0b'},
+  {bg:'rgba(16,185,129,0.18)',  border:'#10b981'},
+  {bg:'rgba(244,114,182,0.18)', border:'#f472b6'},
+  {bg:'rgba(139,92,246,0.18)',  border:'#8b5cf6'},
+  {bg:'rgba(251,191,36,0.2)',   border:'#fbbf24'},
+  {bg:'rgba(52,211,153,0.18)',  border:'#34d399'},
+  {bg:'rgba(248,113,113,0.18)', border:'#f87171'},
+  {bg:'rgba(96,165,250,0.18)',  border:'#60a5fa'},
+  {bg:'rgba(167,139,250,0.2)',  border:'#a78bfa'},
+];
+
+const CONSTRAINT_COLORS = {
+  sum:'#e94560', eq:'#0ea5e9', lt:'#f59e0b', gt:'#10b981', neq:'#8b5cf6'
+};
+
+const CONFIGS = {
+  easy:   { rows:5, cols:5, dominoes:5 },
+  medium: { rows:6, cols:7, dominoes:7 },
+  hard:   { rows:8, cols:9, dominoes:12 },
+};
+
+// ════════════════════════════════════
+//  SEEDED PRNG (mulberry32)
+// ════════════════════════════════════
+let _seed = 0;
+function seedRandom(s) {
+  _seed = s | 0;
+}
+function rand(n) {
+  _seed = (_seed + 0x6D2B79F5) | 0;
+  let t = Math.imul(_seed ^ (_seed >>> 15), 1 | _seed);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  const r = ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  return Math.floor(r * n);
+}
+function shuffle(a) { for(let i=a.length-1;i>0;i--){const j=rand(i+1);[a[i],a[j]]=[a[j],a[i]];} return a; }
+function generateSeed() { return Math.floor(Math.random() * 2147483647); }
+function key(r,c) { return `${r},${c}`; }
+function getCellSize() {
+  return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-size'));
+}
+
+// ════════════════════════════════════
+//  DOT RENDERING
+// ════════════════════════════════════
+function dotPositions(n) {
+  const pos = {
+    0: [],
+    1: [[1,1]],
+    2: [[0,2],[2,0]],
+    3: [[0,2],[1,1],[2,0]],
+    4: [[0,0],[0,2],[2,0],[2,2]],
+    5: [[0,0],[0,2],[1,1],[2,0],[2,2]],
+    6: [[0,0],[0,2],[1,0],[1,2],[2,0],[2,2]],
+  };
+  return pos[n] || pos[6];
+}
+
+function renderDots(value) {
+  const container = document.createElement('div');
+  container.className = 'dot-container';
+  const positions = dotPositions(value);
+  for(let r=0;r<3;r++) for(let c=0;c<3;c++){
+    const d = document.createElement('div');
+    d.className = positions.some(p=>p[0]===r&&p[1]===c) ? 'dot' : 'dot-spacer';
+    container.appendChild(d);
+  }
+  return container;
+}
+
+// ════════════════════════════════════
+//  TIMER
+// ════════════════════════════════════
+function startTimer() {
+  stopTimer();
+  elapsedSeconds = 0;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    if(!gameWon) { elapsedSeconds++; updateTimerDisplay(); }
+  }, 1000);
+}
+function stopTimer() {
+  if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+function updateTimerDisplay() {
+  const m = Math.floor(elapsedSeconds / 60);
+  const s = elapsedSeconds % 60;
+  document.getElementById('timer').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+}
+
+// ════════════════════════════════════
+//  PUZZLE GENERATION
+// ════════════════════════════════════
+function generatePuzzle() {
+  seedRandom(currentSeed);
+  const cfg = CONFIGS[difficulty];
+  boardRows = cfg.rows;
+  boardCols = cfg.cols;
+
+  // 1) Create grid, carve edges for irregular shapes
+  boardData = Array.from({length:boardRows}, ()=>
+    Array.from({length:boardCols}, ()=>({slot:true, region:-1, dominoId:null, value:null}))
+  );
+
+  if(difficulty !== 'easy') {
+    const carveTarget = difficulty === 'medium' ? 4 : 10;
+    let carved = 0;
+    const edges = [];
+    for(let r=0;r<boardRows;r++) for(let c=0;c<boardCols;c++) {
+      if(r===0||r===boardRows-1||c===0||c===boardCols-1) edges.push([r,c]);
+    }
+    shuffle(edges);
+    for(const [r,c] of edges) {
+      if(carved >= carveTarget) break;
+      if(!boardData[r][c]) continue;
+      boardData[r][c] = null;
+      carved++;
+    }
+  }
+
+  // 2) Collect slots
+  let slots = [];
+  for(let r=0;r<boardRows;r++) for(let c=0;c<boardCols;c++) {
+    if(boardData[r][c]) slots.push([r,c]);
+  }
+
+  // 3) Place domino solution — only use right and down to ensure consistent a/b mapping
+  shuffle(slots);
+  const placed = [];
+  const usedCells = new Set();
+
+  for(let i=0; i<slots.length && placed.length < cfg.dominoes; i++) {
+    const [r,c] = slots[i];
+    if(usedCells.has(key(r,c))) continue;
+
+    const dirs = shuffle([{dr:0,dc:1},{dr:1,dc:0}]);
+    for(const {dr,dc} of dirs) {
+      const nr = r+dr, nc = c+dc;
+      if(nr>=0 && nr<boardRows && nc>=0 && nc<boardCols
+        && boardData[nr]?.[nc] && !usedCells.has(key(nr,nc))) {
+        const a = rand(7), b = rand(7);
+        placed.push({r1:r, c1:c, r2:nr, c2:nc, a, b});
+        usedCells.add(key(r,c));
+        usedCells.add(key(nr,nc));
+        break;
+      }
+    }
+  }
+
+  // 4) Trim to only domino-covered cells
+  const validCells = new Set();
+  for(const p of placed) {
+    validCells.add(key(p.r1,p.c1));
+    validCells.add(key(p.r2,p.c2));
+  }
+  for(let r=0;r<boardRows;r++) for(let c=0;c<boardCols;c++) {
+    if(!validCells.has(key(r,c))) boardData[r][c] = null;
+    else boardData[r][c] = {slot:true, region:-1, dominoId:null, value:null};
+  }
+
+  // 5) Build contiguous regions — start each domino as own region, then merge adjacent
+  const cellToRegion = {};
+  regions = [];
+  let regionIdx = 0;
+
+  for(const p of placed) {
+    const ri = regionIdx++;
+    regions.push({
+      cells:[[p.r1,p.c1],[p.r2,p.c2]],
+      constraint:null,
+      color:REGION_COLORS[ri % REGION_COLORS.length]
+    });
+    cellToRegion[key(p.r1,p.c1)] = ri;
+    cellToRegion[key(p.r2,p.c2)] = ri;
+  }
+
+  // Merge until we hit target region count
+  const targetRegions = Math.max(2, Math.ceil(placed.length * 0.6));
+  let attempts = 0;
+  while(regions.filter(r=>r.cells.length>0).length > targetRegions && attempts < 300) {
+    attempts++;
+    const active = regions.map((r,i)=>({idx:i,r})).filter(x=>x.r.cells.length>0);
+    const pick = active[rand(active.length)];
+    const ri = pick.idx;
+
+    const neighborRegions = new Set();
+    for(const [cr,cc] of pick.r.cells) {
+      for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
+        const nk = key(cr+dr,cc+dc);
+        if(cellToRegion[nk] !== undefined && cellToRegion[nk] !== ri) {
+          neighborRegions.add(cellToRegion[nk]);
+        }
+      }
+    }
+    if(neighborRegions.size === 0) continue;
+
+    const targetRi = [...neighborRegions][rand(neighborRegions.size)];
+    if(pick.r.cells.length + regions[targetRi].cells.length > 6) continue;
+
+    for(const cell of regions[targetRi].cells) {
+      pick.r.cells.push(cell);
+      cellToRegion[key(cell[0],cell[1])] = ri;
+    }
+    regions[targetRi].cells = [];
+  }
+
+  regions = regions.filter(r => r.cells.length > 0);
+
+  // Re-index
+  const reindex = {};
+  regions.forEach((reg,i) => {
+    reg.color = REGION_COLORS[i % REGION_COLORS.length];
+    reg.cells.forEach(([r,c]) => { reindex[key(r,c)] = i; });
+  });
+  for(let r=0;r<boardRows;r++) for(let c=0;c<boardCols;c++) {
+    if(boardData[r][c]) boardData[r][c].region = reindex[key(r,c)] ?? -1;
+  }
+
+  // 6) Assign constraints from solution values
+  const solVals = {};
+  for(const p of placed) {
+    solVals[key(p.r1,p.c1)] = p.a;
+    solVals[key(p.r2,p.c2)] = p.b;
+  }
+
+  for(const reg of regions) {
+    const vals = reg.cells.map(([r,c]) => {
+      const v = solVals[key(r,c)];
+      return v !== undefined ? v : 0;
+    });
+    const sum = vals.reduce((a,b)=>a+b,0);
+    const allUnique = new Set(vals).size === vals.length;
+    const allEqual = vals.every(v => v === vals[0]);
+
+    const options = [];
+    options.push({type:'sum', value:sum, label:`${sum}`});
+
+    if(sum > 1) {
+      const t = Math.max(0, sum - 1 - rand(Math.min(sum, 4)));
+      options.push({type:'gt', value:t, label:`>${t}`});
+    }
+
+    const lt = sum + 1 + rand(5);
+    options.push({type:'lt', value:lt, label:`<${lt}`});
+
+    if(reg.cells.length === 2 && allEqual) {
+      options.push({type:'eq', label:'='});
+    }
+
+    if(allUnique && vals.length >= 2) {
+      options.push({type:'neq', label:'≠'});
+    }
+
+    reg.constraint = options[rand(options.length)];
+  }
+
+  // 7) Create domino pieces
+  dominoes = placed.map((p,i) => ({
+    id: i,
+    a: p.a,
+    b: p.b,
+    orientation: Math.random() < 0.5 ? 'h' : 'v',
+    placed: false,
+    placedAt: null,
+  }));
+  shuffle(dominoes);
+}
+
+// ════════════════════════════════════
+//  CONSTRAINT VALIDATION (real-time)
+// ════════════════════════════════════
+function checkConstraint(reg) {
+  const con = reg.constraint;
+  if(!con) return { status:'none' };
+
+  const vals = [];
+  let allFilled = true;
+  for(const [r,c] of reg.cells) {
+    const cell = boardData[r]?.[c];
+    if(cell && cell.value !== null && cell.value !== undefined) {
+      vals.push(cell.value);
+    } else {
+      allFilled = false;
+    }
+  }
+
+  if(vals.length === 0) return { status:'pending' };
+
+  const sum = vals.reduce((a,b)=>a+b,0);
+
+  // Early violation detection on partial fills
+  if(!allFilled) {
+    if(con.type === 'sum') {
+      // Can't exceed target with remaining cells (each 0-6)
+      const remaining = reg.cells.length - vals.length;
+      if(sum > con.value) return { status:'violated' };
+      // Can't possibly reach target even with max remaining
+      if(sum + remaining * 6 < con.value) return { status:'violated' };
+    }
+    if(con.type === 'lt' && sum >= con.value) return { status:'violated' };
+    if(con.type === 'neq' && new Set(vals).size !== vals.length) return { status:'violated' };
+    if(con.type === 'eq' && vals.length >= 2 && !vals.every(v=>v===vals[0])) return { status:'violated' };
+    return { status:'pending' };
+  }
+
+  // Full check
+  if(con.type === 'sum' && sum !== con.value) return { status:'violated' };
+  if(con.type === 'gt' && !(sum > con.value)) return { status:'violated' };
+  if(con.type === 'lt' && !(sum < con.value)) return { status:'violated' };
+  if(con.type === 'eq' && !vals.every(v=>v===vals[0])) return { status:'violated' };
+  if(con.type === 'neq' && new Set(vals).size !== vals.length) return { status:'violated' };
+
+  return { status:'satisfied' };
+}
+
+function getAllViolations() {
+  const violatedCells = new Set();
+  const regionStatuses = [];
+
+  for(let i=0;i<regions.length;i++) {
+    const result = checkConstraint(regions[i]);
+    regionStatuses.push(result.status);
+    if(result.status === 'violated') {
+      for(const [r,c] of regions[i].cells) {
+        if(boardData[r][c]?.value !== null && boardData[r][c]?.value !== undefined) {
+          violatedCells.add(key(r,c));
+        }
+      }
+    }
+  }
+
+  return { violatedCells, regionStatuses };
+}
+
+// ════════════════════════════════════
+//  RENDERING
+// ════════════════════════════════════
+function fitCellSize() {
+  // Compute max cell size that fits the board within the viewport width
+  // Account for: app padding (16*2), board-container padding (12*2), grid gaps, badge overflow (~30px)
+  const viewportW = window.innerWidth;
+  const padding = 32 + 24 + 30; // app padding + container padding + badge room
+  const gap = 2;
+  const availableW = viewportW - padding;
+  const maxFromWidth = Math.floor((availableW - (boardCols - 1) * gap) / boardCols);
+
+  // Also consider height — leave room for header/controls/tray (~280px)
+  const viewportH = window.innerHeight;
+  const headerRoom = 280;
+  const availableH = viewportH - headerRoom;
+  const maxFromHeight = Math.floor((availableH - (boardRows - 1) * gap) / boardRows);
+
+  const ideal = Math.min(maxFromWidth, maxFromHeight);
+  const clamped = Math.max(28, Math.min(56, ideal)); // min 28px, max 56px
+
+  document.documentElement.style.setProperty('--cell-size', clamped + 'px');
+
+  // Scale dots proportionally
+  const dotSize = Math.max(4, Math.round(clamped * 0.14));
+  const dotContainerSize = Math.max(20, Math.round(clamped * 0.64));
+  document.documentElement.style.setProperty('--dot-size', dotSize + 'px');
+  document.documentElement.style.setProperty('--dot-container-size', dotContainerSize + 'px');
+}
+
+function render() {
+  fitCellSize();
+  renderBoard();
+  renderTray();
+  renderBadges();
+  updateStats();
+  syncWidths();
+}
+
+function syncWidths() {
+  // Make tray match the board container's width
+  requestAnimationFrame(() => {
+    const container = document.querySelector('.board-container');
+    const tray = document.getElementById('tray');
+    if(container && tray) {
+      const w = container.offsetWidth;
+      tray.style.width = w + 'px';
+      tray.style.maxWidth = w + 'px';
+    }
+  });
+}
+
+function renderBoard() {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  board.style.gridTemplateColumns = `repeat(${boardCols}, var(--cell-size))`;
+  board.style.gridTemplateRows = `repeat(${boardRows}, var(--cell-size))`;
+
+  const { violatedCells } = getAllViolations();
+
+  for(let r=0;r<boardRows;r++) {
+    for(let c=0;c<boardCols;c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.row = r;
+      cell.dataset.col = c;
+
+      const data = boardData[r][c];
+      if(!data) {
+        cell.classList.add('empty');
+      } else if(data.dominoId !== null) {
+        cell.classList.add('filled');
+        const regionColor = regions[data.region]?.color;
+        if(regionColor) cell.style.background = regionColor.bg;
+        cell.appendChild(renderDots(data.value));
+
+        if(violatedCells.has(key(r,c))) cell.classList.add('violation');
+
+        cell.addEventListener('dblclick', ()=> removeDomino(data.dominoId));
+        let lastTap = 0;
+        cell.addEventListener('touchend', (e) => {
+          const now = Date.now();
+          if(now - lastTap < 350) { e.preventDefault(); removeDomino(data.dominoId); }
+          lastTap = now;
+        });
+      } else {
+        cell.classList.add('slot');
+        const regionColor = regions[data.region]?.color;
+        if(regionColor) {
+          cell.style.borderColor = regionColor.border;
+          cell.style.background = regionColor.bg;
+        }
+      }
+
+      // Region borders
+      if(data && data.region >= 0) {
+        const reg = data.region;
+        const color = regions[reg]?.color?.border || '';
+        if(r===0 || !boardData[r-1]?.[c] || boardData[r-1][c]?.region !== reg) {
+          cell.style.borderTopColor = color; cell.classList.add('region-border-top');
+        }
+        if(r===boardRows-1 || !boardData[r+1]?.[c] || boardData[r+1][c]?.region !== reg) {
+          cell.style.borderBottomColor = color; cell.classList.add('region-border-bottom');
+        }
+        if(c===0 || !boardData[r][c-1] || boardData[r][c-1]?.region !== reg) {
+          cell.style.borderLeftColor = color; cell.classList.add('region-border-left');
+        }
+        if(c===boardCols-1 || !boardData[r][c+1] || boardData[r][c+1]?.region !== reg) {
+          cell.style.borderRightColor = color; cell.classList.add('region-border-right');
+        }
+      }
+
+      board.appendChild(cell);
+    }
+  }
+}
+
+function renderBadges() {
+  const container = document.getElementById('badges');
+  container.innerHTML = '';
+  const { regionStatuses } = getAllViolations();
+  const cellSize = getCellSize();
+  const gap = 2;
+
+  for(let i=0;i<regions.length;i++) {
+    const reg = regions[i];
+    if(!reg.constraint) continue;
+
+    let maxR=-1, maxC=-1;
+    for(const [r,c] of reg.cells) {
+      if(r > maxR || (r === maxR && c > maxC)) { maxR=r; maxC=c; }
+    }
+
+    const badge = document.createElement('div');
+    badge.className = 'constraint-badge';
+    badge.textContent = reg.constraint.label;
+    badge.style.backgroundColor = CONSTRAINT_COLORS[reg.constraint.type] || '#555';
+
+    const status = regionStatuses[i];
+    if(status === 'satisfied') badge.classList.add('satisfied');
+    if(status === 'violated') badge.classList.add('violated');
+
+    badge.style.left = (maxC * (cellSize + gap) + cellSize - 4) + 'px';
+    badge.style.top = (maxR * (cellSize + gap) + cellSize - 8) + 'px';
+    container.appendChild(badge);
+  }
+}
+
+function renderTray() {
+  const tray = document.getElementById('tray');
+  tray.innerHTML = '<div class="tray-label">Dominoes</div>';
+
+  const unplaced = dominoes.filter(d => !d.placed);
+  if(unplaced.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'tray-empty';
+    empty.textContent = 'All dominoes placed!';
+    tray.appendChild(empty);
+    return;
+  }
+  unplaced.forEach(dom => tray.appendChild(createDominoElement(dom)));
+}
+
+function renderLegend() {
+  const legend = document.getElementById('legend');
+  legend.innerHTML = '';
+  const types = [
+    {type:'sum', ex:'7', desc:'Sum equals'},
+    {type:'gt', ex:'>3', desc:'Greater than'},
+    {type:'lt', ex:'<5', desc:'Less than'},
+    {type:'eq', ex:'=', desc:'Values equal'},
+    {type:'neq', ex:'≠', desc:'All different'},
+  ];
+  for(const t of types) {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    const swatch = document.createElement('div');
+    swatch.className = 'legend-swatch';
+    swatch.style.background = CONSTRAINT_COLORS[t.type];
+    swatch.textContent = t.ex;
+    item.appendChild(swatch);
+    const label = document.createElement('span');
+    label.textContent = t.desc;
+    item.appendChild(label);
+    legend.appendChild(item);
+  }
+}
+
+function updateStats() {
+  document.getElementById('moveCount').textContent = moveCount;
+  document.getElementById('placedCount').textContent = dominoes.filter(d=>d.placed).length;
+  document.getElementById('totalCount').textContent = dominoes.length;
+}
+
+function createDominoElement(dom) {
+  const el = document.createElement('div');
+  el.className = `domino ${dom.orientation === 'h' ? 'horizontal' : 'vertical'}`;
+  el.dataset.id = dom.id;
+
+  const halfA = document.createElement('div');
+  halfA.className = 'half';
+  halfA.appendChild(renderDots(dom.a));
+
+  const halfB = document.createElement('div');
+  halfB.className = 'half';
+  halfB.appendChild(renderDots(dom.b));
+
+  el.appendChild(halfA);
+  el.appendChild(halfB);
+
+  const hint = document.createElement('div');
+  hint.className = 'rotate-hint';
+  hint.textContent = '↻';
+  el.appendChild(hint);
+
+  el.addEventListener('mousedown', (e) => startDrag(e, dom));
+  el.addEventListener('touchstart', (e) => startDrag(e, dom), {passive: false});
+
+  return el;
+}
+
+// ════════════════════════════════════
+//  DRAG AND DROP
+// ════════════════════════════════════
+function startDrag(e, dom) {
+  if(dom.placed || gameWon) return;
+  e.preventDefault();
+  e.stopPropagation();
+
+  const touch = e.touches ? e.touches[0] : e;
+  const el = e.currentTarget;
+  const rect = el.getBoundingClientRect();
+
+  const isTouch = !!e.touches;
+  // On touch, lift the domino above the finger so it's visible
+  const offsetY = isTouch ? rect.height + 30 : (touch.clientY - rect.top);
+
+  dragState = {
+    dom,
+    offsetX: touch.clientX - rect.left,
+    offsetY,
+    el: el.cloneNode(true),
+    startX: touch.clientX,
+    startY: touch.clientY,
+    startTime: Date.now(),
+    moved: false,
+  };
+
+  dragState.el.classList.add('dragging');
+  dragState.el.style.width = rect.width + 'px';
+  dragState.el.style.left = (touch.clientX - dragState.offsetX) + 'px';
+  dragState.el.style.top = (touch.clientY - dragState.offsetY) + 'px';
+  document.body.appendChild(dragState.el);
+
+  el.style.opacity = '0.3';
+  dragState.sourceEl = el;
+}
+
+function onDragMove(e) {
+  if(!dragState) return;
+  // Only prevent scroll when actively dragging a domino
+  if(e.cancelable) e.preventDefault();
+  const touch = e.touches ? e.touches[0] : e;
+
+  if(Math.abs(touch.clientX - dragState.startX) > 5 ||
+     Math.abs(touch.clientY - dragState.startY) > 5) {
+    dragState.moved = true;
+  }
+
+  dragState.el.style.left = (touch.clientX - dragState.offsetX) + 'px';
+  dragState.el.style.top = (touch.clientY - dragState.offsetY) + 'px';
+
+  clearHighlights();
+  // Use center of the dragged domino to determine target
+  const domRect = dragState.el.getBoundingClientRect();
+  const cx = domRect.left + domRect.width * 0.25; // bias toward first cell
+  const cy = domRect.top + domRect.height * 0.25;
+  const target = getCellUnderPoint(cx, cy);
+
+  if(target) {
+    const [r,c] = target;
+    const cells = getDominoCells(r, c, dragState.dom);
+    if(cells) {
+      const valid = canPlace(cells);
+      cells.forEach(([cr,cc]) => {
+        const cellEl = document.querySelector(`.cell[data-row="${cr}"][data-col="${cc}"]`);
+        if(cellEl) cellEl.classList.add(valid ? 'highlight-valid' : 'highlight-invalid');
+      });
+    }
+  }
+}
+
+function onDragEnd(e) {
+  if(!dragState) return;
+
+  clearHighlights();
+  dragState.el.remove();
+  if(dragState.sourceEl) dragState.sourceEl.style.opacity = '1';
+
+  // Tap → rotate
+  if(!dragState.moved || Date.now() - dragState.startTime < 180) {
+    const dom = dragState.dom;
+    dom.orientation = dom.orientation === 'h' ? 'v' : 'h';
+    dragState = null;
+    renderTray();
+    return;
+  }
+
+  // Try placement using center of dragged domino ghost
+  const touch = e.changedTouches ? e.changedTouches[0] : e;
+  // Reconstruct where the domino ghost was
+  const ghostLeft = touch.clientX - dragState.offsetX;
+  const ghostTop = touch.clientY - dragState.offsetY;
+  const cellSize = getCellSize();
+  const ghostW = dragState.dom.orientation === 'h' ? cellSize * 2 + 8 : cellSize + 6;
+  const ghostH = dragState.dom.orientation === 'v' ? cellSize * 2 + 8 : cellSize + 6;
+  const cx = ghostLeft + ghostW * 0.25;
+  const cy = ghostTop + ghostH * 0.25;
+
+  const target = getCellUnderPoint(cx, cy);
+  if(target) {
+    const [r,c] = target;
+    const dom = dragState.dom;
+    const cells = getDominoCells(r, c, dom);
+    if(cells && canPlace(cells)) {
+      placeDomino(dom, cells);
+      moveCount++;
+      undoStack.push({type:'place', dominoId:dom.id});
+    }
+  }
+
+  dragState = null;
+  render();
+  checkWin();
+}
+
+function getCellUnderPoint(x, y) {
+  const board = document.getElementById('board');
+  const rect = board.getBoundingClientRect();
+  const cellSize = getCellSize();
+  const gap = 2;
+  const step = cellSize + gap;
+
+  const col = Math.floor((x - rect.left) / step);
+  const row = Math.floor((y - rect.top) / step);
+
+  if(row >= 0 && row < boardRows && col >= 0 && col < boardCols) return [row, col];
+  return null;
+}
+
+function getDominoCells(r, c, dom) {
+  let r2, c2;
+  if(dom.orientation === 'h') { r2 = r; c2 = c + 1; }
+  else { r2 = r + 1; c2 = c; }
+
+  if(r2 >= 0 && r2 < boardRows && c2 >= 0 && c2 < boardCols) {
+    return [[r, c, dom.a], [r2, c2, dom.b]];
+  }
+  return null;
+}
+
+function canPlace(cells) {
+  return cells.every(([r, c]) => {
+    const data = boardData[r]?.[c];
+    return data && data.dominoId === null && data.region >= 0;
+  });
+}
+
+function placeDomino(dom, cells) {
+  const [[r1,c1,va],[r2,c2,vb]] = cells;
+  boardData[r1][c1].dominoId = dom.id;
+  boardData[r1][c1].value = va;
+  boardData[r2][c2].dominoId = dom.id;
+  boardData[r2][c2].value = vb;
+  dom.placed = true;
+  dom.placedAt = [r1,c1,r2,c2];
+}
+
+function removeDomino(dominoId) {
+  if(gameWon) return;
+  const dom = dominoes.find(d => d.id === dominoId);
+  if(!dom || !dom.placed) return;
+  const [r1,c1,r2,c2] = dom.placedAt;
+  boardData[r1][c1].dominoId = null;
+  boardData[r1][c1].value = null;
+  boardData[r2][c2].dominoId = null;
+  boardData[r2][c2].value = null;
+  dom.placed = false;
+  dom.placedAt = null;
+  moveCount++;
+  undoStack.push({type:'remove', dominoId: dom.id, at:[r1,c1,r2,c2], a:dom.a, b:dom.b});
+  render();
+}
+
+function clearHighlights() {
+  document.querySelectorAll('.highlight-valid').forEach(c => c.classList.remove('highlight-valid'));
+  document.querySelectorAll('.highlight-invalid').forEach(c => c.classList.remove('highlight-invalid'));
+}
+
+// ════════════════════════════════════
+//  UNDO
+// ════════════════════════════════════
+function undoLast() {
+  if(gameWon || undoStack.length === 0) return;
+  const action = undoStack.pop();
+
+  if(action.type === 'place') {
+    const dom = dominoes.find(d => d.id === action.dominoId);
+    if(dom && dom.placed) {
+      const [r1,c1,r2,c2] = dom.placedAt;
+      boardData[r1][c1].dominoId = null;
+      boardData[r1][c1].value = null;
+      boardData[r2][c2].dominoId = null;
+      boardData[r2][c2].value = null;
+      dom.placed = false;
+      dom.placedAt = null;
+    }
+  } else if(action.type === 'remove') {
+    const dom = dominoes.find(d => d.id === action.dominoId);
+    const [r1,c1,r2,c2] = action.at;
+    if(dom && !dom.placed && canPlace([[r1,c1,dom.a],[r2,c2,dom.b]])) {
+      boardData[r1][c1].dominoId = dom.id;
+      boardData[r1][c1].value = dom.a;
+      boardData[r2][c2].dominoId = dom.id;
+      boardData[r2][c2].value = dom.b;
+      dom.placed = true;
+      dom.placedAt = [r1,c1,r2,c2];
+    }
+  }
+
+  render();
+}
+
+// ════════════════════════════════════
+//  WIN CHECK
+// ════════════════════════════════════
+function checkWin() {
+  if(dominoes.some(d => !d.placed)) return;
+
+  for(const reg of regions) {
+    const result = checkConstraint(reg);
+    if(result.status !== 'satisfied' && result.status !== 'none') return;
+  }
+
+  gameWon = true;
+  stopTimer();
+  setTimeout(() => {
+    const m = Math.floor(elapsedSeconds / 60);
+    const s = elapsedSeconds % 60;
+    document.getElementById('winStats').textContent =
+      `${moveCount} moves in ${m}:${s.toString().padStart(2,'0')}`;
+    document.getElementById('winOverlay').style.display = 'flex';
+  }, 400);
+}
+
+// ════════════════════════════════════
+//  GAME CONTROLS
+// ════════════════════════════════════
+function setDifficulty(d) {
+  difficulty = d;
+  document.querySelectorAll('.btn-diff').forEach(b =>
+    b.classList.toggle('active', b.dataset.diff === d)
+  );
+  newGame();
+}
+
+function newGame(seed) {
+  gameWon = false;
+  moveCount = 0;
+  undoStack = [];
+  currentSeed = seed !== undefined ? seed : generateSeed();
+  document.getElementById('winOverlay').style.display = 'none';
+  // Close share panel on new game
+  document.getElementById('sharePanel').classList.remove('open');
+  document.getElementById('shareToggle').classList.remove('active');
+  generatePuzzle();
+  render();
+  renderLegend();
+  updateShareLink();
+  startTimer();
+}
+
+function clearBoard() {
+  if(gameWon) return;
+  const hadPlaced = dominoes.some(d => d.placed);
+  for(const dom of dominoes) {
+    if(dom.placed) {
+      const [r1,c1,r2,c2] = dom.placedAt;
+      boardData[r1][c1].dominoId = null;
+      boardData[r1][c1].value = null;
+      boardData[r2][c2].dominoId = null;
+      boardData[r2][c2].value = null;
+      dom.placed = false;
+      dom.placedAt = null;
+    }
+  }
+  if(hadPlaced) { moveCount++; undoStack = []; }
+  render();
+}
+
+// ════════════════════════════════════
+//  HELP & SHARE TOGGLES
+// ════════════════════════════════════
+function toggleHelp() {
+  const panel = document.getElementById('helpPanel');
+  const btn = document.getElementById('helpToggle');
+  panel.classList.toggle('open');
+  btn.classList.toggle('active');
+  // Close share if open
+  document.getElementById('sharePanel').classList.remove('open');
+  document.getElementById('shareToggle').classList.remove('active');
+}
+
+function toggleShare() {
+  const panel = document.getElementById('sharePanel');
+  const btn = document.getElementById('shareToggle');
+  panel.classList.toggle('open');
+  btn.classList.toggle('active');
+  // Close help if open
+  document.getElementById('helpPanel').classList.remove('open');
+  document.getElementById('helpToggle').classList.remove('active');
+  // Select the text for easy copying
+  if(panel.classList.contains('open')) {
+    setTimeout(() => document.getElementById('shareInput').select(), 100);
+  }
+}
+
+function updateShareLink() {
+  const base = window.location.origin + window.location.pathname;
+  const url = `${base}?d=${difficulty}&s=${currentSeed}`;
+  document.getElementById('shareInput').value = url;
+  document.getElementById('shareHint').textContent = 'Send this link to a friend to challenge them!';
+  document.getElementById('shareHint').classList.remove('copied');
+}
+
+function copyShareLink() {
+  const input = document.getElementById('shareInput');
+  input.select();
+  input.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(input.value).then(() => {
+    const hint = document.getElementById('shareHint');
+    hint.textContent = 'Copied to clipboard!';
+    hint.classList.add('copied');
+    setTimeout(() => {
+      hint.textContent = 'Send this link to a friend to challenge them!';
+      hint.classList.remove('copied');
+    }, 2500);
+  }).catch(() => {
+    // Fallback: execCommand
+    try { document.execCommand('copy'); } catch(e) {}
+  });
+}
+
+function loadFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const d = params.get('d');
+  const s = params.get('s');
+  if(d && ['easy','medium','hard'].includes(d) && s) {
+    difficulty = d;
+    document.querySelectorAll('.btn-diff').forEach(b =>
+      b.classList.toggle('active', b.dataset.diff === d)
+    );
+    newGame(parseInt(s, 10));
+    return true;
+  }
+  return false;
+}
+
+// ════════════════════════════════════
+//  EVENT LISTENERS
+// ════════════════════════════════════
+document.addEventListener('mousemove', onDragMove);
+document.addEventListener('mouseup', onDragEnd);
+document.addEventListener('touchmove', onDragMove, {passive: false});
+document.addEventListener('touchend', onDragEnd);
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => render(), 150);
+});
+
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// ════════════════════════════════════
+//  INIT
+// ════════════════════════════════════
+if(!loadFromURL()) {
+  newGame();
+}
+</script>
+</body>
+</html>
