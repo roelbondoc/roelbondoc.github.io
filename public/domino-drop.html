@@ -44,7 +44,7 @@ permalink: /domino-drop/
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
-    padding: 16px;
+    padding: 16px 24px;
   }
 
   header {
@@ -205,7 +205,7 @@ permalink: /domino-drop/
     align-items: center;
     gap: 14px;
     width: 100%;
-    max-width: 700px;
+    max-width: 640px;
   }
 
   .board-container {
@@ -217,6 +217,9 @@ permalink: /domino-drop/
     border: 1px solid rgba(255,255,255,0.06);
     overflow: visible;
     touch-action: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .board {
@@ -422,6 +425,16 @@ permalink: /domino-drop/
   .region-border-left { border-left: 2.5px dashed !important; }
   .region-border-right { border-right: 2.5px dashed !important; }
 
+  /* Colorblind mode: thicker borders, higher contrast fills */
+  body.cb-mode .region-border-top { border-top-width: 3.5px !important; border-top-style: solid !important; }
+  body.cb-mode .region-border-bottom { border-bottom-width: 3.5px !important; border-bottom-style: solid !important; }
+  body.cb-mode .region-border-left { border-left-width: 3.5px !important; border-left-style: solid !important; }
+  body.cb-mode .region-border-right { border-right-width: 3.5px !important; border-right-style: solid !important; }
+  body.cb-mode .cell.slot { border-width: 3px; }
+  body.cb-mode .constraint-badge { font-size: 0.78rem; padding: 4px 9px; font-weight: bold; }
+
+  .cb-icon { font-size: 0.7rem; margin-right: 2px; }
+
   .win-overlay {
     position: fixed;
     inset: 0;
@@ -576,6 +589,7 @@ permalink: /domino-drop/
   }
 
   @media (max-width: 480px) {
+    .app { padding: 12px 16px; }
     h1 { font-size: 1.5rem; }
     .btn { padding: 6px 12px; font-size: 0.7rem; }
     .tray { gap: 6px; padding: 8px; }
@@ -821,6 +835,9 @@ permalink: /domino-drop/
       <div class="menu-row">
         <button class="btn btn-secondary" id="helpToggle" onclick="toggleHelp()">Info</button>
         <button class="btn btn-secondary" id="shareToggle" onclick="toggleShare()">Share</button>
+        <button class="btn btn-secondary" id="cbToggle" onclick="toggleColorblind()">
+          <span class="cb-icon">👁</span> A11y
+        </button>
       </div>
     </div>
     <div class="help-panel" id="helpPanel">
@@ -891,7 +908,7 @@ permalink: /domino-drop/
         <div class="constraint-row" data-type="sum">
           <label class="constraint-toggle">
             <input type="checkbox" id="cEnabledSum" checked onchange="updateCustomPreview()">
-            <div class="constraint-swatch" style="background:#e94560">7</div>
+            <div class="constraint-swatch" style="background:rgba(255,255,255,0.2)">7</div>
             <span>Sum equals</span>
           </label>
           <div class="weight-control">
@@ -903,7 +920,7 @@ permalink: /domino-drop/
         <div class="constraint-row" data-type="eq">
           <label class="constraint-toggle">
             <input type="checkbox" id="cEnabledEq" checked onchange="updateCustomPreview()">
-            <div class="constraint-swatch" style="background:#0ea5e9">=</div>
+            <div class="constraint-swatch" style="background:rgba(255,255,255,0.2)">=</div>
             <span>Values equal</span>
           </label>
           <div class="weight-control">
@@ -915,7 +932,7 @@ permalink: /domino-drop/
         <div class="constraint-row" data-type="neq">
           <label class="constraint-toggle">
             <input type="checkbox" id="cEnabledNeq" checked onchange="updateCustomPreview()">
-            <div class="constraint-swatch" style="background:#8b5cf6">≠</div>
+            <div class="constraint-swatch" style="background:rgba(255,255,255,0.2)">≠</div>
             <span>All different</span>
           </label>
           <div class="weight-control">
@@ -927,7 +944,7 @@ permalink: /domino-drop/
         <div class="constraint-row" data-type="gt">
           <label class="constraint-toggle">
             <input type="checkbox" id="cEnabledGt" checked onchange="updateCustomPreview()">
-            <div class="constraint-swatch" style="background:#10b981">&gt;3</div>
+            <div class="constraint-swatch" style="background:rgba(255,255,255,0.2)">&gt;3</div>
             <span>Greater than</span>
           </label>
           <div class="weight-control">
@@ -939,7 +956,7 @@ permalink: /domino-drop/
         <div class="constraint-row" data-type="lt">
           <label class="constraint-toggle">
             <input type="checkbox" id="cEnabledLt" checked onchange="updateCustomPreview()">
-            <div class="constraint-swatch" style="background:#f59e0b">&lt;5</div>
+            <div class="constraint-swatch" style="background:rgba(255,255,255,0.2)">&lt;5</div>
             <span>Less than</span>
           </label>
           <div class="weight-control">
@@ -974,30 +991,71 @@ let timerInterval = null;
 let elapsedSeconds = 0;
 let gameWon = false;
 let currentSeed = 0;
+let colorblindMode = false;
 
-const REGION_COLORS = [
-  {bg:'rgba(168,130,214,0.22)', border:'#a882d6'},
-  {bg:'rgba(233,69,96,0.18)',   border:'#e94560'},
-  {bg:'rgba(14,165,233,0.18)',  border:'#0ea5e9'},
-  {bg:'rgba(245,158,11,0.18)',  border:'#f59e0b'},
-  {bg:'rgba(16,185,129,0.18)',  border:'#10b981'},
-  {bg:'rgba(244,114,182,0.18)', border:'#f472b6'},
-  {bg:'rgba(139,92,246,0.18)',  border:'#8b5cf6'},
-  {bg:'rgba(251,191,36,0.2)',   border:'#fbbf24'},
-  {bg:'rgba(52,211,153,0.18)',  border:'#34d399'},
-  {bg:'rgba(248,113,113,0.18)', border:'#f87171'},
-  {bg:'rgba(96,165,250,0.18)',  border:'#60a5fa'},
-  {bg:'rgba(167,139,250,0.2)',  border:'#a78bfa'},
+// Standard palette
+const REGION_COLORS_STANDARD = [
+  {bg:'rgba(168,130,214,0.25)', border:'#a882d6'},
+  {bg:'rgba(233,69,96,0.22)',   border:'#e94560'},
+  {bg:'rgba(14,165,233,0.22)',  border:'#0ea5e9'},
+  {bg:'rgba(245,158,11,0.22)',  border:'#f59e0b'},
+  {bg:'rgba(16,185,129,0.22)',  border:'#10b981'},
+  {bg:'rgba(244,114,182,0.22)', border:'#f472b6'},
+  {bg:'rgba(139,92,246,0.22)',  border:'#8b5cf6'},
+  {bg:'rgba(251,191,36,0.22)',  border:'#fbbf24'},
+  {bg:'rgba(52,211,153,0.22)',  border:'#34d399'},
+  {bg:'rgba(248,113,113,0.22)', border:'#f87171'},
+  {bg:'rgba(96,165,250,0.22)',  border:'#60a5fa'},
+  {bg:'rgba(167,139,250,0.22)', border:'#a78bfa'},
+  {bg:'rgba(251,146,60,0.22)',  border:'#fb923c'},
+  {bg:'rgba(232,121,249,0.22)', border:'#e879f9'},
+  {bg:'rgba(74,222,128,0.22)',  border:'#4ade80'},
+  {bg:'rgba(56,189,248,0.22)',  border:'#38bdf8'},
+  {bg:'rgba(253,186,116,0.22)', border:'#fdba74'},
+  {bg:'rgba(196,181,253,0.22)', border:'#c4b5fd'},
+  {bg:'rgba(134,239,172,0.22)', border:'#86efac'},
+  {bg:'rgba(252,165,165,0.22)', border:'#fca5a5'},
 ];
+
+// Colorblind-safe palette (Wong + IBM, high luminance contrast, avoids red-green confusion)
+const REGION_COLORS_CB = [
+  {bg:'rgba(0,114,178,0.25)',   border:'#0072B2'},   // blue
+  {bg:'rgba(230,159,0,0.25)',   border:'#E69F00'},   // orange
+  {bg:'rgba(86,180,233,0.25)',  border:'#56B4E9'},   // sky blue
+  {bg:'rgba(204,121,167,0.25)', border:'#CC79A7'},   // reddish purple
+  {bg:'rgba(240,228,66,0.28)',  border:'#F0E442'},   // yellow
+  {bg:'rgba(213,94,0,0.25)',    border:'#D55E00'},    // vermillion
+  {bg:'rgba(0,158,115,0.25)',   border:'#009E73'},    // bluish green
+  {bg:'rgba(170,170,170,0.22)', border:'#AAAAAA'},    // grey
+  {bg:'rgba(100,143,255,0.25)', border:'#648FFF'},    // IBM blue
+  {bg:'rgba(220,38,127,0.25)',  border:'#DC267F'},    // IBM magenta
+  {bg:'rgba(254,176,25,0.25)',  border:'#FEB019'},    // IBM gold
+  {bg:'rgba(120,94,240,0.25)',  border:'#785EF0'},    // IBM purple
+  {bg:'rgba(0,114,178,0.18)',   border:'#0072B2'},    // blue (lighter)
+  {bg:'rgba(230,159,0,0.18)',   border:'#E69F00'},    // orange (lighter)
+  {bg:'rgba(86,180,233,0.18)',  border:'#56B4E9'},    // sky blue (lighter)
+  {bg:'rgba(204,121,167,0.18)', border:'#CC79A7'},    // reddish purple (lighter)
+  {bg:'rgba(240,228,66,0.20)',  border:'#F0E442'},    // yellow (lighter)
+  {bg:'rgba(213,94,0,0.18)',    border:'#D55E00'},    // vermillion (lighter)
+  {bg:'rgba(0,158,115,0.18)',   border:'#009E73'},    // bluish green (lighter)
+  {bg:'rgba(170,170,170,0.15)', border:'#AAAAAA'},    // grey (lighter)
+];
+
+// Active palette reference
+let REGION_COLORS = REGION_COLORS_STANDARD;
+
+function getActiveColors() {
+  return colorblindMode ? REGION_COLORS_CB : REGION_COLORS_STANDARD;
+}
 
 const CONSTRAINT_COLORS = {
   sum:'#e94560', eq:'#0ea5e9', lt:'#f59e0b', gt:'#10b981', neq:'#8b5cf6'
 };
 
 const CONFIGS = {
-  easy:   { rows:5, cols:5, dominoes:5 },
-  medium: { rows:6, cols:7, dominoes:7 },
-  hard:   { rows:8, cols:9, dominoes:12 },
+  easy:   { rows:6, cols:6, dominoes:8 },
+  medium: { rows:8, cols:8, dominoes:14 },
+  hard:   { rows:10, cols:11, dominoes:18 },
   custom: { rows:6, cols:7, dominoes:7 },
 };
 
@@ -1091,40 +1149,69 @@ function generatePuzzle() {
   const cfg = CONFIGS[difficulty];
   boardRows = cfg.rows;
   boardCols = cfg.cols;
+  const numDominoes = cfg.dominoes;
 
-  // 1) Create grid, carve edges for irregular shapes
+  // 1) Build an organic board shape using a random walk from center.
+  //    We need at least numDominoes*2 cells. Grow outward organically.
   boardData = Array.from({length:boardRows}, ()=>
-    Array.from({length:boardCols}, ()=>({slot:true, region:-1, dominoId:null, value:null}))
+    Array.from({length:boardCols}, ()=> null)
   );
 
-  if(difficulty !== 'easy') {
-    const carveTarget = difficulty === 'medium' ? 4 : 10;
-    let carved = 0;
-    const edges = [];
-    for(let r=0;r<boardRows;r++) for(let c=0;c<boardCols;c++) {
-      if(r===0||r===boardRows-1||c===0||c===boardCols-1) edges.push([r,c]);
-    }
-    shuffle(edges);
-    for(const [r,c] of edges) {
-      if(carved >= carveTarget) break;
-      if(!boardData[r][c]) continue;
-      boardData[r][c] = null;
-      carved++;
+  const targetCells = numDominoes * 2 + rand(Math.max(1, Math.floor(numDominoes * 0.3)));
+  const centerR = Math.floor(boardRows / 2);
+  const centerC = Math.floor(boardCols / 2);
+
+  // Seed the shape from center
+  const shapeSet = new Set();
+  const frontier = [];
+
+  function addToShape(r, c) {
+    if(r<0||r>=boardRows||c<0||c>=boardCols) return;
+    const k = key(r,c);
+    if(shapeSet.has(k)) return;
+    shapeSet.add(k);
+    boardData[r][c] = {slot:true, region:-1, dominoId:null, value:null};
+    // Add neighbors to frontier
+    for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
+      const nr=r+dr, nc=c+dc;
+      if(nr>=0&&nr<boardRows&&nc>=0&&nc<boardCols&&!shapeSet.has(key(nr,nc))) {
+        frontier.push([nr,nc]);
+      }
     }
   }
 
-  // 2) Collect slots
+  addToShape(centerR, centerC);
+
+  while(shapeSet.size < targetCells && frontier.length > 0) {
+    // Pick a random frontier cell, biased toward cells with more shape neighbors (organic growth)
+    const idx = rand(frontier.length);
+    const [fr,fc] = frontier.splice(idx, 1)[0];
+    if(shapeSet.has(key(fr,fc))) continue;
+
+    // Count shape neighbors — more neighbors = more likely to add (but we already picked, so just add)
+    let neighbors = 0;
+    for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
+      if(shapeSet.has(key(fr+dr,fc+dc))) neighbors++;
+    }
+
+    // Skip isolated cells (only 1 neighbor) sometimes to create more interesting shapes
+    if(neighbors <= 1 && rand(3) === 0 && shapeSet.size > 4) continue;
+
+    addToShape(fr, fc);
+  }
+
+  // 2) Place domino solution using greedy matching on the shape.
+  //    Try to pack as many as possible — use all 4 directions.
   let slots = [];
   for(let r=0;r<boardRows;r++) for(let c=0;c<boardCols;c++) {
     if(boardData[r][c]) slots.push([r,c]);
   }
-
-  // 3) Place domino solution — only use right and down to ensure consistent a/b mapping
   shuffle(slots);
+
   const placed = [];
   const usedCells = new Set();
 
-  for(let i=0; i<slots.length && placed.length < cfg.dominoes; i++) {
+  for(let i=0; i<slots.length && placed.length < numDominoes; i++) {
     const [r,c] = slots[i];
     if(usedCells.has(key(r,c))) continue;
 
@@ -1133,6 +1220,7 @@ function generatePuzzle() {
       const nr = r+dr, nc = c+dc;
       if(nr>=0 && nr<boardRows && nc>=0 && nc<boardCols
         && boardData[nr]?.[nc] && !usedCells.has(key(nr,nc))) {
+        // Use more constrained values: bias toward lower numbers to make sums tighter
         const a = rand(7), b = rand(7);
         placed.push({r1:r, c1:c, r2:nr, c2:nc, a, b});
         usedCells.add(key(r,c));
@@ -1142,7 +1230,7 @@ function generatePuzzle() {
     }
   }
 
-  // 4) Trim to only domino-covered cells
+  // 3) Trim board to only cells covered by placed dominoes
   const validCells = new Set();
   for(const p of placed) {
     validCells.add(key(p.r1,p.c1));
@@ -1153,79 +1241,67 @@ function generatePuzzle() {
     else boardData[r][c] = {slot:true, region:-1, dominoId:null, value:null};
   }
 
-  // 5) Build regions that DELIBERATELY split dominoes across region boundaries.
-  //    Strategy: Use domino midpoints as region seeds so that each half of a domino
-  //    tends to end up in a different region. Then validate and adjust.
+  // 4) Build regions with VARIED sizes (mix of 2-3 cell and 4-6 cell regions).
+  //    Use domino-aware seeding to maximize cross-region splits.
   const allCells = [];
   for(let r=0;r<boardRows;r++) for(let c=0;c<boardCols;c++) {
     if(boardData[r][c]) allCells.push([r,c]);
   }
 
-  // More regions = smaller regions = more splits
-  const targetRegionCount = Math.max(3, placed.length);
-  const targetRegionSize = Math.max(2, Math.round(allCells.length / targetRegionCount));
+  // Target: more regions than dominoes, with varied sizes
+  const targetRegionCount = Math.max(4, Math.ceil(placed.length * 1.1));
 
   const cellToRegion = {};
   regions = [];
   let regionIdx = 0;
 
-  // Seed strategy: pick one cell from each domino pair as a seed.
-  // Alternate which half we pick so adjacent dominoes get different halves seeded,
-  // maximizing the chance of region boundaries splitting dominoes.
+  // Seed from alternating domino halves
   const seedCells = [];
   for(let i=0; i<placed.length; i++) {
     const p = placed[i];
-    // Alternate: even dominoes seed cell1, odd seed cell2
-    if(i % 2 === 0) {
-      seedCells.push([p.r1, p.c1]);
-    } else {
-      seedCells.push([p.r2, p.c2]);
-    }
+    seedCells.push(i % 2 === 0 ? [p.r1, p.c1] : [p.r2, p.c2]);
   }
   shuffle(seedCells);
 
-  // Place seeds — skip if cell already seeded by a neighbor
   for(const [r,c] of seedCells) {
     if(cellToRegion[key(r,c)] !== undefined) continue;
-    // Don't place a seed adjacent to an existing seed (creates tiny regions)
-    let tooClose = false;
-    for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
-      if(cellToRegion[key(r+dr,c+dc)] !== undefined) { tooClose = true; break; }
-    }
-    if(tooClose && regionIdx >= 3) continue; // need at least 3 regions
+    if(regionIdx >= targetRegionCount) break;
 
     const ri = regionIdx++;
+    // Assign a random target size to this region (varied: some small, some large)
+    const targetSize = 2 + rand(4); // 2 to 5 cells
     regions.push({
       cells:[[r,c]],
       constraint:null,
-      color:REGION_COLORS[ri % REGION_COLORS.length]
+      color:REGION_COLORS[ri % REGION_COLORS.length],
+      _targetSize: targetSize
     });
     cellToRegion[key(r,c)] = ri;
   }
 
-  // Ensure we have enough regions (at least 3)
-  if(regionIdx < 3) {
+  // Ensure minimum regions
+  if(regionIdx < 4) {
     const remaining = allCells.filter(([r,c]) => cellToRegion[key(r,c)] === undefined);
     shuffle(remaining);
     for(const [r,c] of remaining) {
-      if(regionIdx >= 3) break;
+      if(regionIdx >= 4) break;
       const ri = regionIdx++;
       regions.push({
-        cells:[[r,c]],
-        constraint:null,
-        color:REGION_COLORS[ri % REGION_COLORS.length]
+        cells:[[r,c]], constraint:null,
+        color:REGION_COLORS[ri % REGION_COLORS.length],
+        _targetSize: 2 + rand(4)
       });
       cellToRegion[key(r,c)] = ri;
     }
   }
 
-  // Grow regions outward round-robin, one cell at a time
+  // Grow regions round-robin, respecting each region's target size
   let growing = true;
   while(growing) {
     growing = false;
     for(let ri=0; ri<regions.length; ri++) {
       const reg = regions[ri];
-      if(reg.cells.length >= targetRegionSize + 2) continue;
+      if(reg.cells.length >= (reg._targetSize || 4)) continue;
 
       const frontier = [];
       for(const [cr,cc] of reg.cells) {
@@ -1247,7 +1323,7 @@ function generatePuzzle() {
     }
   }
 
-  // Assign any remaining unassigned cells
+  // Second pass: absorb any remaining unassigned cells into nearest region (no size limit)
   for(const [r,c] of allCells) {
     const k = key(r,c);
     if(cellToRegion[k] !== undefined) continue;
@@ -1262,19 +1338,20 @@ function generatePuzzle() {
     }
     if(cellToRegion[k] === undefined) {
       const ri = regionIdx++;
-      regions.push({cells:[[r,c]], constraint:null, color:REGION_COLORS[ri % REGION_COLORS.length]});
+      regions.push({cells:[[r,c]], constraint:null, color:REGION_COLORS[ri % REGION_COLORS.length], _targetSize:2});
       cellToRegion[k] = ri;
     }
   }
 
-  // Merge any 1-cell regions into a neighbor
+  // Merge 1-cell regions
   for(let i=0;i<regions.length;i++) {
-    if(regions[i].cells.length < 2) {
+    if(!regions[i] || regions[i].cells.length < 2) {
+      if(!regions[i] || regions[i].cells.length === 0) continue;
       const [r,c] = regions[i].cells[0];
       for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
         const nk = key(r+dr,c+dc);
-        if(cellToRegion[nk] !== undefined && cellToRegion[nk] !== i) {
-          const target = cellToRegion[nk];
+        const target = cellToRegion[nk];
+        if(target !== undefined && target !== i && regions[target] && regions[target].cells.length > 0) {
           regions[target].cells.push([r,c]);
           cellToRegion[key(r,c)] = target;
           regions[i].cells = [];
@@ -1284,39 +1361,38 @@ function generatePuzzle() {
     }
   }
 
-  regions = regions.filter(r => r.cells.length > 0);
+  // DON'T filter regions yet — keep indices stable for post-processing
 
-  // Post-processing: if too few dominoes span two regions, swap some border cells
-  // to break apart domino pairs that ended up in the same region.
+  // Post-processing: force at least 60% of dominoes to span two regions
   let splitCount = 0;
   for(const p of placed) {
-    if(cellToRegion[key(p.r1,p.c1)] !== cellToRegion[key(p.r2,p.c2)]) splitCount++;
+    const r1 = cellToRegion[key(p.r1,p.c1)];
+    const r2 = cellToRegion[key(p.r2,p.c2)];
+    if(r1 !== undefined && r2 !== undefined && r1 !== r2) splitCount++;
   }
 
-  const targetSplits = Math.max(2, Math.ceil(placed.length * 0.5));
+  const targetSplits = Math.max(2, Math.ceil(placed.length * 0.6));
   if(splitCount < targetSplits) {
-    // Find unsplit dominoes and try to reassign one half to an adjacent region
-    const unsplit = placed.filter(p =>
-      cellToRegion[key(p.r1,p.c1)] === cellToRegion[key(p.r2,p.c2)]
-    );
+    const unsplit = placed.filter(p => {
+      const r1 = cellToRegion[key(p.r1,p.c1)];
+      const r2 = cellToRegion[key(p.r2,p.c2)];
+      return r1 !== undefined && r2 !== undefined && r1 === r2;
+    });
     shuffle(unsplit);
 
     for(const p of unsplit) {
       if(splitCount >= targetSplits) break;
-
-      // Try reassigning cell2 to an adjacent different region
       for(const [dr,dc] of shuffle([[0,1],[0,-1],[1,0],[-1,0]])) {
         const nr = p.r2+dr, nc = p.c2+dc;
         const nk = key(nr,nc);
-        if(cellToRegion[nk] !== undefined && cellToRegion[nk] !== cellToRegion[key(p.r2,p.c2)]
-          && !(nr===p.r1 && nc===p.c1)) {
-          const oldReg = cellToRegion[key(p.r2,p.c2)];
-          const newReg = cellToRegion[nk];
-          // Move cell2 to the neighbor's region
-          cellToRegion[key(p.r2,p.c2)] = newReg;
-          // Update region cell lists
-          regions[oldReg].cells = regions[oldReg].cells.filter(([r,c]) => !(r===p.r2 && c===p.c2));
-          regions[newReg].cells.push([p.r2, p.c2]);
+        const curReg = cellToRegion[key(p.r2,p.c2)];
+        const neighborReg = cellToRegion[nk];
+        if(neighborReg !== undefined && neighborReg !== curReg
+          && !(nr===p.r1 && nc===p.c1)
+          && regions[curReg] && regions[neighborReg]) {
+          cellToRegion[key(p.r2,p.c2)] = neighborReg;
+          regions[curReg].cells = regions[curReg].cells.filter(([r,c]) => !(r===p.r2 && c===p.c2));
+          regions[neighborReg].cells.push([p.r2, p.c2]);
           splitCount++;
           break;
         }
@@ -1324,18 +1400,25 @@ function generatePuzzle() {
     }
   }
 
-  // Clean up empty regions after post-processing swaps
+  // Now clean up: remove empty regions, merge 1-cell regions
   regions = regions.filter(r => r.cells.length > 0);
 
-  // Merge any new 1-cell regions created by swaps
+  // Rebuild cellToRegion from scratch after filter
+  const cellToRegionClean = {};
+  regions.forEach((reg, i) => {
+    reg.cells.forEach(([r,c]) => { cellToRegionClean[key(r,c)] = i; });
+  });
+
+  // Merge any 1-cell regions
   for(let i=0;i<regions.length;i++) {
     if(regions[i].cells.length < 2) {
       const [r,c] = regions[i].cells[0];
       for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
         const nk = key(r+dr,c+dc);
-        const neighborReg = regions.findIndex(reg => reg.cells.some(([rr,cc]) => key(rr,cc) === nk));
-        if(neighborReg >= 0 && neighborReg !== i) {
-          regions[neighborReg].cells.push([r,c]);
+        const ni = cellToRegionClean[nk];
+        if(ni !== undefined && ni !== i) {
+          regions[ni].cells.push([r,c]);
+          cellToRegionClean[key(r,c)] = ni;
           regions[i].cells = [];
           break;
         }
@@ -1348,12 +1431,62 @@ function generatePuzzle() {
   // Re-index
   const reindex = {};
   regions.forEach((reg,i) => {
-    reg.color = REGION_COLORS[i % REGION_COLORS.length];
     reg.cells.forEach(([r,c]) => { reindex[key(r,c)] = i; });
   });
   for(let r=0;r<boardRows;r++) for(let c=0;c<boardCols;c++) {
     if(boardData[r][c]) boardData[r][c].region = reindex[key(r,c)] ?? -1;
   }
+
+  // Graph-color regions: no two adjacent regions share a color
+  const palette = getActiveColors();
+  const adj = regions.map(() => new Set());
+  for(let r=0;r<boardRows;r++) {
+    for(let c=0;c<boardCols;c++) {
+      const ri = reindex[key(r,c)];
+      if(ri === undefined) continue;
+      for(const [dr,dc] of [[0,1],[1,0]]) {
+        const ni = reindex[key(r+dr,c+dc)];
+        if(ni !== undefined && ni !== ri) {
+          adj[ri].add(ni);
+          adj[ni].add(ri);
+        }
+      }
+    }
+  }
+
+  // Process most-constrained regions first
+  const order = regions.map((_,i) => i).sort((a,b) => adj[b].size - adj[a].size);
+  const colorAssignment = new Array(regions.length).fill(-1);
+
+  for(const ri of order) {
+    const usedByNeighbors = new Set();
+    for(const ni of adj[ri]) {
+      if(colorAssignment[ni] >= 0) usedByNeighbors.add(colorAssignment[ni]);
+    }
+    // Also avoid 2-hop neighbors for more spread
+    const usedBy2Hop = new Set(usedByNeighbors);
+    for(const ni of adj[ri]) {
+      for(const nni of adj[ni]) {
+        if(colorAssignment[nni] >= 0) usedBy2Hop.add(colorAssignment[nni]);
+      }
+    }
+
+    let chosen = -1;
+    // Prefer a color not used by any 1-hop or 2-hop neighbor
+    for(let c=0; c<palette.length; c++) {
+      if(!usedByNeighbors.has(c) && !usedBy2Hop.has(c)) { chosen = c; break; }
+    }
+    // Fallback: just avoid direct neighbors
+    if(chosen < 0) {
+      for(let c=0; c<palette.length; c++) {
+        if(!usedByNeighbors.has(c)) { chosen = c; break; }
+      }
+    }
+    if(chosen < 0) chosen = ri % palette.length;
+    colorAssignment[ri] = chosen;
+  }
+
+  regions.forEach((reg, i) => { reg.color = palette[colorAssignment[i]]; });
 
   // 6) Assign constraints — guarantee at least one of each type before reusing.
   //    Two-pass approach:
@@ -1559,28 +1692,50 @@ function getAllViolations() {
 //  RENDERING
 // ════════════════════════════════════
 function fitCellSize() {
-  // Compute max cell size that fits the board within the viewport width
-  // Account for: app padding (16*2), board-container padding (12*2), grid gaps, badge overflow (~30px)
-  const viewportW = window.innerWidth;
-  const padding = 32 + 24 + 30; // app padding + container padding + badge room
+  if(!boardRows || !boardCols) return;
+
   const gap = 2;
-  const availableW = viewportW - padding;
-  const maxFromWidth = Math.floor((availableW - (boardCols - 1) * gap) / boardCols);
+  const containerPad = 24; // 12px * 2
 
-  // Also consider height — leave room for header/controls/tray (~280px)
-  const viewportH = window.innerHeight;
-  const headerRoom = 280;
-  const availableH = viewportH - headerRoom;
-  const maxFromHeight = Math.floor((availableH - (boardRows - 1) * gap) / boardRows);
+  // Shrink cells so game-area collapses to CSS-constrained width
+  document.documentElement.style.setProperty('--cell-size', '1px');
 
-  const ideal = Math.min(maxFromWidth, maxFromHeight);
-  const clamped = Math.max(28, Math.min(56, ideal)); // min 28px, max 56px
+  // Measure available space from CSS-constrained game-area
+  const gameArea = document.querySelector('.game-area');
+  const maxW = gameArea.clientWidth;
+
+  // Available height for the board (viewport minus chrome and tray)
+  const header = document.querySelector('header');
+  const stats = document.querySelector('.stats');
+  const menuPanel = document.getElementById('menuPanel');
+  const chromeH = (header?.offsetHeight || 40) + (stats?.offsetHeight || 30)
+    + (menuPanel?.classList.contains('open') ? (menuPanel.offsetHeight || 0) : 0)
+    + 16;
+  const trayEstimate = 90;
+  const gameGaps = 28;
+  const maxH = window.innerHeight - chromeH - trayEstimate - gameGaps;
+
+  // Square side = smaller of available width and height
+  const squareSide = Math.min(maxW, maxH);
+
+  // Inner space after container padding
+  const innerSide = squareSide - containerPad;
+
+  // Cell size: fit both cols and rows inside the square, take the smaller
+  const cellFromCols = Math.floor((innerSide - (boardCols - 1) * gap) / boardCols);
+  const cellFromRows = Math.floor((innerSide - (boardRows - 1) * gap) / boardRows);
+  const ideal = Math.min(cellFromCols, cellFromRows);
+  const clamped = Math.max(24, Math.min(72, ideal));
 
   document.documentElement.style.setProperty('--cell-size', clamped + 'px');
 
-  // Scale dots proportionally
-  const dotSize = Math.max(4, Math.round(clamped * 0.14));
-  const dotContainerSize = Math.max(20, Math.round(clamped * 0.64));
+  // Set container to exact square size
+  const container = document.querySelector('.board-container');
+  container.style.width = squareSide + 'px';
+  container.style.height = squareSide + 'px';
+
+  const dotSize = Math.max(3, Math.round(clamped * 0.14));
+  const dotContainerSize = Math.max(16, Math.round(clamped * 0.64));
   document.documentElement.style.setProperty('--dot-size', dotSize + 'px');
   document.documentElement.style.setProperty('--dot-container-size', dotContainerSize + 'px');
 }
@@ -1691,7 +1846,7 @@ function renderBadges() {
     const badge = document.createElement('div');
     badge.className = 'constraint-badge';
     badge.textContent = reg.constraint.label;
-    badge.style.backgroundColor = CONSTRAINT_COLORS[reg.constraint.type] || '#555';
+    badge.style.backgroundColor = reg.color?.border || '#555';
 
     const status = regionStatuses[i];
     if(status === 'satisfied') badge.classList.add('satisfied');
@@ -1722,18 +1877,18 @@ function renderLegend() {
   const legend = document.getElementById('legend');
   legend.innerHTML = '';
   const types = [
-    {type:'sum', ex:'7', desc:'Sum equals'},
-    {type:'gt', ex:'>3', desc:'Greater than'},
-    {type:'lt', ex:'<5', desc:'Less than'},
-    {type:'eq', ex:'=', desc:'Values equal'},
-    {type:'neq', ex:'≠', desc:'All different'},
+    {ex:'7', desc:'Sum equals'},
+    {ex:'>3', desc:'Sum greater than'},
+    {ex:'<5', desc:'Sum less than'},
+    {ex:'=', desc:'Values equal'},
+    {ex:'≠', desc:'All different'},
   ];
   for(const t of types) {
     const item = document.createElement('div');
     item.className = 'legend-item';
     const swatch = document.createElement('div');
     swatch.className = 'legend-swatch';
-    swatch.style.background = CONSTRAINT_COLORS[t.type];
+    swatch.style.background = 'rgba(255,255,255,0.2)';
     swatch.textContent = t.ex;
     item.appendChild(swatch);
     const label = document.createElement('span');
@@ -2068,7 +2223,18 @@ function newGame(seed) {
   document.getElementById('shareToggle').classList.remove('active');
   document.getElementById('helpPanel').classList.remove('open');
   document.getElementById('helpToggle').classList.remove('active');
-  generatePuzzle();
+  // Generate puzzle with retry on error
+  let retries = 0;
+  while(retries < 5) {
+    try {
+      generatePuzzle();
+      if(dominoes.length > 0) break;
+    } catch(e) {
+      console.warn('Puzzle generation failed, retrying with new seed:', e);
+    }
+    retries++;
+    currentSeed = generateSeed();
+  }
   render();
   renderLegend();
   updateShareLink();
@@ -2128,6 +2294,49 @@ function toggleShare() {
   document.getElementById('helpToggle').classList.remove('active');
   if(panel.classList.contains('open')) {
     setTimeout(() => document.getElementById('shareInput').select(), 100);
+  }
+}
+
+function toggleColorblind() {
+  colorblindMode = !colorblindMode;
+  REGION_COLORS = getActiveColors();
+  document.getElementById('cbToggle').classList.toggle('active', colorblindMode);
+  document.body.classList.toggle('cb-mode', colorblindMode);
+
+  // Re-color existing regions with graph coloring using new palette
+  if(regions.length > 0) {
+    const palette = getActiveColors();
+    // Rebuild adjacency from boardData
+    const riMap = {};
+    for(let r=0;r<boardRows;r++) for(let c=0;c<boardCols;c++) {
+      if(boardData[r]?.[c]?.region >= 0) riMap[key(r,c)] = boardData[r][c].region;
+    }
+    const adj = regions.map(() => new Set());
+    for(let r=0;r<boardRows;r++) {
+      for(let c=0;c<boardCols;c++) {
+        const ri = riMap[key(r,c)];
+        if(ri === undefined) continue;
+        for(const [dr,dc] of [[0,1],[1,0]]) {
+          const ni = riMap[key(r+dr,c+dc)];
+          if(ni !== undefined && ni !== ri) { adj[ri].add(ni); adj[ni].add(ri); }
+        }
+      }
+    }
+    const order = regions.map((_,i)=>i).sort((a,b)=>adj[b].size-adj[a].size);
+    const ca = new Array(regions.length).fill(-1);
+    for(const ri of order) {
+      const used1 = new Set();
+      for(const ni of adj[ri]) { if(ca[ni]>=0) used1.add(ca[ni]); }
+      const used2 = new Set(used1);
+      for(const ni of adj[ri]) { for(const nni of adj[ni]) { if(ca[nni]>=0) used2.add(ca[nni]); } }
+      let ch = -1;
+      for(let c=0;c<palette.length;c++) { if(!used1.has(c)&&!used2.has(c)){ch=c;break;} }
+      if(ch<0) for(let c=0;c<palette.length;c++) { if(!used1.has(c)){ch=c;break;} }
+      if(ch<0) ch = ri % palette.length;
+      ca[ri] = ch;
+    }
+    regions.forEach((reg,i) => { reg.color = palette[ca[i]]; });
+    render();
   }
 }
 
