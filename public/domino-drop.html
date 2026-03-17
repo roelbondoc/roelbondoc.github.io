@@ -1,7 +1,7 @@
----
-layout: null
-permalink: /domino-drop/
----
+----
+-layout: null
+-permalink: /domino-drop/
+----
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,25 +48,97 @@ permalink: /domino-drop/
   }
 
   header {
-    text-align: center;
-    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 4px;
     width: 100%;
     max-width: 600px;
   }
 
   h1 {
     font-family: 'Righteous', cursive;
-    font-size: 2rem;
+    font-size: 1.8rem;
     background: linear-gradient(135deg, var(--accent1), var(--accent3));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: 2px;
   }
 
-  .subtitle {
+  .btn-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .btn-menu span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--text-dim);
+    border-radius: 1px;
+    transition: all 0.25s;
+  }
+  .btn-menu:hover, .btn-menu.active {
+    border-color: var(--accent3);
+  }
+  .btn-menu:hover span, .btn-menu.active span {
+    background: var(--accent3);
+  }
+  .btn-menu.active span:nth-child(1) {
+    transform: rotate(45deg) translate(4px, 4px);
+  }
+  .btn-menu.active span:nth-child(2) {
+    opacity: 0;
+  }
+  .btn-menu.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(4px, -4px);
+  }
+
+  .menu-panel {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.25s ease;
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .menu-panel.open {
+    max-height: 500px;
+    opacity: 1;
+    padding: 8px 0;
+  }
+
+  .menu-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .menu-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
     color: var(--text-dim);
-    font-size: 0.85rem;
-    margin-top: 2px;
+    opacity: 0.6;
+  }
+
+  .menu-row {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .controls {
@@ -514,37 +586,50 @@ permalink: /domino-drop/
 <div class="app" id="app">
   <header>
     <h1>DOMINO DROP</h1>
-    <p class="subtitle">Place all dominoes to satisfy the constraints</p>
+    <button class="btn-menu" id="menuToggle" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
   </header>
 
-  <div class="controls">
-    <button class="btn btn-diff active" data-diff="easy" onclick="setDifficulty('easy')">Easy</button>
-    <button class="btn btn-diff" data-diff="medium" onclick="setDifficulty('medium')">Medium</button>
-    <button class="btn btn-diff" data-diff="hard" onclick="setDifficulty('hard')">Hard</button>
-    <button class="btn btn-action" onclick="newGame()">New Game</button>
-    <button class="btn btn-secondary" onclick="undoLast()">Undo</button>
-    <button class="btn btn-secondary" onclick="clearBoard()">Clear</button>
-    <button class="btn btn-secondary" id="helpToggle" onclick="toggleHelp()">Info</button>
-    <button class="btn btn-secondary" id="shareToggle" onclick="toggleShare()">Share</button>
-  </div>
-
-  <div class="share-panel" id="sharePanel">
-    <div class="share-row">
-      <input type="text" class="share-input" id="shareInput" readonly>
-      <button class="btn btn-secondary btn-copy" onclick="copyShareLink()">Copy</button>
+  <div class="menu-panel" id="menuPanel">
+    <div class="menu-section">
+      <div class="menu-label">Difficulty</div>
+      <div class="menu-row">
+        <button class="btn btn-diff active" data-diff="easy" onclick="setDifficulty('easy')">Easy</button>
+        <button class="btn btn-diff" data-diff="medium" onclick="setDifficulty('medium')">Medium</button>
+        <button class="btn btn-diff" data-diff="hard" onclick="setDifficulty('hard')">Hard</button>
+      </div>
     </div>
-    <p class="share-hint" id="shareHint">Send this link to a friend to challenge them!</p>
+    <div class="menu-section">
+      <div class="menu-row">
+        <button class="btn btn-action" onclick="newGame()">New Game</button>
+        <button class="btn btn-secondary" onclick="undoLast()">Undo</button>
+        <button class="btn btn-secondary" onclick="clearBoard()">Clear</button>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-row">
+        <button class="btn btn-secondary" id="helpToggle" onclick="toggleHelp()">Info</button>
+        <button class="btn btn-secondary" id="shareToggle" onclick="toggleShare()">Share</button>
+      </div>
+    </div>
+    <div class="help-panel" id="helpPanel">
+      <p class="instructions">Drag dominoes onto the board. <span>Tap/click</span> to rotate. <span>Double-tap</span> placed domino to return it.</p>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="share-panel" id="sharePanel">
+      <div class="share-row">
+        <input type="text" class="share-input" id="shareInput" readonly>
+        <button class="btn btn-secondary btn-copy" onclick="copyShareLink()">Copy</button>
+      </div>
+      <p class="share-hint" id="shareHint">Send this link to a friend to challenge them!</p>
+    </div>
   </div>
 
   <div class="stats">
     <div>Moves: <span id="moveCount">0</span></div>
     <div>Placed: <span id="placedCount">0</span> / <span id="totalCount">0</span></div>
     <div>Time: <span id="timer">0:00</span></div>
-  </div>
-
-  <div class="help-panel" id="helpPanel">
-    <p class="instructions">Drag dominoes onto the board. <span>Tap/click</span> to rotate. <span>Double-tap</span> placed domino to return it.</p>
-    <div class="legend" id="legend"></div>
   </div>
 
   <div class="game-area">
@@ -748,50 +833,97 @@ function generatePuzzle() {
     else boardData[r][c] = {slot:true, region:-1, dominoId:null, value:null};
   }
 
-  // 5) Build contiguous regions — start each domino as own region, then merge adjacent
+  // 5) Build regions INDEPENDENTLY of domino pairs using flood-fill
+  //    This means region boundaries will split some dominoes across two regions,
+  //    forcing the player to consider cross-region placement.
+  const allCells = [];
+  for(let r=0;r<boardRows;r++) for(let c=0;c<boardCols;c++) {
+    if(boardData[r][c]) allCells.push([r,c]);
+  }
+
+  const targetRegionCount = Math.max(3, Math.ceil(placed.length * 0.8));
+  const targetRegionSize = Math.max(2, Math.round(allCells.length / targetRegionCount));
+
   const cellToRegion = {};
   regions = [];
   let regionIdx = 0;
 
-  for(const p of placed) {
+  // Pick seed cells spread across the board
+  const seeds = shuffle([...allCells]).slice(0, targetRegionCount);
+  for(const [r,c] of seeds) {
+    if(cellToRegion[key(r,c)] !== undefined) continue;
     const ri = regionIdx++;
     regions.push({
-      cells:[[p.r1,p.c1],[p.r2,p.c2]],
+      cells:[[r,c]],
       constraint:null,
       color:REGION_COLORS[ri % REGION_COLORS.length]
     });
-    cellToRegion[key(p.r1,p.c1)] = ri;
-    cellToRegion[key(p.r2,p.c2)] = ri;
+    cellToRegion[key(r,c)] = ri;
   }
 
-  // Merge until we hit target region count
-  const targetRegions = Math.max(2, Math.ceil(placed.length * 0.6));
-  let attempts = 0;
-  while(regions.filter(r=>r.cells.length>0).length > targetRegions && attempts < 300) {
-    attempts++;
-    const active = regions.map((r,i)=>({idx:i,r})).filter(x=>x.r.cells.length>0);
-    const pick = active[rand(active.length)];
-    const ri = pick.idx;
+  // Grow regions outward round-robin, one cell at a time
+  let growing = true;
+  while(growing) {
+    growing = false;
+    for(let ri=0; ri<regions.length; ri++) {
+      const reg = regions[ri];
+      if(reg.cells.length >= targetRegionSize + 2) continue;
 
-    const neighborRegions = new Set();
-    for(const [cr,cc] of pick.r.cells) {
+      const frontier = [];
+      for(const [cr,cc] of reg.cells) {
+        for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
+          const nr=cr+dr, nc=cc+dc;
+          if(nr>=0 && nr<boardRows && nc>=0 && nc<boardCols
+            && boardData[nr]?.[nc] && cellToRegion[key(nr,nc)] === undefined) {
+            frontier.push([nr,nc]);
+          }
+        }
+      }
+
+      if(frontier.length > 0) {
+        const pick = frontier[rand(frontier.length)];
+        reg.cells.push(pick);
+        cellToRegion[key(pick[0],pick[1])] = ri;
+        growing = true;
+      }
+    }
+  }
+
+  // Assign remaining unassigned cells to nearest neighbor region
+  for(const [r,c] of allCells) {
+    const k = key(r,c);
+    if(cellToRegion[k] !== undefined) continue;
+    for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
+      const nk = key(r+dr,c+dc);
+      if(cellToRegion[nk] !== undefined) {
+        const ri = cellToRegion[nk];
+        regions[ri].cells.push([r,c]);
+        cellToRegion[k] = ri;
+        break;
+      }
+    }
+    if(cellToRegion[k] === undefined) {
+      const ri = regionIdx++;
+      regions.push({cells:[[r,c]], constraint:null, color:REGION_COLORS[ri % REGION_COLORS.length]});
+      cellToRegion[k] = ri;
+    }
+  }
+
+  // Merge any 1-cell regions into a neighbor
+  for(let i=0;i<regions.length;i++) {
+    if(regions[i].cells.length < 2) {
+      const [r,c] = regions[i].cells[0];
       for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
-        const nk = key(cr+dr,cc+dc);
-        if(cellToRegion[nk] !== undefined && cellToRegion[nk] !== ri) {
-          neighborRegions.add(cellToRegion[nk]);
+        const nk = key(r+dr,c+dc);
+        if(cellToRegion[nk] !== undefined && cellToRegion[nk] !== i) {
+          const target = cellToRegion[nk];
+          regions[target].cells.push([r,c]);
+          cellToRegion[key(r,c)] = target;
+          regions[i].cells = [];
+          break;
         }
       }
     }
-    if(neighborRegions.size === 0) continue;
-
-    const targetRi = [...neighborRegions][rand(neighborRegions.size)];
-    if(pick.r.cells.length + regions[targetRi].cells.length > 6) continue;
-
-    for(const cell of regions[targetRi].cells) {
-      pick.r.cells.push(cell);
-      cellToRegion[key(cell[0],cell[1])] = ri;
-    }
-    regions[targetRi].cells = [];
   }
 
   regions = regions.filter(r => r.cells.length > 0);
@@ -806,14 +938,18 @@ function generatePuzzle() {
     if(boardData[r][c]) boardData[r][c].region = reindex[key(r,c)] ?? -1;
   }
 
-  // 6) Assign constraints from solution values
+  // 6) Assign constraints — guarantee at least one of each type before reusing.
+  //    Two-pass approach:
+  //    Pass 1: For each constraint type not yet used, find a compatible region and force-assign it.
+  //    Pass 2: Assign remaining regions using weighted random (favoring exact constraints).
   const solVals = {};
   for(const p of placed) {
     solVals[key(p.r1,p.c1)] = p.a;
     solVals[key(p.r2,p.c2)] = p.b;
   }
 
-  for(const reg of regions) {
+  // Helper: get valid constraint options for a region
+  function getOptions(reg) {
     const vals = reg.cells.map(([r,c]) => {
       const v = solVals[key(r,c)];
       return v !== undefined ? v : 0;
@@ -822,34 +958,89 @@ function generatePuzzle() {
     const allUnique = new Set(vals).size === vals.length;
     const allEqual = vals.every(v => v === vals[0]);
 
-    const options = [];
-    options.push({type:'sum', value:sum, label:`${sum}`});
+    const opts = {};
+    opts.sum = {type:'sum', value:sum, label:`${sum}`};
 
     if(sum > 1) {
-      const t = Math.max(0, sum - 1 - rand(Math.min(sum, 4)));
-      options.push({type:'gt', value:t, label:`>${t}`});
+      const t = sum - 1;
+      opts.gt = {type:'gt', value:t, label:`>${t}`};
     }
 
-    const lt = sum + 1 + rand(5);
-    options.push({type:'lt', value:lt, label:`<${lt}`});
+    opts.lt = {type:'lt', value:sum + 1, label:`<${sum + 1}`};
 
     if(reg.cells.length === 2 && allEqual) {
-      options.push({type:'eq', label:'='});
+      opts.eq = {type:'eq', label:'='};
     }
 
     if(allUnique && vals.length >= 2) {
-      options.push({type:'neq', label:'≠'});
+      opts.neq = {type:'neq', label:'≠'};
     }
 
-    reg.constraint = options[rand(options.length)];
+    return opts;
   }
 
-  // 7) Create domino pieces
+  // Pre-compute options for each region
+  const regionOptions = regions.map(reg => getOptions(reg));
+
+  // Track which types have been used
+  const usedTypes = new Set();
+  const allTypes = ['sum', 'gt', 'lt', 'eq', 'neq'];
+  const unassigned = new Set(regions.map((_,i) => i));
+
+  // Pass 1: Force one of each type
+  const typeOrder = shuffle([...allTypes]);
+  for(const type of typeOrder) {
+    if(unassigned.size === 0) break;
+
+    // Find an unassigned region that supports this type
+    const candidates = [...unassigned].filter(i => regionOptions[i][type]);
+    if(candidates.length === 0) continue; // No region can support this type, skip
+
+    const pick = candidates[rand(candidates.length)];
+    regions[pick].constraint = regionOptions[pick][type];
+    usedTypes.add(type);
+    unassigned.delete(pick);
+  }
+
+  // Pass 2: Assign remaining regions with weighted random
+  for(const i of unassigned) {
+    const opts = regionOptions[i];
+
+    const weighted = [];
+    if(opts.sum) weighted.push([opts.sum, 5]);
+    if(opts.eq)  weighted.push([opts.eq, 5]);
+    if(opts.neq) weighted.push([opts.neq, 4]);
+    if(opts.gt)  weighted.push([opts.gt, 1]);
+    if(opts.lt)  weighted.push([opts.lt, 1]);
+
+    // Fallback if somehow empty
+    if(weighted.length === 0) {
+      const vals = regions[i].cells.map(([r,c]) => {
+        const v = solVals[key(r,c)]; return v !== undefined ? v : 0;
+      });
+      const sum = vals.reduce((a,b)=>a+b,0);
+      regions[i].constraint = {type:'sum', value:sum, label:`${sum}`};
+      continue;
+    }
+
+    const totalWeight = weighted.reduce((s,w) => s + w[1], 0);
+    let pick = rand(totalWeight);
+    let chosen = weighted[0][0];
+    for(const [option, weight] of weighted) {
+      pick -= weight;
+      if(pick < 0) { chosen = option; break; }
+    }
+
+    regions[i].constraint = chosen;
+  }
+
+  // 7) Create domino pieces with random orientations (4 directions)
+  const orientations = ['right','down','left','up'];
   dominoes = placed.map((p,i) => ({
     id: i,
     a: p.a,
     b: p.b,
-    orientation: Math.random() < 0.5 ? 'h' : 'v',
+    orientation: orientations[rand(4)],
     placed: false,
     placedAt: null,
   }));
@@ -1118,19 +1309,28 @@ function updateStats() {
 
 function createDominoElement(dom) {
   const el = document.createElement('div');
-  el.className = `domino ${dom.orientation === 'h' ? 'horizontal' : 'vertical'}`;
+  const isHoriz = (dom.orientation === 'right' || dom.orientation === 'left');
+  el.className = `domino ${isHoriz ? 'horizontal' : 'vertical'}`;
   el.dataset.id = dom.id;
 
-  const halfA = document.createElement('div');
-  halfA.className = 'half';
-  halfA.appendChild(renderDots(dom.a));
+  // Determine which half renders first based on orientation
+  // right: a then b (left-to-right)
+  // left:  b then a (b on left, a on right)
+  // down:  a then b (top-to-bottom)
+  // up:    b then a (b on top, a on bottom)
+  const firstVal = (dom.orientation === 'left' || dom.orientation === 'up') ? dom.b : dom.a;
+  const secondVal = (dom.orientation === 'left' || dom.orientation === 'up') ? dom.a : dom.b;
 
-  const halfB = document.createElement('div');
-  halfB.className = 'half';
-  halfB.appendChild(renderDots(dom.b));
+  const half1 = document.createElement('div');
+  half1.className = 'half';
+  half1.appendChild(renderDots(firstVal));
 
-  el.appendChild(halfA);
-  el.appendChild(halfB);
+  const half2 = document.createElement('div');
+  half2.className = 'half';
+  half2.appendChild(renderDots(secondVal));
+
+  el.appendChild(half1);
+  el.appendChild(half2);
 
   const hint = document.createElement('div');
   hint.className = 'rotate-hint';
@@ -1221,10 +1421,12 @@ function onDragEnd(e) {
   dragState.el.remove();
   if(dragState.sourceEl) dragState.sourceEl.style.opacity = '1';
 
-  // Tap → rotate
+  // Tap → rotate through 4 orientations
   if(!dragState.moved || Date.now() - dragState.startTime < 180) {
     const dom = dragState.dom;
-    dom.orientation = dom.orientation === 'h' ? 'v' : 'h';
+    const cycle = ['right','down','left','up'];
+    const idx = cycle.indexOf(dom.orientation);
+    dom.orientation = cycle[(idx + 1) % 4];
     dragState = null;
     renderTray();
     return;
@@ -1236,8 +1438,9 @@ function onDragEnd(e) {
   const ghostLeft = touch.clientX - dragState.offsetX;
   const ghostTop = touch.clientY - dragState.offsetY;
   const cellSize = getCellSize();
-  const ghostW = dragState.dom.orientation === 'h' ? cellSize * 2 + 8 : cellSize + 6;
-  const ghostH = dragState.dom.orientation === 'v' ? cellSize * 2 + 8 : cellSize + 6;
+  const isHoriz = (dragState.dom.orientation === 'right' || dragState.dom.orientation === 'left');
+  const ghostW = isHoriz ? cellSize * 2 + 8 : cellSize + 6;
+  const ghostH = !isHoriz ? cellSize * 2 + 8 : cellSize + 6;
   const cx = ghostLeft + ghostW * 0.25;
   const cy = ghostTop + ghostH * 0.25;
 
@@ -1273,12 +1476,34 @@ function getCellUnderPoint(x, y) {
 }
 
 function getDominoCells(r, c, dom) {
-  let r2, c2;
-  if(dom.orientation === 'h') { r2 = r; c2 = c + 1; }
-  else { r2 = r + 1; c2 = c; }
+  // Calculate second cell position and value mapping based on orientation
+  // 'right': a at (r,c), b at (r,c+1)
+  // 'left':  a at (r,c+1), b at (r,c) — visually b is on left, a on right
+  // 'down':  a at (r,c), b at (r+1,c)
+  // 'up':    a at (r+1,c), b at (r,c) — visually b is on top, a on bottom
+  let r1,c1,v1, r2,c2,v2;
+
+  switch(dom.orientation) {
+    case 'right':
+      r1=r; c1=c; v1=dom.a;
+      r2=r; c2=c+1; v2=dom.b;
+      break;
+    case 'left':
+      r1=r; c1=c; v1=dom.b;
+      r2=r; c2=c+1; v2=dom.a;
+      break;
+    case 'down':
+      r1=r; c1=c; v1=dom.a;
+      r2=r+1; c2=c; v2=dom.b;
+      break;
+    case 'up':
+      r1=r; c1=c; v1=dom.b;
+      r2=r+1; c2=c; v2=dom.a;
+      break;
+  }
 
   if(r2 >= 0 && r2 < boardRows && c2 >= 0 && c2 < boardCols) {
-    return [[r, c, dom.a], [r2, c2, dom.b]];
+    return [[r1, c1, v1], [r2, c2, v2]];
   }
   return null;
 }
@@ -1394,9 +1619,13 @@ function newGame(seed) {
   undoStack = [];
   currentSeed = seed !== undefined ? seed : generateSeed();
   document.getElementById('winOverlay').style.display = 'none';
-  // Close share panel on new game
+  // Close menu and sub-panels on new game
+  document.getElementById('menuPanel').classList.remove('open');
+  document.getElementById('menuToggle').classList.remove('active');
   document.getElementById('sharePanel').classList.remove('open');
   document.getElementById('shareToggle').classList.remove('active');
+  document.getElementById('helpPanel').classList.remove('open');
+  document.getElementById('helpToggle').classList.remove('active');
   generatePuzzle();
   render();
   renderLegend();
@@ -1423,14 +1652,27 @@ function clearBoard() {
 }
 
 // ════════════════════════════════════
-//  HELP & SHARE TOGGLES
+//  MENU, HELP & SHARE TOGGLES
 // ════════════════════════════════════
+function toggleMenu() {
+  const panel = document.getElementById('menuPanel');
+  const btn = document.getElementById('menuToggle');
+  const isOpen = panel.classList.toggle('open');
+  btn.classList.toggle('active');
+  // Close sub-panels when closing menu
+  if(!isOpen) {
+    document.getElementById('helpPanel').classList.remove('open');
+    document.getElementById('helpToggle').classList.remove('active');
+    document.getElementById('sharePanel').classList.remove('open');
+    document.getElementById('shareToggle').classList.remove('active');
+  }
+}
+
 function toggleHelp() {
   const panel = document.getElementById('helpPanel');
   const btn = document.getElementById('helpToggle');
   panel.classList.toggle('open');
   btn.classList.toggle('active');
-  // Close share if open
   document.getElementById('sharePanel').classList.remove('open');
   document.getElementById('shareToggle').classList.remove('active');
 }
@@ -1440,10 +1682,8 @@ function toggleShare() {
   const btn = document.getElementById('shareToggle');
   panel.classList.toggle('open');
   btn.classList.toggle('active');
-  // Close help if open
   document.getElementById('helpPanel').classList.remove('open');
   document.getElementById('helpToggle').classList.remove('active');
-  // Select the text for easy copying
   if(panel.classList.contains('open')) {
     setTimeout(() => document.getElementById('shareInput').select(), 100);
   }
