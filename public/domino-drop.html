@@ -1477,6 +1477,30 @@ function generatePuzzle() {
 
   // DON'T filter regions yet — keep indices stable for post-processing
 
+  // Helper: check if removing a cell from a region keeps it contiguous
+  function wouldStayContiguous(regIdx, removeR, removeC) {
+    const reg = regions[regIdx];
+    if(!reg) return false;
+    const remaining = reg.cells.filter(([r,c]) => !(r===removeR && c===removeC));
+    if(remaining.length <= 1) return true;
+    // BFS from first remaining cell
+    const visited = new Set();
+    const queue = [remaining[0]];
+    visited.add(key(remaining[0][0], remaining[0][1]));
+    const cellSet = new Set(remaining.map(([r,c]) => key(r,c)));
+    while(queue.length > 0) {
+      const [cr,cc] = queue.shift();
+      for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
+        const nk = key(cr+dr,cc+dc);
+        if(cellSet.has(nk) && !visited.has(nk)) {
+          visited.add(nk);
+          queue.push([cr+dr,cc+dc]);
+        }
+      }
+    }
+    return visited.size === remaining.length;
+  }
+
   // Post-processing: force at least 60% of dominoes to span two regions
   let splitCount = 0;
   for(const p of placed) {
@@ -1503,7 +1527,8 @@ function generatePuzzle() {
         const neighborReg = cellToRegion[nk];
         if(neighborReg !== undefined && neighborReg !== curReg
           && !(nr===p.r1 && nc===p.c1)
-          && regions[curReg] && regions[neighborReg]) {
+          && regions[curReg] && regions[neighborReg]
+          && wouldStayContiguous(curReg, p.r2, p.c2)) {
           cellToRegion[key(p.r2,p.c2)] = neighborReg;
           regions[curReg].cells = regions[curReg].cells.filter(([r,c]) => !(r===p.r2 && c===p.c2));
           regions[neighborReg].cells.push([p.r2, p.c2]);
@@ -1522,6 +1547,62 @@ function generatePuzzle() {
   regions.forEach((reg, i) => {
     reg.cells.forEach(([r,c]) => { cellToRegionClean[key(r,c)] = i; });
   });
+
+  // Final contiguity fix: split any non-contiguous regions into separate regions
+  let needsResplit = true;
+  while(needsResplit) {
+    needsResplit = false;
+    for(let i=0; i<regions.length; i++) {
+      const reg = regions[i];
+      if(reg.cells.length <= 1) continue;
+
+      // BFS from first cell to find connected component
+      const cellSet = new Set(reg.cells.map(([r,c]) => key(r,c)));
+      const visited = new Set();
+      const queue = [reg.cells[0]];
+      visited.add(key(reg.cells[0][0], reg.cells[0][1]));
+      while(queue.length > 0) {
+        const [cr,cc] = queue.shift();
+        for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
+          const nk = key(cr+dr,cc+dc);
+          if(cellSet.has(nk) && !visited.has(nk)) {
+            visited.add(nk);
+            queue.push([cr+dr,cc+dc]);
+          }
+        }
+      }
+
+      if(visited.size < reg.cells.length) {
+        // Split: keep visited cells in this region, move the rest to a new region
+        const kept = reg.cells.filter(([r,c]) => visited.has(key(r,c)));
+        const split = reg.cells.filter(([r,c]) => !visited.has(key(r,c)));
+        reg.cells = kept;
+
+        // Try to merge split cells into an adjacent existing region
+        for(const [sr,sc] of split) {
+          let merged = false;
+          for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
+            const nk = key(sr+dr,sc+dc);
+            const ni = cellToRegionClean[nk];
+            if(ni !== undefined && ni !== i) {
+              regions[ni].cells.push([sr,sc]);
+              cellToRegionClean[key(sr,sc)] = ni;
+              merged = true;
+              break;
+            }
+          }
+          if(!merged) {
+            // Create a new region for this orphan cluster
+            const ni = regions.length;
+            regions.push({cells:[[sr,sc]], constraint:null, color:REGION_COLORS[ni % REGION_COLORS.length], _targetSize:2});
+            cellToRegionClean[key(sr,sc)] = ni;
+          }
+        }
+        needsResplit = true;
+        break; // restart the loop since regions array changed
+      }
+    }
+  }
 
   // Merge any 1-cell regions
   for(let i=0;i<regions.length;i++) {
