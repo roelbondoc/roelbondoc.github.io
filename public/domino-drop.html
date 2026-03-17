@@ -262,9 +262,89 @@ permalink: /domino-drop/
   }
 
   .cell.filled {
-    border: none;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.25);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.4);
     cursor: pointer;
+    position: relative;
+  }
+
+  /* Lighten overlay so the tile pops from the board */
+  .cell.filled::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(255,255,255,0.18);
+    pointer-events: none;
+  }
+
+  /* Domino connection: remove border and radius on the side touching the partner */
+  .cell.filled.domino-right {
+    border-right-color: transparent;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-right: -1px;
+    z-index: 1;
+  }
+  .cell.filled.domino-right::before {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .cell.filled.domino-left {
+    border-left-color: transparent;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  .cell.filled.domino-left::before {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .cell.filled.domino-down {
+    border-bottom-color: transparent;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-bottom: -1px;
+    z-index: 1;
+  }
+  .cell.filled.domino-down::before {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .cell.filled.domino-up {
+    border-top-color: transparent;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+  .cell.filled.domino-up::before {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  /* Divider line between domino halves — darker and thicker for visibility */
+  .cell.filled.domino-right::after,
+  .cell.filled.domino-down::after {
+    content: '';
+    position: absolute;
+    background: rgba(0,0,0,0.6);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .cell.filled.domino-right::after {
+    right: -1px;
+    top: 15%;
+    bottom: 15%;
+    width: 2px;
+    border-radius: 1px;
+  }
+  .cell.filled.domino-down::after {
+    bottom: -1px;
+    left: 15%;
+    right: 15%;
+    height: 2px;
+    border-radius: 1px;
   }
 
   .cell.violation {
@@ -594,6 +674,32 @@ permalink: /domino-drop/
     .btn { padding: 6px 12px; font-size: 0.7rem; }
     .tray { gap: 6px; padding: 8px; }
     .modal-card { padding: 20px; margin: 10px; }
+  }
+
+  @media (min-width: 900px) {
+    .game-area {
+      flex-direction: row;
+      align-items: flex-start;
+      max-width: 960px;
+      gap: 16px;
+    }
+    .tray {
+      flex-direction: column;
+      width: 200px !important;
+      max-width: 200px !important;
+      min-height: auto;
+      max-height: 70vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+      align-self: stretch;
+    }
+    .tray-label {
+      position: sticky;
+      top: 0;
+      background: var(--bg2);
+      z-index: 1;
+      padding-bottom: 4px;
+    }
   }
 
   /* Custom Modal */
@@ -1696,23 +1802,30 @@ function fitCellSize() {
 
   const gap = 2;
   const containerPad = 24; // 12px * 2
+  const isWide = window.innerWidth >= 900;
 
   // Shrink cells so game-area collapses to CSS-constrained width
   document.documentElement.style.setProperty('--cell-size', '1px');
 
   // Measure available space from CSS-constrained game-area
   const gameArea = document.querySelector('.game-area');
-  const maxW = gameArea.clientWidth;
+  let maxW = gameArea.clientWidth;
 
-  // Available height for the board (viewport minus chrome and tray)
+  // On wide screens, subtract tray width + gap from available board width
+  if(isWide) {
+    maxW = maxW - 200 - 16; // tray width + gap
+  }
+
+  // Available height for the board
   const header = document.querySelector('header');
   const stats = document.querySelector('.stats');
   const menuPanel = document.getElementById('menuPanel');
   const chromeH = (header?.offsetHeight || 40) + (stats?.offsetHeight || 30)
     + (menuPanel?.classList.contains('open') ? (menuPanel.offsetHeight || 0) : 0)
     + 16;
-  const trayEstimate = 90;
-  const gameGaps = 28;
+  // On wide screens, tray is beside not below, so no tray height deduction
+  const trayEstimate = isWide ? 0 : 90;
+  const gameGaps = isWide ? 16 : 28;
   const maxH = window.innerHeight - chromeH - trayEstimate - gameGaps;
 
   // Square side = smaller of available width and height
@@ -1750,15 +1863,21 @@ function render() {
 }
 
 function syncWidths() {
-  // Make tray match the board container's width
   requestAnimationFrame(() => {
     const container = document.querySelector('.board-container');
     const tray = document.getElementById('tray');
-    if(container && tray) {
-      const w = container.offsetWidth;
-      tray.style.width = w + 'px';
-      tray.style.maxWidth = w + 'px';
+    if(!container || !tray) return;
+
+    // On wide screens (side-by-side), don't override tray width
+    if(window.innerWidth >= 900) {
+      tray.style.width = '';
+      tray.style.maxWidth = '';
+      return;
     }
+
+    const w = container.offsetWidth;
+    tray.style.width = w + 'px';
+    tray.style.maxWidth = w + 'px';
   });
 }
 
@@ -1783,8 +1902,26 @@ function renderBoard() {
       } else if(data.dominoId !== null) {
         cell.classList.add('filled');
         const regionColor = regions[data.region]?.color;
-        if(regionColor) cell.style.background = regionColor.bg;
+        if(regionColor) {
+          const border = regionColor.border || '#888';
+          cell.style.background = border;
+        }
         cell.appendChild(renderDots(data.value));
+
+        // Detect domino partner direction to visually connect the two halves
+        const domId = data.dominoId;
+        if(c+1 < boardCols && boardData[r][c+1]?.dominoId === domId) {
+          cell.classList.add('domino-right');
+        }
+        if(c-1 >= 0 && boardData[r][c-1]?.dominoId === domId) {
+          cell.classList.add('domino-left');
+        }
+        if(r+1 < boardRows && boardData[r+1]?.[c]?.dominoId === domId) {
+          cell.classList.add('domino-down');
+        }
+        if(r-1 >= 0 && boardData[r-1]?.[c]?.dominoId === domId) {
+          cell.classList.add('domino-up');
+        }
 
         if(violatedCells.has(key(r,c))) cell.classList.add('violation');
 
