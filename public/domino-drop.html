@@ -579,6 +579,215 @@ permalink: /domino-drop/
     h1 { font-size: 1.5rem; }
     .btn { padding: 6px 12px; font-size: 0.7rem; }
     .tray { gap: 6px; padding: 8px; }
+    .modal-card { padding: 20px; margin: 10px; }
+  }
+
+  /* Custom Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s;
+  }
+
+  .modal-card {
+    background: var(--bg2);
+    border-radius: 20px;
+    padding: 28px;
+    width: 90%;
+    max-width: 420px;
+    max-height: 85vh;
+    overflow-y: auto;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .modal-header h2 {
+    font-family: 'Righteous', cursive;
+    font-size: 1.3rem;
+    background: linear-gradient(135deg, var(--accent1), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .modal-close:hover { color: var(--accent1); background: rgba(255,255,255,0.05); }
+
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .modal-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-section-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    opacity: 0.7;
+  }
+
+  .modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .modal-field label {
+    font-size: 0.8rem;
+    color: var(--text);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .modal-field label span {
+    color: var(--accent3);
+    font-weight: 700;
+    min-width: 24px;
+    text-align: right;
+  }
+
+  .modal-field input[type="range"],
+  .weight-control input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.1);
+    outline: none;
+  }
+
+  .modal-field input[type="range"]::-webkit-slider-thumb,
+  .weight-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent3);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+
+  .constraint-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .constraint-row.disabled {
+    opacity: 0.35;
+  }
+
+  .constraint-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    color: var(--text);
+  }
+
+  .constraint-toggle input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .constraint-toggle input[type="checkbox"]:checked {
+    background: var(--accent3);
+    border-color: var(--accent3);
+  }
+
+  .constraint-toggle input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: -1px;
+    left: 2px;
+    font-size: 12px;
+    color: white;
+    font-weight: bold;
+  }
+
+  .constraint-swatch {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    color: white;
+    font-family: 'Righteous', cursive;
+    flex-shrink: 0;
+  }
+
+  .weight-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: 26px;
+  }
+
+  .weight-label {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  .weight-val {
+    font-size: 0.75rem;
+    color: var(--accent3);
+    font-weight: 700;
+    min-width: 16px;
+    text-align: right;
+  }
+
+  .modal-footer {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 20px;
   }
 </style>
 </head>
@@ -598,6 +807,7 @@ permalink: /domino-drop/
         <button class="btn btn-diff active" data-diff="easy" onclick="setDifficulty('easy')">Easy</button>
         <button class="btn btn-diff" data-diff="medium" onclick="setDifficulty('medium')">Medium</button>
         <button class="btn btn-diff" data-diff="hard" onclick="setDifficulty('hard')">Hard</button>
+        <button class="btn btn-diff" data-diff="custom" onclick="openCustomModal()">Custom</button>
       </div>
     </div>
     <div class="menu-section">
@@ -652,6 +862,102 @@ permalink: /domino-drop/
   </div>
 </div>
 
+<div class="modal-overlay" id="customModal" style="display:none">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2>Custom Game</h2>
+      <button class="modal-close" onclick="closeCustomModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-section">
+        <div class="modal-section-title">Board Size</div>
+        <div class="modal-field">
+          <label>Rows: <span id="customRowsVal">6</span></label>
+          <input type="range" id="customRows" min="4" max="10" value="6" oninput="updateCustomPreview()">
+        </div>
+        <div class="modal-field">
+          <label>Columns: <span id="customColsVal">7</span></label>
+          <input type="range" id="customCols" min="4" max="12" value="7" oninput="updateCustomPreview()">
+        </div>
+        <div class="modal-field">
+          <label>Dominoes: <span id="customDominoesVal">7</span></label>
+          <input type="range" id="customDominoes" min="3" max="20" value="7" oninput="updateCustomPreview()">
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Constraints</div>
+        <div class="constraint-row" data-type="sum">
+          <label class="constraint-toggle">
+            <input type="checkbox" id="cEnabledSum" checked onchange="updateCustomPreview()">
+            <div class="constraint-swatch" style="background:#e94560">7</div>
+            <span>Sum equals</span>
+          </label>
+          <div class="weight-control">
+            <span class="weight-label">Weight:</span>
+            <input type="range" id="cWeightSum" min="0" max="10" value="5" oninput="updateCustomPreview()">
+            <span class="weight-val" id="cWeightSumVal">5</span>
+          </div>
+        </div>
+        <div class="constraint-row" data-type="eq">
+          <label class="constraint-toggle">
+            <input type="checkbox" id="cEnabledEq" checked onchange="updateCustomPreview()">
+            <div class="constraint-swatch" style="background:#0ea5e9">=</div>
+            <span>Values equal</span>
+          </label>
+          <div class="weight-control">
+            <span class="weight-label">Weight:</span>
+            <input type="range" id="cWeightEq" min="0" max="10" value="5" oninput="updateCustomPreview()">
+            <span class="weight-val" id="cWeightEqVal">5</span>
+          </div>
+        </div>
+        <div class="constraint-row" data-type="neq">
+          <label class="constraint-toggle">
+            <input type="checkbox" id="cEnabledNeq" checked onchange="updateCustomPreview()">
+            <div class="constraint-swatch" style="background:#8b5cf6">≠</div>
+            <span>All different</span>
+          </label>
+          <div class="weight-control">
+            <span class="weight-label">Weight:</span>
+            <input type="range" id="cWeightNeq" min="0" max="10" value="4" oninput="updateCustomPreview()">
+            <span class="weight-val" id="cWeightNeqVal">4</span>
+          </div>
+        </div>
+        <div class="constraint-row" data-type="gt">
+          <label class="constraint-toggle">
+            <input type="checkbox" id="cEnabledGt" checked onchange="updateCustomPreview()">
+            <div class="constraint-swatch" style="background:#10b981">&gt;3</div>
+            <span>Greater than</span>
+          </label>
+          <div class="weight-control">
+            <span class="weight-label">Weight:</span>
+            <input type="range" id="cWeightGt" min="0" max="10" value="1" oninput="updateCustomPreview()">
+            <span class="weight-val" id="cWeightGtVal">1</span>
+          </div>
+        </div>
+        <div class="constraint-row" data-type="lt">
+          <label class="constraint-toggle">
+            <input type="checkbox" id="cEnabledLt" checked onchange="updateCustomPreview()">
+            <div class="constraint-swatch" style="background:#f59e0b">&lt;5</div>
+            <span>Less than</span>
+          </label>
+          <div class="weight-control">
+            <span class="weight-label">Weight:</span>
+            <input type="range" id="cWeightLt" min="0" max="10" value="1" oninput="updateCustomPreview()">
+            <span class="weight-val" id="cWeightLtVal">1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeCustomModal()">Cancel</button>
+      <button class="btn btn-action" onclick="applyCustom()">Play</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ════════════════════════════════════
 //  GLOBALS
@@ -692,6 +998,20 @@ const CONFIGS = {
   easy:   { rows:5, cols:5, dominoes:5 },
   medium: { rows:6, cols:7, dominoes:7 },
   hard:   { rows:8, cols:9, dominoes:12 },
+  custom: { rows:6, cols:7, dominoes:7 },
+};
+
+let customConfig = {
+  rows: 6,
+  cols: 7,
+  dominoes: 7,
+  constraints: {
+    sum: { enabled: true, weight: 5 },
+    eq:  { enabled: true, weight: 5 },
+    neq: { enabled: true, weight: 4 },
+    gt:  { enabled: true, weight: 1 },
+    lt:  { enabled: true, weight: 1 },
+  }
 };
 
 // ════════════════════════════════════
@@ -833,25 +1153,47 @@ function generatePuzzle() {
     else boardData[r][c] = {slot:true, region:-1, dominoId:null, value:null};
   }
 
-  // 5) Build regions INDEPENDENTLY of domino pairs using flood-fill
-  //    This means region boundaries will split some dominoes across two regions,
-  //    forcing the player to consider cross-region placement.
+  // 5) Build regions that DELIBERATELY split dominoes across region boundaries.
+  //    Strategy: Use domino midpoints as region seeds so that each half of a domino
+  //    tends to end up in a different region. Then validate and adjust.
   const allCells = [];
   for(let r=0;r<boardRows;r++) for(let c=0;c<boardCols;c++) {
     if(boardData[r][c]) allCells.push([r,c]);
   }
 
-  const targetRegionCount = Math.max(3, Math.ceil(placed.length * 0.8));
+  // More regions = smaller regions = more splits
+  const targetRegionCount = Math.max(3, placed.length);
   const targetRegionSize = Math.max(2, Math.round(allCells.length / targetRegionCount));
 
   const cellToRegion = {};
   regions = [];
   let regionIdx = 0;
 
-  // Pick seed cells spread across the board
-  const seeds = shuffle([...allCells]).slice(0, targetRegionCount);
-  for(const [r,c] of seeds) {
+  // Seed strategy: pick one cell from each domino pair as a seed.
+  // Alternate which half we pick so adjacent dominoes get different halves seeded,
+  // maximizing the chance of region boundaries splitting dominoes.
+  const seedCells = [];
+  for(let i=0; i<placed.length; i++) {
+    const p = placed[i];
+    // Alternate: even dominoes seed cell1, odd seed cell2
+    if(i % 2 === 0) {
+      seedCells.push([p.r1, p.c1]);
+    } else {
+      seedCells.push([p.r2, p.c2]);
+    }
+  }
+  shuffle(seedCells);
+
+  // Place seeds — skip if cell already seeded by a neighbor
+  for(const [r,c] of seedCells) {
     if(cellToRegion[key(r,c)] !== undefined) continue;
+    // Don't place a seed adjacent to an existing seed (creates tiny regions)
+    let tooClose = false;
+    for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
+      if(cellToRegion[key(r+dr,c+dc)] !== undefined) { tooClose = true; break; }
+    }
+    if(tooClose && regionIdx >= 3) continue; // need at least 3 regions
+
     const ri = regionIdx++;
     regions.push({
       cells:[[r,c]],
@@ -859,6 +1201,22 @@ function generatePuzzle() {
       color:REGION_COLORS[ri % REGION_COLORS.length]
     });
     cellToRegion[key(r,c)] = ri;
+  }
+
+  // Ensure we have enough regions (at least 3)
+  if(regionIdx < 3) {
+    const remaining = allCells.filter(([r,c]) => cellToRegion[key(r,c)] === undefined);
+    shuffle(remaining);
+    for(const [r,c] of remaining) {
+      if(regionIdx >= 3) break;
+      const ri = regionIdx++;
+      regions.push({
+        cells:[[r,c]],
+        constraint:null,
+        color:REGION_COLORS[ri % REGION_COLORS.length]
+      });
+      cellToRegion[key(r,c)] = ri;
+    }
   }
 
   // Grow regions outward round-robin, one cell at a time
@@ -889,7 +1247,7 @@ function generatePuzzle() {
     }
   }
 
-  // Assign remaining unassigned cells to nearest neighbor region
+  // Assign any remaining unassigned cells
   for(const [r,c] of allCells) {
     const k = key(r,c);
     if(cellToRegion[k] !== undefined) continue;
@@ -919,6 +1277,65 @@ function generatePuzzle() {
           const target = cellToRegion[nk];
           regions[target].cells.push([r,c]);
           cellToRegion[key(r,c)] = target;
+          regions[i].cells = [];
+          break;
+        }
+      }
+    }
+  }
+
+  regions = regions.filter(r => r.cells.length > 0);
+
+  // Post-processing: if too few dominoes span two regions, swap some border cells
+  // to break apart domino pairs that ended up in the same region.
+  let splitCount = 0;
+  for(const p of placed) {
+    if(cellToRegion[key(p.r1,p.c1)] !== cellToRegion[key(p.r2,p.c2)]) splitCount++;
+  }
+
+  const targetSplits = Math.max(2, Math.ceil(placed.length * 0.5));
+  if(splitCount < targetSplits) {
+    // Find unsplit dominoes and try to reassign one half to an adjacent region
+    const unsplit = placed.filter(p =>
+      cellToRegion[key(p.r1,p.c1)] === cellToRegion[key(p.r2,p.c2)]
+    );
+    shuffle(unsplit);
+
+    for(const p of unsplit) {
+      if(splitCount >= targetSplits) break;
+
+      // Try reassigning cell2 to an adjacent different region
+      for(const [dr,dc] of shuffle([[0,1],[0,-1],[1,0],[-1,0]])) {
+        const nr = p.r2+dr, nc = p.c2+dc;
+        const nk = key(nr,nc);
+        if(cellToRegion[nk] !== undefined && cellToRegion[nk] !== cellToRegion[key(p.r2,p.c2)]
+          && !(nr===p.r1 && nc===p.c1)) {
+          const oldReg = cellToRegion[key(p.r2,p.c2)];
+          const newReg = cellToRegion[nk];
+          // Move cell2 to the neighbor's region
+          cellToRegion[key(p.r2,p.c2)] = newReg;
+          // Update region cell lists
+          regions[oldReg].cells = regions[oldReg].cells.filter(([r,c]) => !(r===p.r2 && c===p.c2));
+          regions[newReg].cells.push([p.r2, p.c2]);
+          splitCount++;
+          break;
+        }
+      }
+    }
+  }
+
+  // Clean up empty regions after post-processing swaps
+  regions = regions.filter(r => r.cells.length > 0);
+
+  // Merge any new 1-cell regions created by swaps
+  for(let i=0;i<regions.length;i++) {
+    if(regions[i].cells.length < 2) {
+      const [r,c] = regions[i].cells[0];
+      for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
+        const nk = key(r+dr,c+dc);
+        const neighborReg = regions.findIndex(reg => reg.cells.some(([rr,cc]) => key(rr,cc) === nk));
+        if(neighborReg >= 0 && neighborReg !== i) {
+          regions[neighborReg].cells.push([r,c]);
           regions[i].cells = [];
           break;
         }
@@ -979,22 +1396,48 @@ function generatePuzzle() {
     return opts;
   }
 
-  // Pre-compute options for each region
-  const regionOptions = regions.map(reg => getOptions(reg));
+  // Get constraint weights (custom or default)
+  function getConstraintWeight(type) {
+    if(difficulty === 'custom') {
+      const cc = customConfig.constraints[type];
+      return (cc && cc.enabled) ? cc.weight : 0;
+    }
+    // Default weights
+    return {sum:5, eq:5, neq:4, gt:1, lt:1}[type] || 1;
+  }
+
+  function isConstraintEnabled(type) {
+    if(difficulty === 'custom') {
+      return customConfig.constraints[type]?.enabled !== false;
+    }
+    return true;
+  }
+
+  // Pre-compute options for each region (filtered by enabled constraints)
+  const regionOptions = regions.map(reg => {
+    const allOpts = getOptions(reg);
+    const filtered = {};
+    for(const type in allOpts) {
+      if(isConstraintEnabled(type) && getConstraintWeight(type) > 0) {
+        filtered[type] = allOpts[type];
+      }
+    }
+    return filtered;
+  });
 
   // Track which types have been used
   const usedTypes = new Set();
   const allTypes = ['sum', 'gt', 'lt', 'eq', 'neq'];
+  const enabledTypes = allTypes.filter(t => isConstraintEnabled(t) && getConstraintWeight(t) > 0);
   const unassigned = new Set(regions.map((_,i) => i));
 
-  // Pass 1: Force one of each type
-  const typeOrder = shuffle([...allTypes]);
+  // Pass 1: Force one of each enabled type
+  const typeOrder = shuffle([...enabledTypes]);
   for(const type of typeOrder) {
     if(unassigned.size === 0) break;
 
-    // Find an unassigned region that supports this type
     const candidates = [...unassigned].filter(i => regionOptions[i][type]);
-    if(candidates.length === 0) continue; // No region can support this type, skip
+    if(candidates.length === 0) continue;
 
     const pick = candidates[rand(candidates.length)];
     regions[pick].constraint = regionOptions[pick][type];
@@ -1007,11 +1450,10 @@ function generatePuzzle() {
     const opts = regionOptions[i];
 
     const weighted = [];
-    if(opts.sum) weighted.push([opts.sum, 5]);
-    if(opts.eq)  weighted.push([opts.eq, 5]);
-    if(opts.neq) weighted.push([opts.neq, 4]);
-    if(opts.gt)  weighted.push([opts.gt, 1]);
-    if(opts.lt)  weighted.push([opts.lt, 1]);
+    for(const type in opts) {
+      const w = getConstraintWeight(type);
+      if(w > 0) weighted.push([opts[type], w]);
+    }
 
     // Fallback if somehow empty
     if(weighted.length === 0) {
@@ -1719,7 +2161,7 @@ function loadFromURL() {
   const params = new URLSearchParams(window.location.search);
   const d = params.get('d');
   const s = params.get('s');
-  if(d && ['easy','medium','hard'].includes(d) && s) {
+  if(d && ['easy','medium','hard','custom'].includes(d) && s) {
     difficulty = d;
     document.querySelectorAll('.btn-diff').forEach(b =>
       b.classList.toggle('active', b.dataset.diff === d)
@@ -1728,6 +2170,89 @@ function loadFromURL() {
     return true;
   }
   return false;
+}
+
+// ════════════════════════════════════
+//  CUSTOM GAME MODAL
+// ════════════════════════════════════
+function openCustomModal() {
+  // Populate fields from current customConfig
+  document.getElementById('customRows').value = customConfig.rows;
+  document.getElementById('customCols').value = customConfig.cols;
+  document.getElementById('customDominoes').value = customConfig.dominoes;
+
+  for(const type of ['sum','eq','neq','gt','lt']) {
+    const cap = type.charAt(0).toUpperCase() + type.slice(1);
+    document.getElementById('cEnabled' + cap).checked = customConfig.constraints[type].enabled;
+    document.getElementById('cWeight' + cap).value = customConfig.constraints[type].weight;
+  }
+
+  updateCustomPreview();
+  document.getElementById('customModal').style.display = 'flex';
+}
+
+function closeCustomModal() {
+  document.getElementById('customModal').style.display = 'none';
+}
+
+function updateCustomPreview() {
+  const rows = parseInt(document.getElementById('customRows').value);
+  const cols = parseInt(document.getElementById('customCols').value);
+  const doms = parseInt(document.getElementById('customDominoes').value);
+
+  // Clamp dominoes to max possible (half of grid cells)
+  const maxDominoes = Math.floor((rows * cols) / 2);
+  const domSlider = document.getElementById('customDominoes');
+  domSlider.max = maxDominoes;
+  const clampedDoms = Math.min(doms, maxDominoes);
+  domSlider.value = clampedDoms;
+
+  document.getElementById('customRowsVal').textContent = rows;
+  document.getElementById('customColsVal').textContent = cols;
+  document.getElementById('customDominoesVal').textContent = clampedDoms;
+
+  // Update weight display values and disabled states
+  for(const type of ['sum','eq','neq','gt','lt']) {
+    const cap = type.charAt(0).toUpperCase() + type.slice(1);
+    const enabled = document.getElementById('cEnabled' + cap).checked;
+    const weight = document.getElementById('cWeight' + cap).value;
+    document.getElementById('cWeight' + cap + 'Val').textContent = weight;
+
+    const row = document.getElementById('cEnabled' + cap).closest('.constraint-row');
+    if(row) {
+      row.classList.toggle('disabled', !enabled);
+    }
+    document.getElementById('cWeight' + cap).disabled = !enabled;
+  }
+}
+
+function applyCustom() {
+  const rows = parseInt(document.getElementById('customRows').value);
+  const cols = parseInt(document.getElementById('customCols').value);
+  const doms = parseInt(document.getElementById('customDominoes').value);
+
+  customConfig.rows = rows;
+  customConfig.cols = cols;
+  customConfig.dominoes = doms;
+
+  for(const type of ['sum','eq','neq','gt','lt']) {
+    const cap = type.charAt(0).toUpperCase() + type.slice(1);
+    customConfig.constraints[type].enabled = document.getElementById('cEnabled' + cap).checked;
+    customConfig.constraints[type].weight = parseInt(document.getElementById('cWeight' + cap).value);
+  }
+
+  // Ensure at least one constraint is enabled
+  const anyEnabled = Object.values(customConfig.constraints).some(c => c.enabled);
+  if(!anyEnabled) {
+    customConfig.constraints.sum.enabled = true;
+    customConfig.constraints.sum.weight = 5;
+  }
+
+  // Update CONFIGS.custom
+  CONFIGS.custom = { rows, cols, dominoes: doms };
+
+  closeCustomModal();
+  setDifficulty('custom');
 }
 
 // ════════════════════════════════════
