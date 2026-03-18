@@ -585,6 +585,21 @@ permalink: /domino-drop/
   .win-card p { color: var(--text-dim); margin-bottom: 6px; }
   .win-card .win-stats { color: var(--accent3); font-weight: 700; margin-bottom: 20px; font-size: 0.9rem; }
 
+  .win-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .win-share-msg {
+    margin-top: 12px;
+    font-size: 0.8rem;
+    color: var(--accent4);
+    min-height: 1.2em;
+    transition: opacity 0.3s;
+  }
+
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
@@ -1015,7 +1030,12 @@ permalink: /domino-drop/
     <h2>Puzzle Solved!</h2>
     <p>All constraints satisfied!</p>
     <div class="win-stats" id="winStats"></div>
-    <button class="btn btn-action" onclick="newGame()">Play Again</button>
+    <div class="win-buttons">
+      <button class="btn btn-action" onclick="newGame()">Play Again</button>
+      <button class="btn btn-secondary" onclick="shareWin()">Share</button>
+      <button class="btn btn-secondary" onclick="closeWin()">View Board</button>
+    </div>
+    <p class="win-share-msg" id="winShareMsg"></p>
   </div>
 </div>
 
@@ -2656,9 +2676,39 @@ function copyShareLink() {
       hint.classList.remove('copied');
     }, 2500);
   }).catch(() => {
-    // Fallback: execCommand
     try { document.execCommand('copy'); } catch(e) {}
   });
+}
+
+function shareWin() {
+  const m = Math.floor(elapsedSeconds / 60);
+  const s = elapsedSeconds % 60;
+  const time = `${m}:${s.toString().padStart(2,'0')}`;
+  const base = window.location.origin + window.location.pathname;
+  const url = `${base}?d=${difficulty}&s=${currentSeed}`;
+  const text = `🎲 Domino Drop — ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}\n✅ Solved in ${moveCount} moves, ${time}\nCan you beat my score?\n${url}`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    const msg = document.getElementById('winShareMsg');
+    msg.textContent = 'Copied to clipboard!';
+    setTimeout(() => { msg.textContent = ''; }, 2500);
+  }).catch(() => {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      const msg = document.getElementById('winShareMsg');
+      msg.textContent = 'Copied to clipboard!';
+      setTimeout(() => { msg.textContent = ''; }, 2500);
+    } catch(e) {}
+  });
+}
+
+function closeWin() {
+  document.getElementById('winOverlay').style.display = 'none';
 }
 
 function loadFromURL() {
