@@ -1405,6 +1405,59 @@ function generatePuzzle() {
     else boardData[r][c] = {slot:true, region:-1, dominoId:null, value:null};
   }
 
+  // 3b) Ensure landscape: if bounding box is taller than wide, rotate 90° clockwise.
+  //     Extract content by bounding box, transpose, and rebuild the grid.
+  let bbMinR=Infinity, bbMaxR=0, bbMinC=Infinity, bbMaxC=0;
+  for(let r=0;r<boardRows;r++) for(let c=0;c<boardCols;c++) {
+    if(boardData[r][c]) {
+      if(r<bbMinR) bbMinR=r; if(r>bbMaxR) bbMaxR=r;
+      if(c<bbMinC) bbMinC=c; if(c>bbMaxC) bbMaxC=c;
+    }
+  }
+  const bbH = bbMaxR - bbMinR + 1;
+  const bbW = bbMaxC - bbMinC + 1;
+
+  if(bbH > bbW) {
+    // Extract occupied cells relative to bounding box origin
+    const cells = [];
+    for(let r=bbMinR;r<=bbMaxR;r++) for(let c=bbMinC;c<=bbMaxC;c++) {
+      if(boardData[r][c]) cells.push([r - bbMinR, c - bbMinC]);
+    }
+
+    // Rotate 90° clockwise: (r,c) -> (c, bbH-1-r) in local coords
+    // New bounding box: width=bbH, height=bbW
+    const newBBW = bbH;
+    const newBBH = bbW;
+
+    // Rebuild grid large enough for rotated content
+    const newRows = Math.max(boardRows, newBBH + 2);
+    const newCols = Math.max(boardCols, newBBW + 2);
+    const newBoard = Array.from({length:newRows}, ()=>
+      Array.from({length:newCols}, ()=> null)
+    );
+
+    // Place rotated cells starting from (0,0)
+    const rotatedSet = new Set();
+    for(const [lr,lc] of cells) {
+      const nr = lc;
+      const nc = (bbH - 1) - lr;
+      newBoard[nr][nc] = {slot:true, region:-1, dominoId:null, value:null};
+      rotatedSet.add(key(nr, nc));
+    }
+
+    // Rotate placed domino coordinates
+    for(const p of placed) {
+      const lr1 = p.r1 - bbMinR, lc1 = p.c1 - bbMinC;
+      const lr2 = p.r2 - bbMinR, lc2 = p.c2 - bbMinC;
+      p.r1 = lc1; p.c1 = (bbH - 1) - lr1;
+      p.r2 = lc2; p.c2 = (bbH - 1) - lr2;
+    }
+
+    boardData = newBoard;
+    boardRows = newRows;
+    boardCols = newCols;
+  }
+
   // 4) Build regions with VARIED sizes (mix of 2-3 cell and 4-6 cell regions).
   //    Use domino-aware seeding to maximize cross-region splits.
   const allCells = [];
