@@ -408,12 +408,13 @@ permalink: /domino-drop/
   }
 
   .tray {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, calc(var(--cell-size) * 2 + 8px));
+    grid-auto-rows: calc(var(--cell-size) + 8px);
     gap: 0px;
     justify-content: center;
-    align-items: center;
-    align-content: flex-start;
+    align-items: start;
+    align-content: start;
     padding: 2px;
     background: var(--bg2);
     border-radius: 14px;
@@ -421,14 +422,42 @@ permalink: /domino-drop/
     min-height: 60px;
     touch-action: none;
     transition: width 0.15s;
+    overflow: visible;
+  }
+
+  /* Each domino gets a fixed-width slot, row height is 1 cell */
+  .tray .domino-slot {
+    width: calc(var(--cell-size) * 2 + 8px);
+    height: calc(var(--cell-size) + 8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tray .domino-slot:hover {
+    z-index: 10;
   }
 
   .tray .domino {
     transform: scale(0.9);
     transform-origin: center;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .tray .domino:hover {
     transform: scale(0.95);
+  }
+
+  /* Animate rotation with a quick scale pulse */
+  .tray .domino.rotate-anim {
+    animation: dominoPulse 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes dominoPulse {
+    0% { transform: scale(0.9); }
+    40% { transform: scale(0.75); }
+    100% { transform: scale(0.9); }
   }
 
   .tray-label {
@@ -682,6 +711,10 @@ permalink: /domino-drop/
     h1 { font-size: 1.5rem; }
     .btn { padding: 6px 12px; font-size: 0.7rem; }
     .tray { gap: 0px; padding: 1px; }
+    .tray .domino-slot {
+      width: calc(var(--cell-size) * 2 + 6px);
+      height: calc(var(--cell-size) + 6px);
+    }
     .modal-card { padding: 20px; margin: 10px; }
   }
 
@@ -693,21 +726,14 @@ permalink: /domino-drop/
       gap: 16px;
     }
     .tray {
-      flex-direction: column;
-      width: 200px !important;
-      max-width: 200px !important;
+      grid-template-columns: repeat(auto-fill, calc(var(--cell-size) * 2 + 8px));
+      width: 220px !important;
+      max-width: 220px !important;
       min-height: auto;
       max-height: 70vh;
       overflow-y: auto;
       flex-shrink: 0;
       align-self: stretch;
-    }
-    .tray-label {
-      position: sticky;
-      top: 0;
-      background: var(--bg2);
-      z-index: 1;
-      padding-bottom: 4px;
     }
   }
 
@@ -1167,9 +1193,9 @@ const CONSTRAINT_COLORS = {
 };
 
 const CONFIGS = {
-  easy:   { rows:4, cols:6, dominoes:8 },
-  medium: { rows:6, cols:8, dominoes:14 },
-  hard:   { rows:8, cols:11, dominoes:18 },
+  easy:   { rows:5, cols:7, dominoes:6 },
+  medium: { rows:7, cols:9, dominoes:12 },
+  hard:   { rows:8, cols:10, dominoes:16 },
   custom: { rows:6, cols:7, dominoes:7 },
 };
 
@@ -1285,11 +1311,15 @@ function generatePuzzle() {
     if(shapeSet.has(k)) return;
     shapeSet.add(k);
     boardData[r][c] = {slot:true, region:-1, dominoId:null, value:null};
-    // Add neighbors to frontier
+    // Add neighbors to frontier — horizontal neighbors added 3x for wider shapes
     for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
       const nr=r+dr, nc=c+dc;
       if(nr>=0&&nr<boardRows&&nc>=0&&nc<boardCols&&!shapeSet.has(key(nr,nc))) {
         frontier.push([nr,nc]);
+        // Bias: add horizontal neighbors extra time
+        if(dr === 0) {
+          frontier.push([nr,nc]);
+        }
       }
     }
   }
@@ -1362,8 +1392,9 @@ function generatePuzzle() {
     if(boardData[r][c]) allCells.push([r,c]);
   }
 
-  // Target: more regions than dominoes, with varied sizes
-  const targetRegionCount = Math.max(4, Math.ceil(placed.length * 1.1));
+  // Target: slightly fewer regions than dominoes for a mix of sizes
+  // Reference shows ~15 regions for ~16 dominoes (32 cells), with varied sizes
+  const targetRegionCount = Math.max(4, Math.ceil(placed.length * 0.85));
 
   const cellToRegion = {};
   regions = [];
@@ -1382,8 +1413,13 @@ function generatePuzzle() {
     if(regionIdx >= targetRegionCount) break;
 
     const ri = regionIdx++;
-    // Assign a random target size to this region (varied: some small, some large)
-    const targetSize = 2 + rand(4); // 2 to 5 cells
+    // Varied sizes: ~40% small (2), ~40% medium (3-5), ~20% large (6-10)
+    let targetSize;
+    const sizeRoll = rand(10);
+    if(sizeRoll < 4) targetSize = 2;
+    else if(sizeRoll < 8) targetSize = 3 + rand(3); // 3-5
+    else targetSize = 6 + rand(5); // 6-10
+
     regions.push({
       cells:[[r,c]],
       constraint:null,
@@ -1731,7 +1767,7 @@ function generatePuzzle() {
       return (cc && cc.enabled) ? cc.weight : 0;
     }
     // Default weights
-    return {sum:5, eq:5, neq:4, gt:1, lt:1}[type] || 1;
+    return {sum:10, eq:4, neq:3, gt:1, lt:1}[type] || 1;
   }
 
   function isConstraintEnabled(type) {
@@ -1809,7 +1845,7 @@ function generatePuzzle() {
     id: i,
     a: p.a,
     b: p.b,
-    orientation: 'down',
+    orientation: 'right',
     placed: false,
     placedAt: null,
   }));
@@ -2109,7 +2145,12 @@ function renderTray() {
     tray.appendChild(empty);
     return;
   }
-  unplaced.forEach(dom => tray.appendChild(createDominoElement(dom)));
+  unplaced.forEach(dom => {
+    const slot = document.createElement('div');
+    slot.className = 'domino-slot';
+    slot.appendChild(createDominoElement(dom));
+    tray.appendChild(slot);
+  });
 }
 
 function renderLegend() {
@@ -2257,14 +2298,24 @@ function onDragEnd(e) {
   dragState.el.remove();
   if(dragState.sourceEl) dragState.sourceEl.style.opacity = '1';
 
-  // Tap → rotate through 4 orientations
+  // Tap → rotate through 4 orientations with pulse feedback
   if(!dragState.moved || Date.now() - dragState.startTime < 180) {
     const dom = dragState.dom;
+    const domId = dom.id;
     const cycle = ['right','down','left','up'];
     const idx = cycle.indexOf(dom.orientation);
     dom.orientation = cycle[(idx + 1) % 4];
     dragState = null;
+
+    // Re-render immediately with new orientation
     renderTray();
+
+    // Apply pulse animation to the newly rendered domino
+    const newEl = document.querySelector(`.domino[data-id="${domId}"]`);
+    if(newEl) {
+      newEl.classList.add('rotate-anim');
+      newEl.addEventListener('animationend', () => newEl.classList.remove('rotate-anim'), {once: true});
+    }
     return;
   }
 
