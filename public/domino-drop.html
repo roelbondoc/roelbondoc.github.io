@@ -22,6 +22,7 @@ permalink: /domino-drop/
     --text: #e2e8f0;
     --text-dim: #94a3b8;
     --cell-size: 56px;
+    --tray-cell: 40px;
     --gap: 2px;
     --dot-size: 8px;
     --dot-container-size: 36px;
@@ -43,8 +44,10 @@ permalink: /domino-drop/
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 100vh;
-    padding: 16px 24px;
+    height: 100vh;
+    height: 100dvh;
+    padding: 12px 24px;
+    overflow: hidden;
   }
 
   header {
@@ -203,9 +206,12 @@ permalink: /domino-drop/
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 14px;
+    gap: 8px;
     width: 100%;
     max-width: 640px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .board-container {
@@ -409,26 +415,28 @@ permalink: /domino-drop/
 
   .tray {
     display: grid;
-    grid-template-columns: repeat(auto-fill, calc(var(--cell-size) * 2 + 8px));
-    grid-auto-rows: calc(var(--cell-size) + 8px);
+    grid-template-columns: repeat(auto-fill, calc(var(--tray-cell) * 2 + 6px));
+    grid-auto-rows: calc(var(--tray-cell) + 4px);
     gap: 0px;
     justify-content: center;
     align-items: start;
     align-content: start;
-    padding: 2px;
+    padding: 4px;
     background: var(--bg2);
     border-radius: 14px;
     border: 1px solid rgba(255,255,255,0.06);
-    min-height: 60px;
     touch-action: none;
-    transition: width 0.15s;
-    overflow: visible;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
   }
 
-  /* Each domino gets a fixed-width slot, row height is 1 cell */
+  /* Each domino gets a fixed-width slot, row height is 1 tray cell */
   .tray .domino-slot {
-    width: calc(var(--cell-size) * 2 + 8px);
-    height: calc(var(--cell-size) + 8px);
+    width: calc(var(--tray-cell) * 2 + 6px);
+    height: calc(var(--tray-cell) + 4px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -441,12 +449,31 @@ permalink: /domino-drop/
   }
 
   .tray .domino {
-    transform: scale(0.9);
+    background: rgba(255,255,255,0.12);
+    transform: scale(0.92);
     transform-origin: center;
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4);
   }
   .tray .domino:hover {
-    transform: scale(0.95);
+    transform: scale(0.97);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.5);
+  }
+  .tray .domino .half {
+    width: var(--tray-cell);
+    height: var(--tray-cell);
+    background: rgba(255,255,255,0.92);
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  .tray .domino .half .dot {
+    background: #1a1a2e;
+    box-shadow: none;
+    width: calc(var(--tray-cell) * 0.14);
+    height: calc(var(--tray-cell) * 0.14);
+  }
+  .tray .domino .half .dot-container {
+    width: calc(var(--tray-cell) * 0.64);
+    height: calc(var(--tray-cell) * 0.64);
   }
 
   /* Animate rotation with a quick scale pulse */
@@ -455,9 +482,9 @@ permalink: /domino-drop/
   }
 
   @keyframes dominoPulse {
-    0% { transform: scale(0.9); }
-    40% { transform: scale(0.75); }
-    100% { transform: scale(0.9); }
+    0% { transform: scale(0.92); }
+    40% { transform: scale(0.78); }
+    100% { transform: scale(0.92); }
   }
 
   .tray-label {
@@ -722,33 +749,24 @@ permalink: /domino-drop/
   }
 
   @media (max-width: 480px) {
-    .app { padding: 12px 16px; }
+    .app { padding: 8px 16px; }
     h1 { font-size: 1.5rem; }
     .btn { padding: 6px 12px; font-size: 0.7rem; }
-    .tray { gap: 0px; padding: 1px; }
-    .tray .domino-slot {
-      width: calc(var(--cell-size) * 2 + 6px);
-      height: calc(var(--cell-size) + 6px);
-    }
     .modal-card { padding: 20px; margin: 10px; }
   }
 
   @media (min-width: 900px) {
     .game-area {
       flex-direction: row;
-      align-items: flex-start;
+      align-items: stretch;
       max-width: 960px;
-      gap: 16px;
+      gap: 12px;
     }
     .tray {
-      grid-template-columns: repeat(auto-fill, calc(var(--cell-size) * 2 + 8px));
+      grid-template-columns: repeat(auto-fill, calc(var(--tray-cell) * 2 + 6px));
       width: 220px !important;
       max-width: 220px !important;
-      min-height: auto;
-      max-height: 70vh;
-      overflow-y: auto;
       flex-shrink: 0;
-      align-self: stretch;
     }
   }
 
@@ -1213,10 +1231,10 @@ const CONSTRAINT_COLORS = {
 };
 
 const CONFIGS = {
-  easy:   { rows:5, cols:7, dominoes:6 },
-  medium: { rows:7, cols:9, dominoes:12 },
-  hard:   { rows:8, cols:10, dominoes:16 },
-  custom: { rows:6, cols:7, dominoes:7 },
+  easy:   { rows:6, cols:6, dominoes:6 },
+  medium: { rows:8, cols:8, dominoes:12 },
+  hard:   { rows:10, cols:10, dominoes:16 },
+  custom: { rows:7, cols:7, dominoes:7 },
 };
 
 let customConfig = {
@@ -1307,21 +1325,21 @@ function updateTimerDisplay() {
 function generatePuzzle() {
   seedRandom(currentSeed);
   const cfg = CONFIGS[difficulty];
-  boardRows = cfg.rows;
-  boardCols = cfg.cols;
   const numDominoes = cfg.dominoes;
 
-  // 1) Build an organic board shape using a random walk from center.
-  //    We need at least numDominoes*2 cells. Grow outward organically.
+  // 1) Build organic shape on a square grid, growing equally in all directions
+  const gridSize = Math.max(cfg.rows, cfg.cols);
+  boardRows = gridSize;
+  boardCols = gridSize;
+
   boardData = Array.from({length:boardRows}, ()=>
     Array.from({length:boardCols}, ()=> null)
   );
 
-  const targetCells = numDominoes * 2 + rand(Math.max(1, Math.floor(numDominoes * 0.3)));
+  const targetCells = numDominoes * 2 + rand(Math.max(1, Math.floor(numDominoes * 0.2)));
   const centerR = Math.floor(boardRows / 2);
   const centerC = Math.floor(boardCols / 2);
 
-  // Seed the shape from center
   const shapeSet = new Set();
   const frontier = [];
 
@@ -1331,15 +1349,10 @@ function generatePuzzle() {
     if(shapeSet.has(k)) return;
     shapeSet.add(k);
     boardData[r][c] = {slot:true, region:-1, dominoId:null, value:null};
-    // Add neighbors to frontier — horizontal neighbors added 3x for wider shapes
     for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
       const nr=r+dr, nc=c+dc;
       if(nr>=0&&nr<boardRows&&nc>=0&&nc<boardCols&&!shapeSet.has(key(nr,nc))) {
         frontier.push([nr,nc]);
-        // Bias: add horizontal neighbors extra time
-        if(dr === 0) {
-          frontier.push([nr,nc]);
-        }
       }
     }
   }
@@ -1347,25 +1360,35 @@ function generatePuzzle() {
   addToShape(centerR, centerC);
 
   while(shapeSet.size < targetCells && frontier.length > 0) {
-    // Pick a random frontier cell, biased toward cells with more shape neighbors (organic growth)
     const idx = rand(frontier.length);
     const [fr,fc] = frontier.splice(idx, 1)[0];
     if(shapeSet.has(key(fr,fc))) continue;
 
-    // Count shape neighbors — more neighbors = more likely to add (but we already picked, so just add)
+    // Check current bounding box — skip if this cell would make it too lopsided
+    let minR=boardRows, maxR=0, minC=boardCols, maxC=0;
+    for(const k of shapeSet) {
+      const [r,c] = k.split(',').map(Number);
+      if(r<minR) minR=r; if(r>maxR) maxR=r;
+      if(c<minC) minC=c; if(c>maxC) maxC=c;
+    }
+    const curH = maxR - minR + 1;
+    const curW = maxC - minC + 1;
+    const newH = Math.max(curH, fr > maxR ? fr - minR + 1 : fr < minR ? maxR - fr + 1 : curH);
+    const newW = Math.max(curW, fc > maxC ? fc - minC + 1 : fc < minC ? maxC - fc + 1 : curW);
+    // If adding this cell would make the difference > 2, skip it most of the time
+    if(Math.abs(newH - newW) > 2 && rand(4) > 0) continue;
+
+    // Skip isolated cells sometimes for organic feel
     let neighbors = 0;
     for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
       if(shapeSet.has(key(fr+dr,fc+dc))) neighbors++;
     }
-
-    // Skip isolated cells (only 1 neighbor) sometimes to create more interesting shapes
     if(neighbors <= 1 && rand(3) === 0 && shapeSet.size > 4) continue;
 
     addToShape(fr, fc);
   }
 
-  // 2) Place domino solution using greedy matching on the shape.
-  //    Try to pack as many as possible — use all 4 directions.
+  // 2) Place domino solution on the shape
   let slots = [];
   for(let r=0;r<boardRows;r++) for(let c=0;c<boardCols;c++) {
     if(boardData[r][c]) slots.push([r,c]);
@@ -1384,7 +1407,6 @@ function generatePuzzle() {
       const nr = r+dr, nc = c+dc;
       if(nr>=0 && nr<boardRows && nc>=0 && nc<boardCols
         && boardData[nr]?.[nc] && !usedCells.has(key(nr,nc))) {
-        // Use more constrained values: bias toward lower numbers to make sums tighter
         const a = rand(7), b = rand(7);
         placed.push({r1:r, c1:c, r2:nr, c2:nc, a, b});
         usedCells.add(key(r,c));
@@ -1405,8 +1427,7 @@ function generatePuzzle() {
     else boardData[r][c] = {slot:true, region:-1, dominoId:null, value:null};
   }
 
-  // 3b) Ensure landscape: if bounding box is taller than wide, rotate 90° clockwise.
-  //     Extract content by bounding box, transpose, and rebuild the grid.
+  // 3b) If bounding box is taller than wide, rotate 90° clockwise to favour landscape
   let bbMinR=Infinity, bbMaxR=0, bbMinC=Infinity, bbMaxC=0;
   for(let r=0;r<boardRows;r++) for(let c=0;c<boardCols;c++) {
     if(boardData[r][c]) {
@@ -1418,31 +1439,21 @@ function generatePuzzle() {
   const bbW = bbMaxC - bbMinC + 1;
 
   if(bbH > bbW) {
-    // Extract occupied cells relative to bounding box origin
-    const cells = [];
+    // Extract cells in local coords relative to bounding box
+    const localCells = [];
     for(let r=bbMinR;r<=bbMaxR;r++) for(let c=bbMinC;c<=bbMaxC;c++) {
-      if(boardData[r][c]) cells.push([r - bbMinR, c - bbMinC]);
+      if(boardData[r][c]) localCells.push([r - bbMinR, c - bbMinC]);
     }
 
-    // Rotate 90° clockwise: (r,c) -> (c, bbH-1-r) in local coords
-    // New bounding box: width=bbH, height=bbW
-    const newBBW = bbH;
-    const newBBH = bbW;
-
-    // Rebuild grid large enough for rotated content
-    const newRows = Math.max(boardRows, newBBH + 2);
-    const newCols = Math.max(boardCols, newBBW + 2);
-    const newBoard = Array.from({length:newRows}, ()=>
-      Array.from({length:newCols}, ()=> null)
+    // Rotated dims
+    const newGridSize = Math.max(boardRows, boardCols, bbH, bbW) + 1;
+    const newBoard = Array.from({length:newGridSize}, ()=>
+      Array.from({length:newGridSize}, ()=> null)
     );
 
-    // Place rotated cells starting from (0,0)
-    const rotatedSet = new Set();
-    for(const [lr,lc] of cells) {
-      const nr = lc;
-      const nc = (bbH - 1) - lr;
-      newBoard[nr][nc] = {slot:true, region:-1, dominoId:null, value:null};
-      rotatedSet.add(key(nr, nc));
+    // Rotate 90° clockwise: local(r,c) -> (c, bbH-1-r)
+    for(const [lr,lc] of localCells) {
+      newBoard[lc][(bbH - 1) - lr] = {slot:true, region:-1, dominoId:null, value:null};
     }
 
     // Rotate placed domino coordinates
@@ -1454,8 +1465,8 @@ function generatePuzzle() {
     }
 
     boardData = newBoard;
-    boardRows = newRows;
-    boardCols = newCols;
+    boardRows = newGridSize;
+    boardCols = newGridSize;
   }
 
   // 4) Build regions with VARIED sizes (mix of 2-3 cell and 4-6 cell regions).
@@ -2017,48 +2028,73 @@ function fitCellSize() {
   boardUsedRows = maxR - minR + 1;
 
   const gap = 2;
-  const containerPad = 24; // 12px * 2
+  const containerPad = 24;
   const isWide = window.innerWidth >= 900;
 
-  // Shrink cells so game-area collapses to CSS-constrained width
+  // Collapse cells to measure available space
   document.documentElement.style.setProperty('--cell-size', '1px');
+  document.documentElement.style.setProperty('--tray-cell', '1px');
 
-  // Measure available space
   const gameArea = document.querySelector('.game-area');
   let availW = gameArea.clientWidth;
-  if(isWide) availW = availW - 200 - 16;
+  if(isWide) availW = availW - 220 - 12;
 
+  // Measure chrome height
   const header = document.querySelector('header');
   const stats = document.querySelector('.stats');
   const menuPanel = document.getElementById('menuPanel');
-  const chromeH = (header?.offsetHeight || 40) + (stats?.offsetHeight || 30)
+  const chromeH = (header?.offsetHeight || 40) + (stats?.offsetHeight || 24)
     + (menuPanel?.classList.contains('open') ? (menuPanel.offsetHeight || 0) : 0)
-    + 16;
-  const trayEstimate = isWide ? 0 : 90;
-  const gameGaps = isWide ? 16 : 28;
-  let availH = window.innerHeight - chromeH - trayEstimate - gameGaps;
+    + 12;
 
-  // Inner space after container padding
+  const totalH = window.innerHeight - chromeH;
+  const gameGap = 8;
+
+  // Board gets ~65% of available height on mobile, tray gets the rest
+  // On wide screens board gets full height
+  const boardFraction = isWide ? 0.95 : 0.62;
+  const boardAvailH = totalH * boardFraction;
+  const trayAvailH = isWide ? totalH : totalH * (1 - boardFraction) - gameGap;
+
+  // Compute board cell size
   const innerW = availW - containerPad;
-  const innerH = availH - containerPad;
-
-  // Size cells independently for width and height based on USED cols/rows only
+  const innerH = boardAvailH - containerPad;
   const cellFromCols = Math.floor((innerW - (boardUsedCols - 1) * gap) / boardUsedCols);
   const cellFromRows = Math.floor((innerH - (boardUsedRows - 1) * gap) / boardUsedRows);
-  const ideal = Math.min(cellFromCols, cellFromRows);
-  const clamped = Math.max(24, Math.min(72, ideal));
+  const cellSize = Math.max(20, Math.min(80, Math.min(cellFromCols, cellFromRows)));
 
-  document.documentElement.style.setProperty('--cell-size', clamped + 'px');
+  document.documentElement.style.setProperty('--cell-size', cellSize + 'px');
 
-  // Size the container to exactly fit the trimmed grid content
-  const contentW = boardUsedCols * clamped + (boardUsedCols - 1) * gap;
-  const contentH = boardUsedRows * clamped + (boardUsedRows - 1) * gap;
+  // Size board container to fit content
+  const contentW = boardUsedCols * cellSize + (boardUsedCols - 1) * gap;
+  const contentH = boardUsedRows * cellSize + (boardUsedRows - 1) * gap;
   const container = document.querySelector('.board-container');
   container.style.width = (contentW + containerPad) + 'px';
   container.style.height = (contentH + containerPad) + 'px';
 
-  const dotSize = Math.max(3, Math.round(clamped * 0.14));
-  const dotContainerSize = Math.max(16, Math.round(clamped * 0.64));
+  // Compute tray cell size to fit all dominoes in the available tray space
+  const unplacedCount = dominoes.filter(d => !d.placed).length || dominoes.length;
+  const trayW = isWide ? 220 : (contentW + containerPad);
+  const trayInnerW = trayW - 8; // tray padding
+  const trayCols = Math.max(1, Math.floor(trayInnerW / (cellSize * 2 + 6)));
+  const trayRows = Math.ceil(unplacedCount / trayCols);
+  const trayInnerH = trayAvailH - 8;
+
+  // Size tray cells to fit all rows
+  let trayCell;
+  if(trayRows > 0) {
+    const maxFromH = Math.floor((trayInnerH - (trayRows - 1) * 0) / trayRows) - 4;
+    const maxFromW = Math.floor((trayInnerW / trayCols - 6) / 2);
+    trayCell = Math.max(16, Math.min(cellSize, Math.min(maxFromH, maxFromW)));
+  } else {
+    trayCell = cellSize;
+  }
+
+  document.documentElement.style.setProperty('--tray-cell', trayCell + 'px');
+
+  // Dot sizes for board
+  const dotSize = Math.max(3, Math.round(cellSize * 0.14));
+  const dotContainerSize = Math.max(16, Math.round(cellSize * 0.64));
   document.documentElement.style.setProperty('--dot-size', dotSize + 'px');
   document.documentElement.style.setProperty('--dot-container-size', dotContainerSize + 'px');
 }
@@ -2078,13 +2114,14 @@ function syncWidths() {
     const tray = document.getElementById('tray');
     if(!container || !tray) return;
 
-    // On wide screens (side-by-side), don't override tray width
+    // On wide screens, tray has its own CSS width
     if(window.innerWidth >= 900) {
       tray.style.width = '';
       tray.style.maxWidth = '';
       return;
     }
 
+    // Match tray width to board container
     const w = container.offsetWidth;
     tray.style.width = w + 'px';
     tray.style.maxWidth = w + 'px';
@@ -2306,25 +2343,48 @@ function startDrag(e, dom) {
   const rect = el.getBoundingClientRect();
 
   const isTouch = !!e.touches;
-  // On touch, lift the domino above the finger so it's visible
-  const offsetY = isTouch ? rect.height + 30 : (touch.clientY - rect.top);
+  const cellSize = getCellSize();
+
+  // Build a board-sized clone for dragging
+  const clone = el.cloneNode(true);
+  clone.classList.add('dragging');
+  // Override tray sizing — use board cell size
+  clone.querySelectorAll('.half').forEach(h => {
+    h.style.width = cellSize + 'px';
+    h.style.height = cellSize + 'px';
+  });
+  clone.querySelectorAll('.dot-container').forEach(d => {
+    d.style.width = Math.round(cellSize * 0.64) + 'px';
+    d.style.height = Math.round(cellSize * 0.64) + 'px';
+  });
+  clone.querySelectorAll('.dot').forEach(d => {
+    d.style.width = Math.round(cellSize * 0.14) + 'px';
+    d.style.height = Math.round(cellSize * 0.14) + 'px';
+  });
+
+  const isHoriz = (dom.orientation === 'right' || dom.orientation === 'left');
+  const cloneW = isHoriz ? cellSize * 2 + 8 : cellSize + 6;
+  const cloneH = isHoriz ? cellSize + 6 : cellSize * 2 + 8;
+
+  // Center the clone on the touch/click point, offset up on touch
+  const offsetX = cloneW / 2;
+  const offsetY = isTouch ? cloneH + 30 : cloneH / 2;
 
   dragState = {
     dom,
-    offsetX: touch.clientX - rect.left,
+    offsetX,
     offsetY,
-    el: el.cloneNode(true),
+    el: clone,
     startX: touch.clientX,
     startY: touch.clientY,
     startTime: Date.now(),
     moved: false,
   };
 
-  dragState.el.classList.add('dragging');
-  dragState.el.style.width = rect.width + 'px';
-  dragState.el.style.left = (touch.clientX - dragState.offsetX) + 'px';
-  dragState.el.style.top = (touch.clientY - dragState.offsetY) + 'px';
-  document.body.appendChild(dragState.el);
+  clone.style.width = cloneW + 'px';
+  clone.style.left = (touch.clientX - offsetX) + 'px';
+  clone.style.top = (touch.clientY - offsetY) + 'px';
+  document.body.appendChild(clone);
 
   el.style.opacity = '0.3';
   dragState.sourceEl = el;
