@@ -1306,11 +1306,18 @@ function startTimer() {
   stopTimer();
   elapsedSeconds = 0;
   updateTimerDisplay();
+  _runTimer();
+}
+function resumeTimer() {
+  stopTimer();
+  updateTimerDisplay();
+  _runTimer();
+}
+function _runTimer() {
   timerInterval = setInterval(() => {
     if(!gameWon) {
       elapsedSeconds++;
       updateTimerDisplay();
-      // Save time every 10 seconds
       if(elapsedSeconds % 10 === 0) saveGame();
     }
   }, 1000);
@@ -3015,7 +3022,7 @@ function restoreGame() {
     updateShareLink();
 
     if(!gameWon) {
-      startTimer();
+      resumeTimer();
     }
 
     return true;
