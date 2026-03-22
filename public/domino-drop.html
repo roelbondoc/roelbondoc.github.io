@@ -1307,7 +1307,12 @@ function startTimer() {
   elapsedSeconds = 0;
   updateTimerDisplay();
   timerInterval = setInterval(() => {
-    if(!gameWon) { elapsedSeconds++; updateTimerDisplay(); }
+    if(!gameWon) {
+      elapsedSeconds++;
+      updateTimerDisplay();
+      // Save time every 10 seconds
+      if(elapsedSeconds % 10 === 0) saveGame();
+    }
   }, 1000);
 }
 function stopTimer() {
@@ -2479,6 +2484,7 @@ function onDragEnd(e) {
   dragState = null;
   render();
   checkWin();
+  saveGame();
 }
 
 function getCellUnderPoint(x, y) {
@@ -2564,6 +2570,7 @@ function removeDomino(dominoId) {
   moveCount++;
   undoStack.push({type:'remove', dominoId: dom.id, at:[r1,c1,r2,c2], a:dom.a, b:dom.b});
   render();
+  saveGame();
 }
 
 function clearHighlights() {
@@ -2603,6 +2610,7 @@ function undoLast() {
   }
 
   render();
+  saveGame();
 }
 
 // ════════════════════════════════════
@@ -2618,6 +2626,7 @@ function checkWin() {
 
   gameWon = true;
   stopTimer();
+  saveGame();
   setTimeout(() => {
     const m = Math.floor(elapsedSeconds / 60);
     const s = elapsedSeconds % 60;
@@ -2667,6 +2676,7 @@ function newGame(seed) {
   renderLegend();
   updateShareLink();
   startTimer();
+  saveGame();
 }
 
 function clearBoard() {
@@ -2685,10 +2695,8 @@ function clearBoard() {
   }
   if(hadPlaced) { moveCount++; undoStack = []; }
   render();
+  saveGame();
 }
-
-// ════════════════════════════════════
-//  MENU, HELP & SHARE TOGGLES
 // ════════════════════════════════════
 function toggleMenu() {
   const panel = document.getElementById('menuPanel');
@@ -2923,8 +2931,103 @@ function applyCustom() {
 }
 
 // ════════════════════════════════════
-//  EVENT LISTENERS
+//  SAVE / RESTORE GAME STATE
 // ════════════════════════════════════
+const SAVE_KEY = 'domino-drop-save';
+
+function saveGame() {
+  try {
+    const state = {
+      difficulty,
+      currentSeed,
+      boardRows,
+      boardCols,
+      boardData: boardData.map(row => row.map(cell =>
+        cell ? { region: cell.region, dominoId: cell.dominoId, value: cell.value } : null
+      )),
+      regions: regions.map(reg => ({
+        cells: reg.cells,
+        constraint: reg.constraint,
+        color: reg.color,
+      })),
+      dominoes: dominoes.map(d => ({
+        id: d.id, a: d.a, b: d.b,
+        orientation: d.orientation,
+        placed: d.placed,
+        placedAt: d.placedAt,
+      })),
+      moveCount,
+      elapsedSeconds,
+      gameWon,
+      colorblindMode,
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+  } catch(e) {
+    // Storage full or unavailable — silently fail
+  }
+}
+
+function restoreGame() {
+  try {
+    const json = localStorage.getItem(SAVE_KEY);
+    if(!json) return false;
+    const state = JSON.parse(json);
+
+    // Validate basic structure
+    if(!state.boardData || !state.dominoes || !state.regions) return false;
+
+    difficulty = state.difficulty || 'easy';
+    currentSeed = state.currentSeed || 0;
+    boardRows = state.boardRows;
+    boardCols = state.boardCols;
+    boardData = state.boardData.map(row => row.map(cell =>
+      cell ? { slot: true, region: cell.region, dominoId: cell.dominoId, value: cell.value } : null
+    ));
+    regions = state.regions.map(reg => ({
+      cells: reg.cells,
+      constraint: reg.constraint,
+      color: reg.color,
+    }));
+    dominoes = state.dominoes.map(d => ({
+      id: d.id, a: d.a, b: d.b,
+      orientation: d.orientation,
+      placed: d.placed,
+      placedAt: d.placedAt,
+    }));
+    moveCount = state.moveCount || 0;
+    elapsedSeconds = state.elapsedSeconds || 0;
+    gameWon = state.gameWon || false;
+    colorblindMode = state.colorblindMode || false;
+    undoStack = [];
+
+    // Restore UI state
+    document.querySelectorAll('.btn-diff').forEach(b =>
+      b.classList.toggle('active', b.dataset.diff === difficulty)
+    );
+    if(colorblindMode) {
+      REGION_COLORS = getActiveColors();
+      document.getElementById('cbToggle').classList.add('active');
+      document.body.classList.add('cb-mode');
+    }
+
+    render();
+    renderLegend();
+    updateShareLink();
+
+    if(!gameWon) {
+      startTimer();
+    }
+
+    return true;
+  } catch(e) {
+    console.warn('Failed to restore game:', e);
+    return false;
+  }
+}
+
+function clearSave() {
+  try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
+}
 document.addEventListener('mousemove', onDragMove);
 document.addEventListener('mouseup', onDragEnd);
 document.addEventListener('touchmove', onDragMove, {passive: false});
@@ -2938,11 +3041,19 @@ window.addEventListener('resize', () => {
 
 document.addEventListener('contextmenu', e => e.preventDefault());
 
+// Auto-save on page hide / unload
+window.addEventListener('beforeunload', () => saveGame());
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'hidden') saveGame();
+});
+
 // ════════════════════════════════════
 //  INIT
 // ════════════════════════════════════
 if(!loadFromURL()) {
-  newGame();
+  if(!restoreGame()) {
+    newGame();
+  }
 }
 </script>
 </body>
