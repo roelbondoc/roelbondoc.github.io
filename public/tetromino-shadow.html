@@ -1,0 +1,898 @@
+---
+layout: null
+title: Tetromino Shadow
+permalink: /tetromino-shadow/
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Tetromino Shadow</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+--bg: #1a1d2e;
+--surface: #232842;
+--board-bg: #1e2238;
+--text: #b8bdd4;
+--text-bright: #e2e5f0;
+--accent: #f05a6e;
+--accent-hover: #e04458;
+--teal: #3ecfb4;
+--gold: #f0c948;
+--muted: #3d425e;
+--muted-light: #4a5070;
+--radius: 14px;
+--radius-sm: 10px;
+--cell: 36px;
+--cols: 10;
+--rows: 12;
+}
+
+body {
+background: var(--bg);
+color: var(--text);
+font-family: 'DM Sans', sans-serif;
+font-weight: 500;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+padding: 16px 0;
+}
+
+h1 {
+font-family: 'Fredoka', sans-serif;
+font-weight: 600;
+font-size: 1.5rem;
+letter-spacing: 0.18em;
+text-transform: uppercase;
+color: var(--text-bright);
+margin-bottom: 14px;
+}
+
+h1 span.t { color: var(--accent); }
+h1 span.s { color: var(--teal); }
+
+.game-wrapper {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 10px;
+}
+
+.hud {
+display: flex;
+justify-content: space-between;
+align-items: center;
+width: calc(var(--cell) * var(--cols) + 20px);
+font-size: 0.78rem;
+font-weight: 500;
+color: var(--text);
+padding: 0 2px;
+}
+
+.hud .moves {
+color: var(--gold);
+font-family: 'Fredoka', sans-serif;
+font-weight: 600;
+font-size: 0.9rem;
+}
+
+.level-display {
+font-family: 'Fredoka', sans-serif;
+font-weight: 600;
+font-size: 0.78rem;
+color: var(--teal);
+}
+
+.score-display {
+font-family: 'Fredoka', sans-serif;
+font-weight: 600;
+font-size: 0.78rem;
+color: var(--text-bright);
+}
+
+.board-container {
+position: relative;
+background: var(--surface);
+border-radius: var(--radius);
+padding: 10px;
+box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+
+canvas {
+display: block;
+background: var(--board-bg);
+border-radius: calc(var(--radius) - 4px);
+}
+
+.controls {
+display: flex;
+gap: 8px;
+margin-top: 6px;
+}
+
+.controls button {
+display: flex;
+align-items: center;
+justify-content: center;
+width: 48px;
+height: 48px;
+padding: 0;
+border: none;
+background: var(--muted);
+color: var(--text);
+border-radius: var(--radius-sm);
+cursor: pointer;
+transition: all 0.15s ease;
+-webkit-user-select: none;
+user-select: none;
+touch-action: manipulation;
+}
+
+.controls button svg {
+display: block;
+}
+
+.controls button:hover {
+background: var(--muted-light);
+color: var(--text-bright);
+}
+
+.controls button:active {
+transform: scale(0.95);
+background: #555a78;
+}
+
+.controls button.primary {
+background: var(--accent);
+color: #fff;
+width: 96px;
+gap: 5px;
+}
+
+.controls button.primary span {
+font-family: 'Fredoka', sans-serif;
+font-size: 0.8rem;
+font-weight: 500;
+}
+
+.controls button.primary:hover {
+background: var(--accent-hover);
+}
+
+.hint {
+font-size: 0.65rem;
+color: var(--muted-light);
+margin-top: 4px;
+}
+
+.overlay {
+position: absolute;
+inset: 0;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+z-index: 10;
+opacity: 0;
+pointer-events: none;
+transition: opacity 0.4s ease;
+}
+
+.overlay.visible {
+opacity: 1;
+pointer-events: all;
+}
+
+.overlay::before {
+content: '';
+position: absolute;
+inset: 0;
+background: rgba(26, 29, 46, 0.92);
+backdrop-filter: blur(6px);
+border-radius: var(--radius);
+}
+
+.overlay-content {
+position: relative;
+text-align: center;
+}
+
+.overlay-content h2 {
+font-family: 'Fredoka', sans-serif;
+font-weight: 700;
+font-size: 1.6rem;
+letter-spacing: 0.08em;
+margin-bottom: 6px;
+}
+
+.overlay-content h2.win { color: var(--teal); }
+.overlay-content h2.lose { color: var(--accent); }
+
+.overlay-content p {
+font-size: 0.85rem;
+color: var(--text);
+opacity: 0.7;
+margin-bottom: 20px;
+}
+
+.overlay-content button {
+font-family: 'Fredoka', sans-serif;
+font-size: 0.85rem;
+font-weight: 600;
+padding: 11px 32px;
+border: none;
+background: var(--accent);
+color: #fff;
+border-radius: var(--radius-sm);
+cursor: pointer;
+transition: all 0.2s;
+box-shadow: 0 3px 12px rgba(240, 90, 110, 0.3);
+}
+
+.overlay-content button:hover {
+background: var(--accent-hover);
+box-shadow: 0 4px 16px rgba(240, 90, 110, 0.4);
+}
+
+@media (max-width: 500px) {
+:root { --cell: 28px; }
+h1 { font-size: 1.2rem; }
+.controls button { padding: 12px 12px; font-size: 0.75rem; }
+}
+</style>
+
+</head>
+<body>
+
+<div class="game-wrapper">
+  <h1><span class="t">Tetromino</span> <span class="s">Shadow</span></h1>
+
+  <div class="hud">
+    <span class="level-display">Level <span id="level">1</span></span>
+    <span class="moves">&times;<span id="multiplier">5.0</span></span>
+    <span class="score-display">Score: <span id="score">0</span></span>
+  </div>
+
+  <div class="board-container">
+    <canvas id="board"></canvas>
+    <div class="overlay" id="overlay">
+      <div class="overlay-content">
+        <h2 id="overlayTitle">&mdash;</h2>
+        <p id="overlayMsg"></p>
+        <button id="overlayBtn" onclick="startRound()">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="doMove('rotL')" aria-label="Rotate Left"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10a6 6 0 1 1 1.76 4.24"/><polyline points="4 14 4 10 8 10"/></svg></button>
+    <button onclick="doMove('left')" aria-label="Move Left"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 4 6 10 12 16"/></svg></button>
+    <button onclick="doMove('wait')" class="primary" aria-label="Hold"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 13 10 7 16 13"/></svg></button>
+    <button onclick="doMove('right')" aria-label="Move Right"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 4 14 10 8 16"/></svg></button>
+    <button onclick="doMove('rotR')" aria-label="Rotate Right"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 10a6 6 0 1 0-1.76 4.24"/><polyline points="16 14 16 10 12 10"/></svg></button>
+  </div>
+  <div class="hint">Arrow keys &middot; Z X &middot; Space</div>
+</div>
+
+<script>
+// -- Standard tetromino templates (offsets from 0,0) --
+const TETRO_TEMPLATES = [
+  [[0,0],[0,1],[0,2],[0,3]],       // I
+  [[0,0],[0,1],[1,0],[1,1]],       // O
+  [[0,0],[0,1],[0,2],[1,1]],       // T
+  [[0,1],[0,2],[1,0],[1,1]],       // S
+  [[0,0],[0,1],[1,1],[1,2]],       // Z
+  [[0,0],[1,0],[2,0],[2,1]],       // L
+  [[0,1],[1,1],[2,1],[2,0]],       // J
+];
+
+// High-contrast palette
+const PIECE_COLORS = [
+  '#e05272',  // rose red
+  '#e89030',  // warm orange
+  '#e8cc38',  // golden yellow
+  '#50b860',  // leaf green
+  '#38a8a0',  // teal
+  '#4888e0',  // sky blue
+  '#7858d0',  // violet
+  '#c850b8',  // magenta
+];
+
+const COLS = 10;
+const ROWS = 12;
+const canvas = document.getElementById('board');
+const ctx = canvas.getContext('2d');
+let CELL;
+
+function resize() {
+  const maxW = Math.min(window.innerWidth - 32, 420);
+  const maxH = window.innerHeight - 180;
+  CELL = Math.min(Math.floor(maxW / COLS), Math.floor(maxH / ROWS));
+  CELL = Math.max(CELL, 20);
+  canvas.width = CELL * COLS;
+  canvas.height = CELL * ROWS;
+  document.documentElement.style.setProperty('--cell', CELL + 'px');
+  if (gameState) draw();
+}
+
+let gameState = null;
+let score = 0;
+let level = 1;
+
+// -- Shape generation: build a compound shape from N tetrominos --
+
+function normalize(cells) {
+  let minR = Infinity, minC = Infinity;
+  for (const [r, c] of cells) {
+    minR = Math.min(minR, r);
+    minC = Math.min(minC, c);
+  }
+  const shifted = cells.map(([r, c]) => [r - minR, c - minC]);
+  shifted.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  return shifted;
+}
+
+function cellSet(cells) {
+  return new Set(cells.map(([r,c]) => r + ',' + c));
+}
+
+function hasCell(set, r, c) {
+  return set.has(r + ',' + c);
+}
+
+function getBorderCells(cells) {
+  const set = cellSet(cells);
+  const borders = [];
+  const seen = new Set();
+  for (const [r, c] of cells) {
+    for (const [dr, dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
+      const nr = r + dr, nc = c + dc;
+      const key = nr + ',' + nc;
+      if (!set.has(key) && !seen.has(key)) {
+        seen.add(key);
+        borders.push([nr, nc]);
+      }
+    }
+  }
+  return borders;
+}
+
+function tryAttachTetromino(existingCells, template) {
+  const existingSet = cellSet(existingCells);
+  const borders = getBorderCells(existingCells);
+
+  shuffleArray(borders);
+
+  const candidates = [];
+
+  for (const [br, bc] of borders) {
+    for (let anchor = 0; anchor < template.length; anchor++) {
+      const [ar, ac] = template[anchor];
+      const offsetR = br - ar;
+      const offsetC = bc - ac;
+      const placed = template.map(([r, c]) => [r + offsetR, c + offsetC]);
+
+      let overlap = false;
+      for (const [r, c] of placed) {
+        if (existingSet.has(r + ',' + c)) { overlap = true; break; }
+      }
+      if (overlap) continue;
+
+      let adjacent = false;
+      for (const [r, c] of placed) {
+        for (const [dr, dc] of [[0,1],[0,-1],[1,0],[-1,0]]) {
+          if (existingSet.has((r+dr) + ',' + (c+dc))) { adjacent = true; break; }
+        }
+        if (adjacent) break;
+      }
+      if (!adjacent) continue;
+
+      const combined = [...existingCells, ...placed];
+      const norm = normalize(combined);
+      const ext = shapeExtent(norm);
+      const ratio = Math.max(ext.w, ext.h) / Math.max(1, Math.min(ext.w, ext.h));
+      const area = ext.w * ext.h;
+      const compactScore = ratio * 10 + area;
+
+      candidates.push({ placed, compactScore });
+    }
+  }
+
+  if (candidates.length === 0) return null;
+
+  candidates.sort((a, b) => a.compactScore - b.compactScore);
+  const topN = Math.min(3, candidates.length);
+  return candidates[Math.floor(Math.random() * topN)].placed;
+}
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function generateShape(pieceCount) {
+  const maxDim = Math.min(COLS, ROWS) - 1;
+
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const palette = [...PIECE_COLORS];
+    shuffleArray(palette);
+
+    let template = TETRO_TEMPLATES[Math.floor(Math.random() * TETRO_TEMPLATES.length)];
+    let cells = template.map(([r, c]) => [r, c]);
+    let colors = [palette[0]];
+    let cellPieceIndex = cells.map(() => 0);
+    let ok = true;
+
+    for (let i = 1; i < pieceCount; i++) {
+      let tmpl = TETRO_TEMPLATES[Math.floor(Math.random() * TETRO_TEMPLATES.length)];
+      let attached = null;
+      let rotations = [tmpl, rotateCW(tmpl), rotateCW(rotateCW(tmpl)), rotateCW(rotateCW(rotateCW(tmpl)))];
+      shuffleArray(rotations);
+
+      for (const rot of rotations) {
+        attached = tryAttachTetromino(cells, rot);
+        if (attached) break;
+      }
+
+      if (!attached) {
+        for (let t = 0; t < TETRO_TEMPLATES.length && !attached; t++) {
+          let fallback = TETRO_TEMPLATES[t];
+          let rots = [fallback, rotateCW(fallback), rotateCW(rotateCW(fallback)), rotateCW(rotateCW(rotateCW(fallback)))];
+          shuffleArray(rots);
+          for (const rot of rots) {
+            attached = tryAttachTetromino(cells, rot);
+            if (attached) break;
+          }
+        }
+      }
+
+      if (attached) {
+        const combined = [...cells, ...attached];
+        const norm = normalize(combined);
+        const ext = shapeExtent(norm);
+
+        if (ext.w > maxDim || ext.h > maxDim) {
+          ok = false;
+          break;
+        }
+
+        const pieceIdx = i;
+        for (const cell of attached) {
+          cells.push(cell);
+          cellPieceIndex.push(pieceIdx);
+        }
+
+        let col;
+        if (i < palette.length) {
+          col = palette[i];
+        } else {
+          const offset = Math.floor(palette.length / 2);
+          col = palette[i % palette.length];
+          if (col === colors[colors.length - 1]) {
+            col = palette[(i + 1) % palette.length];
+          }
+        }
+        colors.push(col);
+      } else {
+        ok = false;
+        break;
+      }
+    }
+
+    if (!ok) continue;
+
+    cells = normalize(cells);
+    const ext = shapeExtent(cells);
+    const bigDim = Math.max(ext.w, ext.h);
+    if (bigDim <= COLS && bigDim <= ROWS) {
+      return { cells, colors, cellPieceIndex };
+    }
+  }
+
+  let template = TETRO_TEMPLATES[Math.floor(Math.random() * TETRO_TEMPLATES.length)];
+  let cells = normalize(template.map(([r,c]) => [r,c]));
+  return { cells, colors: [PIECE_COLORS[0]], cellPieceIndex: cells.map(() => 0) };
+}
+
+function rotateCW(cells) {
+  const rotated = cells.map(([r, c]) => [c, -r]);
+  return normalize(rotated);
+}
+
+function rotateCCW(cells) {
+  const rotated = cells.map(([r, c]) => [-c, r]);
+  return normalize(rotated);
+}
+
+function shapeExtent(cells) {
+  let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
+  for (const [r, c] of cells) {
+    minR = Math.min(minR, r); maxR = Math.max(maxR, r);
+    minC = Math.min(minC, c); maxC = Math.max(maxC, c);
+  }
+  return { minR, maxR, minC, maxC, h: maxR - minR + 1, w: maxC - minC + 1 };
+}
+
+function getCellsAt(shape, row, col) {
+  return shape.map(([r, c]) => [r + row, c + col]);
+}
+
+// -- Game logic --
+
+function startRound() {
+  hideOverlay();
+
+  const pieceCount = level;
+  const { cells, colors, cellPieceIndex } = generateShape(pieceCount);
+
+  const ext = shapeExtent(cells);
+  const playerCol = Math.floor((COLS - ext.w) / 2);
+  const playerRow = 0;
+  const playerCells = cells;
+
+  let shadowCells = cells.map(c => [...c]);
+  const rotCount = Math.floor(Math.random() * 4);
+  for (let i = 0; i < rotCount; i++) {
+    shadowCells = rotateCW(shadowCells);
+  }
+
+  const sExt = shapeExtent(shadowCells);
+  const maxShadowCol = COLS - sExt.w;
+  let shadowCol;
+
+  let attempts = 0;
+  do {
+    shadowCol = Math.floor(Math.random() * (maxShadowCol + 1));
+    attempts++;
+  } while (attempts < 50 && rotCount === 0 && shadowCol === playerCol);
+
+  let shadowPieceIndex = [];
+  if (rotCount === 0) {
+    shadowPieceIndex = [...cellPieceIndex];
+  } else {
+    let trackedCells = cells.map((c, i) => ({ pos: [...c], idx: cellPieceIndex[i] }));
+    for (let i = 0; i < rotCount; i++) {
+      const rotated = trackedCells.map(tc => ({ pos: [tc.pos[1], -tc.pos[0]], idx: tc.idx }));
+      let minR = Infinity, minC = Infinity;
+      for (const tc of rotated) { minR = Math.min(minR, tc.pos[0]); minC = Math.min(minC, tc.pos[1]); }
+      for (const tc of rotated) { tc.pos[0] -= minR; tc.pos[1] -= minC; }
+      rotated.sort((a, b) => a.pos[0] - b.pos[0] || a.pos[1] - b.pos[1]);
+      trackedCells = rotated;
+    }
+    shadowPieceIndex = trackedCells.map(tc => tc.idx);
+  }
+
+  const sExtFinal = shapeExtent(shadowCells);
+  const shadowStartRow = ROWS - 1;
+
+  const totalCells = shadowCells.length;
+  let revealPct;
+  if (level === 1) revealPct = 1.0;
+  else if (level === 2) revealPct = 0.75;
+  else if (level === 3) revealPct = 0.55;
+  else if (level === 4) revealPct = 0.40;
+  else revealPct = Math.max(0.2, 0.35 - (level - 5) * 0.03);
+
+  const revealCount = Math.max(2, Math.round(totalCells * revealPct));
+  const indices = Array.from({ length: totalCells }, (_, i) => i);
+  shuffleArray(indices);
+  const visibleSet = new Set(indices.slice(0, revealCount));
+  const shadowVisibleMask = Array.from({ length: totalCells }, (_, i) => visibleSet.has(i));
+
+  gameState = {
+    playerCells,
+    playerRow,
+    playerCol,
+    shadowCells,
+    shadowRow: shadowStartRow,
+    shadowCol,
+    colors,
+    cellPieceIndex,
+    shadowPieceIndex,
+    shadowVisibleMask,
+    multiplier: 5.0,
+    moves: 0,
+    ended: false
+  };
+
+  document.getElementById('multiplier').textContent = '5.0';
+  document.getElementById('level').textContent = level;
+  document.getElementById('score').textContent = score;
+
+  draw();
+}
+
+function doMove(action) {
+  if (!gameState || gameState.ended) return;
+  const g = gameState;
+
+  let newCells = g.playerCells;
+  let newCol = g.playerCol;
+
+  if (action === 'rotL') {
+    newCells = rotateCCW(g.playerCells);
+  } else if (action === 'rotR') {
+    newCells = rotateCW(g.playerCells);
+  } else if (action === 'left') {
+    newCol = g.playerCol - 1;
+  } else if (action === 'right') {
+    newCol = g.playerCol + 1;
+  }
+
+  if (action !== 'wait') {
+    const ext = shapeExtent(newCells);
+    if (newCol + ext.minC < 0 || newCol + ext.maxC >= COLS) return;
+    if (g.playerRow + ext.minR < 0) return;
+    if (g.playerRow + ext.maxR >= ROWS) return;
+
+    if (action === 'rotL' || action === 'rotR') {
+      const dir = action === 'rotR' ? 'cw' : 'ccw';
+      const tracked = g.playerCells.map((c, i) => ({
+        pos: [...c],
+        idx: g.cellPieceIndex[i]
+      }));
+
+      let rotated;
+      if (dir === 'cw') {
+        rotated = tracked.map(tc => ({ pos: [tc.pos[1], -tc.pos[0]], idx: tc.idx }));
+      } else {
+        rotated = tracked.map(tc => ({ pos: [-tc.pos[1], tc.pos[0]], idx: tc.idx }));
+      }
+
+      let minR = Infinity, minC = Infinity;
+      for (const tc of rotated) { minR = Math.min(minR, tc.pos[0]); minC = Math.min(minC, tc.pos[1]); }
+      for (const tc of rotated) { tc.pos[0] -= minR; tc.pos[1] -= minC; }
+      rotated.sort((a, b) => a.pos[0] - b.pos[0] || a.pos[1] - b.pos[1]);
+
+      g.playerCells = rotated.map(tc => tc.pos);
+      g.cellPieceIndex = rotated.map(tc => tc.idx);
+    }
+
+    g.playerCol = newCol;
+    g.multiplier = Math.max(1.0, g.multiplier - 0.5);
+  }
+
+  g.moves++;
+  g.shadowRow--;
+  document.getElementById('multiplier').textContent = g.multiplier.toFixed(1);
+
+  checkEndCondition();
+  draw();
+}
+
+function checkEndCondition() {
+  const g = gameState;
+  if (g.ended) return;
+
+  const pAbs = getCellsAt(g.playerCells, g.playerRow, g.playerCol);
+  const sAbs = getCellsAt(g.shadowCells, g.shadowRow, g.shadowCol);
+
+  const pSet = cellSet(pAbs);
+  const sOnBoard = sAbs.filter(([r,c]) => r >= 0 && r < ROWS);
+  if (sOnBoard.length === sAbs.length) {
+    if (sAbs.every(([r,c]) => pSet.has(r + ',' + c))) {
+      g.ended = true;
+      const baseScore = 100 + level * 50;
+      const roundScore = Math.round(baseScore * g.multiplier);
+      score += roundScore;
+      level++;
+      document.getElementById('score').textContent = score;
+      const multLabel = g.multiplier > 1.0 ? ` (\u00d7${g.multiplier.toFixed(1)})` : '';
+      showOverlay('Aligned', `+${roundScore} points${multLabel}`, 'win');
+      return;
+    }
+  }
+
+  const sTopRow = Math.min(...sAbs.map(([r]) => r));
+  if (sTopRow <= 0) {
+    g.ended = true;
+    showOverlay('Game Over', `Score: ${score}`, 'lose');
+  }
+}
+
+// -- Drawing --
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function draw() {
+  const g = gameState;
+  const W = canvas.width;
+  const H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  ctx.fillStyle = 'rgba(80, 90, 130, 0.15)';
+  for (let r = 1; r < ROWS; r++) {
+    for (let c = 1; c < COLS; c++) {
+      ctx.beginPath();
+      ctx.arc(c * CELL, r * CELL, 1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  if (!g) return;
+  drawShadow(g);
+  drawPlayerPiece(g);
+}
+
+function drawShadow(g) {
+  const cells = getCellsAt(g.shadowCells, g.shadowRow, g.shadowCol);
+  const pad = 3;
+  const rad = Math.max(4, CELL * 0.14);
+
+  for (let i = 0; i < cells.length; i++) {
+    if (!g.shadowVisibleMask[i]) continue;
+    const [r, c] = cells[i];
+    if (c < 0 || c >= COLS || r < 0 || r >= ROWS) continue;
+    const x = c * CELL + pad, y = r * CELL + pad, s = CELL - pad * 2;
+
+    const pieceIdx = g.shadowPieceIndex[i];
+    const color = g.colors[pieceIdx] || '#e05272';
+    const rgb = hexToRgb(color);
+
+    ctx.save();
+    ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.12)`;
+    roundRect(x, y, s, s, rad);
+    ctx.fill();
+
+    ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.45)`;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    roundRect(x, y, s, s, rad);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+}
+
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : { r: 212, g: 93, b: 122 };
+}
+
+function darkenHex(hex, amt) {
+  const rgb = hexToRgb(hex);
+  return `rgb(${Math.max(0,rgb.r-amt)},${Math.max(0,rgb.g-amt)},${Math.max(0,rgb.b-amt)})`;
+}
+
+function drawPlayerPiece(g) {
+  const cells = getCellsAt(g.playerCells, g.playerRow, g.playerCol);
+  const pad = 2;
+  const rad = Math.max(4, CELL * 0.14);
+
+  for (let i = 0; i < cells.length; i++) {
+    const [r, c] = cells[i];
+    if (c < 0 || c >= COLS || r < 0 || r >= ROWS) continue;
+    const pieceIdx = g.cellPieceIndex[i];
+    const color = g.colors[pieceIdx] || '#e05272';
+    const x = c * CELL + pad, y = r * CELL + pad, s = CELL - pad * 2;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    roundRect(x + 1, y + 2, s, s, rad);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    roundRect(x, y, s, s, rad);
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    roundRect(x + 2, y + 1, s - 4, s * 0.3, Math.max(2, rad - 2));
+    ctx.fill();
+
+    ctx.fillStyle = darkenHex(color, 35);
+    roundRect(x, y + s - 3, s, 3, rad);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.beginPath();
+    ctx.arc(x + s / 2, y + s / 2, Math.max(2, s * 0.08), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+// -- Overlay --
+function showOverlay(title, msg, type) {
+  const overlay = document.getElementById('overlay');
+  const titleEl = document.getElementById('overlayTitle');
+  const msgEl = document.getElementById('overlayMsg');
+  const btn = document.getElementById('overlayBtn');
+
+  titleEl.textContent = title;
+  titleEl.className = type;
+  msgEl.textContent = msg;
+
+  if (type === 'lose') {
+    btn.textContent = 'Try Again';
+    btn.onclick = () => { score = 0; level = 1; startRound(); };
+  } else {
+    btn.textContent = 'Next Round';
+    btn.onclick = () => startRound();
+  }
+  overlay.classList.add('visible');
+}
+
+function hideOverlay() {
+  document.getElementById('overlay').classList.remove('visible');
+}
+
+// -- Keyboard --
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') { doMove('left'); e.preventDefault(); }
+  else if (e.key === 'ArrowRight') { doMove('right'); e.preventDefault(); }
+  else if (e.key === 'ArrowUp' || e.key === 'x' || e.key === 'X') { doMove('rotR'); e.preventDefault(); }
+  else if (e.key === 'z' || e.key === 'Z') { doMove('rotL'); e.preventDefault(); }
+  else if (e.key === 'ArrowDown' || e.key === ' ') {
+    if (gameState && gameState.ended) {
+      document.getElementById('overlayBtn').click();
+    } else {
+      doMove('wait');
+    }
+    e.preventDefault();
+  }
+  else if (e.key === 'Enter') {
+    if (gameState && gameState.ended) {
+      document.getElementById('overlayBtn').click();
+      e.preventDefault();
+    }
+  }
+});
+
+// -- Touch --
+let touchStartX = null, touchStartY = null;
+document.addEventListener('touchstart', (e) => {
+  if (e.target.tagName === 'BUTTON') return;
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+});
+document.addEventListener('touchend', (e) => {
+  if (touchStartX === null) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  touchStartX = null;
+  const threshold = 30;
+  if (Math.abs(dx) > Math.abs(dy)) {
+    if (dx > threshold) doMove('right');
+    else if (dx < -threshold) doMove('left');
+  } else {
+    if (dy < -threshold) doMove('rotR');
+    else if (dy > threshold) doMove('rotL');
+  }
+});
+
+window.addEventListener('resize', resize);
+resize();
+startRound();
+</script>
+
+</body>
+</html>
