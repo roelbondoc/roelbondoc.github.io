@@ -6,11 +6,17 @@
       <div class="container">
         <nav class="masthead-title" role="navigation" aria-label="Main navigation">
           <a href="{{ site.baseurl }}/" aria-label="Home - Blog posts">posts</a>
+          <span class="separator">|</span>
           <a href="{{ site.baseurl }}/now" aria-label="What I'm doing now">now</a>
+          <span class="separator">|</span>
           <a rel="me" href="https://ruby.social/@roel" target="_blank" aria-label="Follow me on Mastodon">social</a>
-          |
+          <span class="separator">|</span>
           <a href="https://rubyup.dev" target="_blank" aria-label="RubyUp - Ruby development services">RubyUp</a>
-          <small> | Roel Bondoc</small>
+          <small><span class="separator">|</span> Roel Bondoc</small>
+          <div class="theme-toggle" role="group" aria-label="Theme switcher">
+            <button id="theme-dark" type="button" aria-label="Switch to dark theme">dark</button>
+            <button id="theme-light" type="button" aria-label="Switch to light theme">light</button>
+          </div>
         </nav>
       </div>
     </header>
@@ -24,13 +30,60 @@
         <form action="https://buttondown.email/api/emails/embed-subscribe/rb" method="post" target="popupwindow" onsubmit="window.open('https://buttondown.email/rb', 'popupwindow')" class="embeddable-buttondown-form">
           <input type="hidden" value="1" name="embed" />
           <label for="bd-email"><small>Subscribe to my newsletter:</small></label><br>
-          <input type="email" name="email" id="bd-email" placeholder="Email address" style="border: 1px solid #555; width: 50%; font-size: 19px; padding: 8px;" required aria-describedby="newsletter-desc" />
-          <input type="submit" value="Subscribe" style="border: 1px solid #555; font-size: 19px; padding: 8px;"/>
+          <input type="email" name="email" id="bd-email" placeholder="Email address" required aria-describedby="newsletter-desc" />
+          <input type="submit" value="Subscribe" />
           <div id="newsletter-desc" class="sr-only">Get updates on new technical articles and projects</div>
         </form>
       </aside>
 
       <p></p>
     </div>
+
+    <script>
+      (function() {
+        var darkBtn = document.getElementById('theme-dark');
+        var lightBtn = document.getElementById('theme-light');
+        var currentTheme = localStorage.getItem('md-theme') || 'dark';
+
+        function setTheme(theme) {
+          currentTheme = theme;
+          document.documentElement.setAttribute('data-theme', theme);
+          localStorage.setItem('md-theme', theme);
+          updateButtons();
+        }
+
+        function updateButtons() {
+          var isDarkSide = (currentTheme === 'dark' || currentTheme === 'dark-alt');
+          var isLightSide = (currentTheme === 'light' || currentTheme === 'light-alt');
+
+          darkBtn.classList.toggle('active', isDarkSide);
+          lightBtn.classList.toggle('active', isLightSide);
+
+          darkBtn.textContent = currentTheme === 'dark-alt' ? 'dark-alt' : 'dark';
+          lightBtn.textContent = currentTheme === 'light-alt' ? 'light-alt' : 'light';
+        }
+
+        darkBtn.addEventListener('click', function() {
+          setTheme(currentTheme === 'dark' ? 'dark-alt' : 'dark');
+        });
+
+        lightBtn.addEventListener('click', function() {
+          setTheme(currentTheme === 'light' ? 'light-alt' : 'light');
+        });
+
+        updateButtons();
+
+        // Extract language from code blocks and set data-lang for gutter display
+        document.querySelectorAll('.highlighter-rouge').forEach(function(el) {
+          var classes = el.className.split(/\s+/);
+          for (var i = 0; i < classes.length; i++) {
+            if (classes[i].indexOf('language-') === 0) {
+              el.setAttribute('data-lang', classes[i].replace('language-', ''));
+              break;
+            }
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

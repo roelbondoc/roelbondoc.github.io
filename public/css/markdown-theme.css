@@ -1,0 +1,855 @@
+/*
+ * Markdown Theme — Complete standalone stylesheet
+ *
+ * Inspired by the Markdown Viewer app: content is rendered with visible,
+ * dimmed markdown syntax markers in a left gutter column.
+ * Supports Phoenix (dark), Dark, Raven (light), and Light themes.
+ */
+
+/* ============================================
+ * Variables
+ * ============================================ */
+
+:root {
+  --gutter-width: 80px;
+  --gutter-gap: 16px;
+  --gutter-total: calc(var(--gutter-width) + var(--gutter-gap));
+  --mono: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+:root, [data-theme="dark"] {
+  --bg: #000;
+  --surface: #111;
+  --text: #d4d4d4;
+  --text-dim: rgba(212, 212, 212, 0.35);
+  --accent: #f8991d;
+  --border: rgba(212, 212, 212, 0.1);
+  --h1-color: #f8991d;
+  --h2-color: #e0af68;
+  --h3-color: #9ece6a;
+  --h4-color: #7dcfff;
+  --h5-color: #bb9af7;
+  --h6-color: rgba(212, 212, 212, 0.7);
+  --link-color: #f8991d;
+  --code-bg: rgba(255, 255, 255, 0.06);
+  --code-text: #e0af68;
+  --code-inline-bg: rgba(255, 255, 255, 0.08);
+  --blockquote-border: #f8991d;
+  --blockquote-text: rgba(212, 212, 212, 0.7);
+  --table-header-bg: #111;
+  --table-stripe: rgba(255, 255, 255, 0.03);
+  --table-border: rgba(212, 212, 212, 0.1);
+  --strong-color: #fff;
+  --em-color: rgba(212, 212, 212, 0.85);
+  --input-bg: #111;
+  --input-border: rgba(212, 212, 212, 0.2);
+  --input-text: #d4d4d4;
+  --btn-bg: #f8991d;
+  --btn-text: #000;
+  --hl-comment: #565f89;
+  --hl-keyword: #bb9af7;
+  --hl-string: #9ece6a;
+  --hl-number: #ff9e64;
+  --hl-function: #7aa2f7;
+  --hl-tag: #f7768e;
+  --hl-attr: #7dcfff;
+  --hl-builtin: #e0af68;
+  --hl-operator: #89ddff;
+}
+
+[data-theme="dark-alt"] {
+  --bg: #0b1238;
+  --surface: #1c2349;
+  --text: #f8f2ee;
+  --text-dim: rgba(248, 242, 238, 0.4);
+  --accent: #f8991d;
+  --border: rgba(248, 242, 238, 0.1);
+  --h1-color: #f8991d;
+  --h2-color: #e0af68;
+  --h3-color: #9ece6a;
+  --h4-color: #7dcfff;
+  --h5-color: #bb9af7;
+  --h6-color: rgba(248, 242, 238, 0.7);
+  --link-color: #f8991d;
+  --code-bg: rgba(51, 68, 135, 0.3);
+  --code-text: #e0af68;
+  --code-inline-bg: rgba(51, 68, 135, 0.4);
+  --blockquote-border: #f8991d;
+  --blockquote-text: rgba(248, 242, 238, 0.7);
+  --table-header-bg: #1c2349;
+  --table-stripe: rgba(248, 242, 238, 0.03);
+  --table-border: rgba(248, 242, 238, 0.1);
+  --strong-color: #fff;
+  --em-color: rgba(248, 242, 238, 0.8);
+  --input-bg: #1c2349;
+  --input-border: rgba(248, 242, 238, 0.2);
+  --input-text: #f8f2ee;
+  --btn-bg: #f8991d;
+  --btn-text: #0b1238;
+  --hl-comment: #565f89;
+  --hl-keyword: #bb9af7;
+  --hl-string: #9ece6a;
+  --hl-number: #ff9e64;
+  --hl-function: #7aa2f7;
+  --hl-tag: #f7768e;
+  --hl-attr: #7dcfff;
+  --hl-builtin: #e0af68;
+  --hl-operator: #89ddff;
+}
+
+[data-theme="light-alt"] {
+  --bg: #f8f2ee;
+  --surface: #ebe1e1;
+  --text: #381e1e;
+  --text-dim: rgba(56, 30, 30, 0.35);
+  --accent: #9a9fd8;
+  --border: rgba(56, 30, 30, 0.1);
+  --h1-color: #381e1e;
+  --h2-color: #666b8e;
+  --h3-color: #ff9a68;
+  --h4-color: #9a9fd8;
+  --h5-color: #ff8082;
+  --h6-color: rgba(56, 30, 30, 0.6);
+  --link-color: #9a9fd8;
+  --code-bg: rgba(56, 30, 30, 0.06);
+  --code-text: #666b8e;
+  --code-inline-bg: rgba(56, 30, 30, 0.08);
+  --blockquote-border: #ff9a68;
+  --blockquote-text: rgba(56, 30, 30, 0.7);
+  --table-header-bg: #ebe1e1;
+  --table-stripe: rgba(56, 30, 30, 0.03);
+  --table-border: rgba(56, 30, 30, 0.1);
+  --strong-color: #1a0a0a;
+  --em-color: rgba(56, 30, 30, 0.8);
+  --input-bg: #ebe1e1;
+  --input-border: rgba(56, 30, 30, 0.2);
+  --input-text: #381e1e;
+  --btn-bg: #9a9fd8;
+  --btn-text: #f8f2ee;
+  --hl-comment: #999;
+  --hl-keyword: #069;
+  --hl-string: #d44950;
+  --hl-number: #f60;
+  --hl-function: #c0f;
+  --hl-tag: #2f6f9f;
+  --hl-attr: #4f9fcf;
+  --hl-builtin: #366;
+  --hl-operator: #555;
+}
+
+[data-theme="light"] {
+  --bg: #fff;
+  --surface: #f5f5f5;
+  --text: #1a1a1a;
+  --text-dim: rgba(26, 26, 26, 0.3);
+  --accent: #9a9fd8;
+  --border: rgba(26, 26, 26, 0.1);
+  --h1-color: #1a1a1a;
+  --h2-color: #666b8e;
+  --h3-color: #ff9a68;
+  --h4-color: #9a9fd8;
+  --h5-color: #ff8082;
+  --h6-color: rgba(26, 26, 26, 0.6);
+  --link-color: #9a9fd8;
+  --code-bg: rgba(0, 0, 0, 0.04);
+  --code-text: #666b8e;
+  --code-inline-bg: rgba(0, 0, 0, 0.06);
+  --blockquote-border: #ff9a68;
+  --blockquote-text: rgba(26, 26, 26, 0.7);
+  --table-header-bg: #f5f5f5;
+  --table-stripe: rgba(0, 0, 0, 0.02);
+  --table-border: rgba(26, 26, 26, 0.1);
+  --strong-color: #000;
+  --em-color: rgba(26, 26, 26, 0.8);
+  --input-bg: #f5f5f5;
+  --input-border: rgba(26, 26, 26, 0.2);
+  --input-text: #1a1a1a;
+  --btn-bg: #9a9fd8;
+  --btn-text: #fff;
+  --hl-comment: #999;
+  --hl-keyword: #069;
+  --hl-string: #d44950;
+  --hl-number: #f60;
+  --hl-function: #c0f;
+  --hl-tag: #2f6f9f;
+  --hl-attr: #4f9fcf;
+  --hl-builtin: #366;
+  --hl-operator: #555;
+}
+
+
+/* ============================================
+ * Reset & Base
+ * ============================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+html {
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+body {
+  color: var(--text);
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+
+/* ============================================
+ * Links
+ * ============================================ */
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+a:hover, a:focus { border-bottom-color: var(--link-color); }
+a strong { color: inherit; }
+
+
+/* ============================================
+ * Typography
+ * ============================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--sans);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+h1 { color: var(--h1-color); font-size: 1.7rem; margin-top: 0; }
+h2 { color: var(--h2-color); font-size: 1.35rem; }
+h3 { color: var(--h3-color); font-size: 1.15rem; }
+h4 { color: var(--h4-color); font-size: 1rem; }
+h5 { color: var(--h5-color); font-size: 0.9rem; }
+h6 { color: var(--h6-color); font-size: 0.85rem; }
+
+p { margin: 0 0 1rem; }
+strong { color: var(--strong-color); }
+em { color: var(--em-color); }
+
+
+/* ============================================
+ * Container
+ * ============================================ */
+
+.container {
+  max-width: 52rem;
+  padding: 0 1.5rem;
+  margin: 0 auto;
+}
+
+
+/* ============================================
+ * Masthead
+ * ============================================ */
+
+.masthead {
+  padding: 1rem 0;
+  margin-bottom: 3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.masthead-title {
+  margin: 0;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.masthead-title a {
+  color: var(--text);
+  border-bottom: none;
+}
+.masthead-title a:hover { color: var(--accent); border-bottom: none; }
+.masthead-title a::before,
+.masthead-title a::after { content: none; }
+
+.masthead-title small {
+  font-size: 75%;
+  font-weight: 400;
+  color: var(--text-dim);
+}
+
+.masthead .separator { color: var(--text-dim); }
+
+@media (max-width: 48em) {
+  .masthead-title { justify-content: center; }
+  .masthead-title small { display: none; }
+}
+
+
+/* ============================================
+ * Theme Toggle
+ * ============================================ */
+
+.theme-toggle {
+  display: inline-flex;
+  margin-left: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.theme-toggle button {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  padding: 0.2rem 0.5rem;
+  font: 0.7rem var(--mono);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-transform: lowercase;
+}
+.theme-toggle button:hover { color: var(--text); background: var(--surface); }
+.theme-toggle button.active { color: var(--accent); background: var(--surface); }
+.theme-toggle button + button { border-left: 1px solid var(--border); }
+
+
+/* ============================================
+ * Gutter Layout
+ *
+ * Every direct child of .content gets a left
+ * margin. Gutter markers are positioned into
+ * that space via absolute positioning.
+ * ============================================ */
+
+/* Pad the entire content area to create gutter space */
+.content {
+  padding-left: var(--gutter-total);
+}
+
+/* Elements that need gutter markers need relative positioning */
+.content h1, .content h2, .content h3,
+.content h4, .content h5, .content h6,
+.content blockquote,
+.content hr,
+.content .highlighter-rouge {
+  position: relative;
+}
+
+
+/* ============================================
+ * Gutter Markers — Headings
+ * ============================================ */
+
+/* Shared gutter marker positioning */
+h1::before, h2::before, h3::before,
+h4::before, h5::before, h6::before {
+  position: absolute;
+  right: calc(100% + var(--gutter-gap));
+  top: 0;
+  width: var(--gutter-width);
+  text-align: right;
+  font: normal 0.75em/inherit var(--mono);
+  user-select: none;
+  opacity: 0.5;
+}
+
+h1::before { content: '#'; color: var(--h1-color); }
+h2::before { content: '##'; color: var(--h2-color); }
+h3::before { content: '###'; color: var(--h3-color); }
+h4::before { content: '####'; color: var(--h4-color); }
+h5::before { content: '#####'; color: var(--h5-color); }
+h6::before { content: '######'; color: var(--h6-color); }
+
+/* Index post titles are h2 but should show # (they're the title) */
+.post-title::before {
+  content: '#' !important;
+  color: var(--h1-color) !important;
+}
+
+
+/* ============================================
+ * Gutter Markers — Blockquotes
+ * ============================================ */
+
+blockquote {
+  border-left: 3px solid var(--blockquote-border);
+  color: var(--blockquote-text);
+  background: transparent;
+  padding: 0.5rem 1rem;
+  margin: 0.8rem 0;
+  font-style: italic;
+  position: relative;
+}
+blockquote p:last-child { margin-bottom: 0; }
+
+blockquote::before {
+  content: '>';
+  position: absolute;
+  right: calc(100% + var(--gutter-gap) + 3px);
+  top: 0.5rem;
+  width: var(--gutter-width);
+  text-align: right;
+  font: normal 0.8em/1 var(--mono);
+  color: var(--text-dim);
+  user-select: none;
+  opacity: 0.5;
+}
+
+
+/* ============================================
+ * Gutter Markers — Lists
+ * ============================================ */
+
+ul, ol, dl { margin: 0 0 1rem; }
+dt { font-weight: bold; }
+dd { margin-bottom: 0.5rem; }
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+ul > li {
+  position: relative;
+  padding-left: 1.2em;
+}
+
+ul > li::before {
+  content: '-';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-family: var(--mono);
+}
+
+ul ul { margin-left: 0; }
+
+ol { padding-left: 1.5em; }
+
+ol > li::marker {
+  color: var(--accent);
+  font-family: var(--mono);
+}
+
+
+/* ============================================
+ * Gutter Markers — Code Blocks (language)
+ * ============================================ */
+
+.highlighter-rouge {
+  position: relative;
+}
+
+.highlighter-rouge[data-lang]::before {
+  content: attr(data-lang);
+  position: absolute;
+  right: calc(100% + var(--gutter-gap));
+  top: 14px;
+  width: var(--gutter-width);
+  text-align: right;
+  font: 0.7rem var(--mono);
+  color: var(--text-dim);
+  user-select: none;
+  opacity: 0.6;
+  text-transform: lowercase;
+}
+
+
+/* ============================================
+ * Gutter Markers — Horizontal Rules
+ * ============================================ */
+
+hr {
+  border: 0;
+  overflow: visible;
+  height: auto;
+  margin: 2rem 0;
+  position: relative;
+}
+
+hr::before {
+  content: '---';
+  position: absolute;
+  right: calc(100% + var(--gutter-gap));
+  top: -0.5em;
+  width: var(--gutter-width);
+  text-align: right;
+  font: 0.8em var(--mono);
+  color: var(--text-dim);
+  user-select: none;
+  opacity: 0.5;
+}
+
+hr::after {
+  content: '';
+  display: block;
+  border-top: 1px solid var(--border);
+}
+
+
+/* ============================================
+ * Inline Syntax Markers
+ * ============================================ */
+
+/* Bold */
+.post strong::before, .post strong::after,
+.page-content strong::before, .page-content strong::after {
+  content: '**';
+  color: var(--text-dim);
+  font: normal 0.85em var(--mono);
+  user-select: none;
+}
+
+/* Italic */
+.post em::before, .post em::after,
+.page-content em::before, .page-content em::after {
+  color: var(--text-dim);
+  font: normal 0.85em var(--mono);
+  font-style: normal;
+  user-select: none;
+}
+.post em::before, .page-content em::before { content: '*'; }
+.post em::after, .page-content em::after { content: '*'; }
+
+/* Inline code backticks */
+:not(pre) > code::before,
+:not(pre) > code::after {
+  color: var(--text-dim);
+  font-weight: normal;
+  user-select: none;
+}
+:not(pre) > code::before { content: '`'; }
+:not(pre) > code::after { content: '`'; }
+pre code::before, pre code::after { content: none !important; }
+
+/* Link brackets */
+.post p a::before, .post li a::before,
+.page-content p a::before, .page-content li a::before {
+  content: '[';
+  color: var(--text-dim);
+  font: 0.85em var(--mono);
+  user-select: none;
+}
+.post p a::after, .post li a::after,
+.page-content p a::after, .page-content li a::after {
+  content: '](' attr(href) ')';
+  color: var(--text-dim);
+  font: 0.85em var(--mono);
+  user-select: none;
+}
+
+/* Exclude nav/UI links */
+.masthead-title a::before, .masthead-title a::after,
+.post-title a::before, .post-title a::after,
+a.pagination-item::before, a.pagination-item::after,
+.post-excerpt + p a::before, .post-excerpt + p a::after,
+.newsletter-signup a::before, .newsletter-signup a::after {
+  content: none !important;
+}
+
+
+/* ============================================
+ * Code & Syntax Highlighting
+ * ============================================ */
+
+code, pre { font-family: var(--mono); }
+
+code {
+  padding: 0.2em 0.4em;
+  font-size: 0.85em;
+  color: var(--code-text);
+  background: var(--code-inline-bg);
+  border-radius: 4px;
+}
+
+pre {
+  display: block;
+  margin: 0 0 1rem;
+  padding: 14px 16px;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  background: var(--code-bg);
+  border-radius: 6px;
+  color: var(--text);
+}
+
+pre code {
+  padding: 0;
+  font-size: 100%;
+  color: inherit;
+  background: transparent;
+  border-radius: 0;
+}
+
+.highlight {
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  background: var(--code-bg);
+}
+.highlight pre { margin-bottom: 0; }
+
+/* Pygments token colors — driven by theme variables */
+.highlight .hll { background-color: rgba(255, 255, 200, 0.15); }
+.highlight .c, .highlight .c1, .highlight .cm, .highlight .cs { color: var(--hl-comment); }
+.highlight .k, .highlight .kc, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr { color: var(--hl-keyword); }
+.highlight .s, .highlight .s1, .highlight .s2, .highlight .sb, .highlight .sc, .highlight .sh, .highlight .sx, .highlight .sd { color: var(--hl-string); }
+.highlight .m, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .mo, .highlight .il { color: var(--hl-number); }
+.highlight .nf, .highlight .nc { color: var(--hl-function); }
+.highlight .nt { color: var(--hl-tag); }
+.highlight .na { color: var(--hl-attr); }
+.highlight .nb, .highlight .bp { color: var(--hl-builtin); }
+.highlight .o, .highlight .ow { color: var(--hl-operator); }
+.highlight .nv, .highlight .vc, .highlight .vg, .highlight .vi { color: var(--text); }
+.highlight .err { color: var(--hl-tag); background: transparent; }
+.highlight .ge { font-style: italic; }
+.highlight .gs { font-weight: bold; }
+.highlight .gd { color: var(--hl-tag); }
+.highlight .gi { color: var(--hl-string); }
+.highlight .w { color: var(--text-dim); }
+.highlight .no { color: var(--hl-number); }
+.highlight .nd, .highlight .nl { color: var(--hl-attr); }
+.highlight .nn { color: var(--hl-attr); }
+.highlight .ne { color: var(--hl-tag); }
+.highlight .sr { color: var(--hl-string); }
+.highlight .ss { color: var(--hl-number); }
+.highlight .se { color: var(--hl-number); }
+.highlight .si { color: var(--hl-tag); }
+.highlight .kt { color: var(--hl-attr); }
+.highlight .cp { color: var(--hl-attr); }
+.highlight .gp { color: var(--hl-comment); }
+.highlight .go { color: var(--text-dim); }
+.highlight .gh, .highlight .gu { color: var(--hl-function); }
+
+
+/* ============================================
+ * Tables
+ * ============================================ */
+
+table {
+  margin-bottom: 1rem;
+  width: 100%;
+  border: 1px solid var(--table-border);
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+th {
+  padding: 8px 16px;
+  border: 1px solid var(--table-border);
+  background: var(--table-header-bg);
+  color: var(--strong-color);
+  font-weight: 600;
+}
+td {
+  padding: 8px 16px;
+  border: 1px solid var(--table-border);
+}
+tbody tr:nth-child(odd) td { background: var(--table-stripe); }
+tbody tr:hover td { background: var(--surface); }
+
+
+/* ============================================
+ * Images
+ * ============================================ */
+
+img {
+  display: block;
+  max-width: 100%;
+  margin: 0 0 1rem;
+  border-radius: 6px;
+}
+
+
+/* ============================================
+ * Posts & Pages
+ * ============================================ */
+
+.page, .post { margin-bottom: 4em; }
+
+.page-title,
+.post-title,
+.post-title a { color: var(--h1-color); }
+
+.post-title a { border-bottom: none; }
+.post-title a:hover { border-bottom: 1px solid var(--h1-color); }
+
+.page-title, .post-title { margin-top: 0; }
+
+.post-date {
+  display: block;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-dim);
+  font: 0.8rem var(--mono);
+}
+
+.post-excerpt { color: var(--text); }
+
+.post-excerpt + p a {
+  font: 0.85em var(--mono);
+  color: var(--accent);
+}
+
+
+/* ============================================
+ * Pagination
+ * ============================================ */
+
+.pagination {
+  overflow: hidden;
+  margin: 3rem 0;
+  font-family: var(--mono);
+  color: var(--text-dim);
+  text-align: center;
+  font-size: 0.85rem;
+}
+.pagination-item {
+  display: block;
+  padding: 1rem;
+  border: 1px solid var(--border);
+}
+.pagination-item:first-child { margin-bottom: -1px; }
+a.pagination-item { color: var(--accent); }
+a.pagination-item:hover { background: var(--surface); border-bottom-color: var(--border); }
+
+@media (min-width: 30em) {
+  .pagination-item {
+    float: left;
+    width: 50%;
+  }
+  .pagination-item:first-child {
+    margin-bottom: 0;
+    border-radius: 4px 0 0 4px;
+  }
+  .pagination-item:last-child {
+    margin-left: -1px;
+    border-radius: 0 4px 4px 0;
+  }
+}
+
+
+/* ============================================
+ * Newsletter Signup
+ * ============================================ */
+
+.newsletter-signup { margin-top: 2rem; }
+.newsletter-signup label { color: var(--text-dim); }
+
+.newsletter-signup input[type="email"] {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  font-size: 16px;
+  padding: 8px;
+  width: 50%;
+  border-radius: 4px;
+}
+.newsletter-signup input[type="email"]:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.newsletter-signup input[type="submit"] {
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-bg);
+  color: var(--btn-text);
+  font-size: 16px;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.newsletter-signup input[type="submit"]:hover { opacity: 0.85; }
+
+
+/* ============================================
+ * Misc
+ * ============================================ */
+
+abbr {
+  font-size: 85%;
+  font-weight: bold;
+  color: var(--text);
+  text-transform: uppercase;
+}
+abbr[title] { cursor: help; border-bottom: 1px dotted var(--border); }
+
+/* Gist embeds */
+.gist .gist-file { font-family: var(--mono) !important; }
+.gist .markdown-body { padding: 15px; }
+.gist pre { padding: 0; background: transparent; }
+.gist code { padding: 0; color: inherit; background: transparent; border-radius: 0; }
+
+
+/* ============================================
+ * Scrollbar
+ * ============================================ */
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+
+/* ============================================
+ * Responsive — collapse gutter on small screens
+ * ============================================ */
+
+@media (max-width: 40em) {
+  :root {
+    --gutter-width: 0px;
+    --gutter-gap: 0px;
+    --gutter-total: 0px;
+  }
+
+  .content {
+    padding-left: 0;
+  }
+
+  /* Show heading markers inline instead of gutter */
+  h1::before, h2::before, h3::before,
+  h4::before, h5::before, h6::before {
+    position: static;
+    display: inline;
+    width: auto;
+    text-align: left;
+    margin-right: 0.4em;
+  }
+
+  /* Hide gutter-only markers */
+  blockquote::before,
+  hr::before,
+  .highlighter-rouge[data-lang]::before {
+    display: none;
+  }
+}
+
+
+/* ============================================
+ * Accessibility
+ * ============================================ */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
