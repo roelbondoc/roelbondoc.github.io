@@ -760,7 +760,7 @@ function submitWord() {
 
   // Push back danger and restart timer
   const oldDangerRow = dangerRow;
-  pushBackDanger(scrollAmount);
+  pushBackDanger(scrollAmount, gained);
   startDangerTimer();
 
   // Animate the scroll (pass old danger row for visual continuity)
@@ -884,15 +884,13 @@ function riseDanger() {
   updateDangerUI();
 }
 
-function pushBackDanger(scrollAmount) {
-  // Push danger back: the board scrolled up by scrollAmount,
-  // so danger effectively drops. But it also rises by 1 as a cost.
-  // Net: danger goes back by (scrollAmount - 1), minimum stays at ROWS
-  dangerRow = Math.min(ROWS, dangerRow + Math.max(0, scrollAmount - 1));
-  // Bonus: long words (5+ letters) push back an extra row
-  if (wordsFound.length > 0 && wordsFound[wordsFound.length - 1].length >= 5) {
-    dangerRow = Math.min(ROWS, dangerRow + 1);
-  }
+function pushBackDanger(scrollAmount, gained) {
+  // Push danger back: depth-based scroll + score-based bonus
+  // Net from scroll: (scrollAmount - 1) rows
+  // Score bonus: every 150 points pushes back an extra row
+  const scrollPush = Math.max(0, scrollAmount - 1);
+  const scorePush = Math.floor(gained / 150);
+  dangerRow = Math.min(ROWS, dangerRow + scrollPush + scorePush);
   updateDangerUI();
 }
 
