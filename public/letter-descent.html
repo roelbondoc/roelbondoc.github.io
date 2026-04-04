@@ -876,12 +876,11 @@ function riseDanger() {
 }
 
 function pushBackDanger(scrollAmount, gained) {
-  // Push danger back: depth-based scroll + score-based bonus
-  // Net from scroll: (scrollAmount - 1) rows
-  // Score bonus: every 150 points pushes back an extra row
-  const scrollPush = Math.max(0, scrollAmount - 1);
+  // First, advance danger with the viewport so it stays in the same relative position
+  dangerRow += scrollAmount;
+  // Then push back further based on score
   const scorePush = Math.floor(gained / 150);
-  dangerRow = Math.min(viewStart + ROWS, dangerRow + scrollPush + scorePush);
+  dangerRow = Math.min(viewStart + ROWS, dangerRow + scorePush);
   updateDangerUI();
 }
 
