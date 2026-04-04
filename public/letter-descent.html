@@ -513,8 +513,8 @@ function renderBoard(skipScroll) {
       tile.dataset.row = r;
       tile.dataset.col = c;
 
-      // First word: highlight must-start row
-      if (mustStartRow >= 0 && r === mustStartRow && selected.length === 0) {
+      // Highlight start line
+      if (r === viewStart && selected.length === 0) {
         tile.classList.add('must-start');
       }
 
@@ -683,8 +683,8 @@ function onTilePointer(row, col) {
   const existingIdx = selected.findIndex(s => s.row === row && s.col === col);
   if (existingIdx >= 0) return;
 
-  // First tile: must be on mustStartRow for the first word only
-  if (selected.length === 0 && mustStartRow >= 0 && row !== mustStartRow) {
+  // First tile must be on the start line (viewStart)
+  if (selected.length === 0 && row !== viewStart) {
     showStatus('Start from the highlighted row', true);
     return;
   }
@@ -743,11 +743,6 @@ function submitWord() {
     viewStart = maxRow;
   }
 
-  // After first word, allow starting from any tile
-  if (mustStartRow >= 0) {
-    mustStartRow = -1;
-  }
-
   // Generate new rows to append at bottom
   const newRows = [];
   for (let i = 0; i < scrollAmount; i++) {
@@ -776,14 +771,9 @@ function checkGameOver() {
 }
 
 function canFormAnyWord() {
-  // DFS from each cell in the playable area
-  const startRow = Math.max(0, viewStart);
-  const endRow = Math.min(grid.length, dangerRow);
-  for (let r = startRow; r < endRow; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const visited = new Set();
-      if (dfsSearch(r, c, '', visited)) return true;
-    }
+  for (let c = 0; c < COLS; c++) {
+    const visited = new Set();
+    if (dfsSearch(viewStart, c, '', visited)) return true;
   }
   return false;
 }
@@ -933,41 +923,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 1200);
 }
 
-// ============================================================
-// TOUCH DRAG SYSTEM
-// ============================================================
-let isDragging = false;
-
-function getTileFromPoint(x, y) {
-  const el = document.elementFromPoint(x, y);
-  if (!el) return null;
-  const tile = el.closest('.tile');
-  if (!tile) return null;
-  const row = parseInt(tile.dataset.row);
-  const col = parseInt(tile.dataset.col);
-  if (isNaN(row) || isNaN(col)) return null;
-  return { row, col };
-}
-
-document.addEventListener('pointerdown', (e) => {
-  if (!e.target.closest('.board')) return;
-  isDragging = true;
-});
-
-document.addEventListener('pointermove', (e) => {
-  if (!isDragging) return;
-  e.preventDefault();
-  const hit = getTileFromPoint(e.clientX, e.clientY);
-  if (hit) onTilePointer(hit.row, hit.col);
-}, { passive: false });
-
-document.addEventListener('pointerup', () => { isDragging = false; });
-document.addEventListener('pointercancel', () => { isDragging = false; });
-
-// Prevent scrolling on touch only when actively dragging tiles
-document.addEventListener('touchmove', (e) => {
-  if (isDragging) e.preventDefault();
-}, { passive: false });
+// Touch: no drag selection, allow native scroll
 
 // ============================================================
 // BOOT
@@ -981,14 +937,9 @@ initGrid();
 
 // Override canFormAnyWord to use fast prefix version
 window.canFormAnyWord = function() {
-  // First word: only search from mustStartRow; after that, search entire playable area
-  const startRow = mustStartRow >= 0 ? mustStartRow : Math.max(0, viewStart);
-  const endRow = mustStartRow >= 0 ? mustStartRow + 1 : Math.min(grid.length, dangerRow);
-  for (let r = startRow; r < endRow; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const visited = new Set();
-      if (dfsSearchFast(r, c, '', visited)) return true;
-    }
+  for (let c = 0; c < COLS; c++) {
+    const visited = new Set();
+    if (dfsSearchFast(viewStart, c, '', visited)) return true;
   }
   return false;
 };
