@@ -7,7 +7,7 @@ permalink: /letter-descent/
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Letter Ascent</title>
+<title>Letter Descent</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -109,13 +109,12 @@ permalink: /letter-descent/
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
   }
   .board-wrapper {
     position: relative;
     width: 100%;
+    height: 100%;
   }
   .board-wrapper.scrolling {
     transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
@@ -140,7 +139,7 @@ permalink: /letter-descent/
     opacity: 1;
   }
   .tile.advance-cutline {
-    box-shadow: 0 -3px 0 0 rgba(255, 230, 109, 0.4);
+    box-shadow: 0 3px 0 0 rgba(255, 230, 109, 0.4);
   }
 
   .tile {
@@ -346,7 +345,7 @@ permalink: /letter-descent/
     pointer-events: none;
   }
   .tile.danger-edge {
-    box-shadow: 0 3px 0 0 rgba(255, 80, 60, 0.6);
+    box-shadow: 0 -3px 0 0 rgba(255, 80, 60, 0.6);
   }
   .board-container.warning {
     animation: warningPulse 1s ease-in-out infinite;
@@ -361,7 +360,7 @@ permalink: /letter-descent/
 <div id="loadingOverlay" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;font-family:var(--font);color:var(--tile-text);font-size:1.2rem;font-weight:600">Loading dictionary&hellip;</div>
 
 <div class="header">
-  <h1>Letter Ascent</h1>
+  <h1>Letter Descent</h1>
   <div class="stats">
     <div class="stat">
       <span class="stat-label">Score</span>
@@ -372,7 +371,7 @@ permalink: /letter-descent/
       <span class="stat-val" id="wordCount">0</span>
     </div>
     <div class="stat">
-      <span class="stat-label">Height</span>
+      <span class="stat-label">Depth</span>
       <span class="stat-val" id="depth">0</span>
     </div>
   </div>
@@ -464,8 +463,7 @@ let depth = 0;            // total rows scrolled
 let wordsFound = [];
 let lockedRows = 0;       // rows above the "start row" — locked out
 let gameOver = false;
-let mustStartRow = 0;     // the row player must start from (first word only, then -1)
-let viewStart = 0;        // absolute row index of viewport top
+let mustStartRow = 0;     // the row player must start from
 const TEST_MODE = false;  // set to true to bypass dictionary checks
 
 // Danger zone
@@ -486,26 +484,24 @@ function initGrid() {
   }
 }
 
-function renderBoard(skipScroll) {
+function renderBoard() {
   const board = document.getElementById('board');
   const wrapper = document.getElementById('boardWrapper');
-  const container = document.getElementById('boardContainer');
+  const container = document.querySelector('.board-container');
 
   const containerH = container.clientHeight;
   const gap = 6;
   const tileH = (containerH - gap * (ROWS - 1)) / ROWS;
-  const totalRows = grid.length;
 
-  board.style.gridTemplateRows = `repeat(${totalRows}, ${tileH}px)`;
+  board.style.gridTemplateRows = `repeat(${ROWS}, ${tileH}px)`;
   board.innerHTML = '';
   wrapper.classList.remove('scrolling');
   wrapper.style.transform = 'translateY(0)';
 
-  // Determine advance zone: rows between viewStart and maxSelectedRow
+  // Determine advance zone: rows 0 to maxRow-1 will scroll off
   const maxSelectedRow = selected.length > 0 ? Math.max(...selected.map(s => s.row)) : -1;
 
-  // Render rows in reverse order (highest row at top, row 0 at bottom)
-  for (let r = totalRows - 1; r >= 0; r--) {
+  for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       const tile = document.createElement('div');
       tile.className = 'tile';
@@ -513,40 +509,31 @@ function renderBoard(skipScroll) {
       tile.dataset.row = r;
       tile.dataset.col = c;
 
-      // Highlight start line
-      if (r === viewStart && selected.length === 0) {
-        tile.classList.add('must-start');
-      }
+      if (r < mustStartRow) tile.classList.add('locked');
+      if (r === mustStartRow && selected.length === 0) tile.classList.add('must-start');
 
-      // Dim rows below viewport (old rows — visually below)
-      if (r < viewStart) {
-        tile.style.opacity = '0.45';
-      }
-
-      // Highlight rows that will advance on submit
-      if (selected.length > 0 && maxSelectedRow > viewStart && r >= viewStart && r < maxSelectedRow) {
+      // Highlight rows that will scroll off on submit
+      if (selected.length > 0 && maxSelectedRow > 0 && r < maxSelectedRow) {
         tile.classList.add('advance-zone');
-        if (r === viewStart) tile.classList.add('advance-cutline');
+        if (r === maxSelectedRow - 1) tile.classList.add('advance-cutline');
       }
 
       const idx = selected.findIndex(s => s.row === r && s.col === c);
       if (idx === selected.length - 1 && idx >= 0) {
         tile.classList.add('selected');
-        tile.style.opacity = '1';
         const badge = document.createElement('span');
         badge.className = 'order-badge';
         badge.textContent = idx + 1;
         tile.appendChild(badge);
       } else if (idx >= 0) {
         tile.classList.add('path');
-        tile.style.opacity = '1';
         const badge = document.createElement('span');
         badge.className = 'order-badge';
         badge.textContent = idx + 1;
         tile.appendChild(badge);
       }
 
-      // Danger zone (visually at top — higher row indices)
+      // Danger zone
       if (r >= dangerRow) {
         tile.classList.add('danger');
         if (r === dangerRow) tile.classList.add('danger-edge');
@@ -557,73 +544,97 @@ function renderBoard(skipScroll) {
       board.appendChild(tile);
     }
   }
-
-  // Scroll to show viewport (viewStart at bottom, new rows at top)
-  if (!skipScroll) {
-    const scrollTarget = Math.max(0, (totalRows - viewStart - ROWS) * (tileH + gap));
-    container.scrollTop = scrollTarget;
-  }
-
   updateUI();
 }
 
 let isAnimating = false;
 
-function animateScroll(scrollAmount, newRows) {
+function animateScroll(scrollAmount, newRows, oldDangerRow) {
   if (scrollAmount === 0) {
-    selected = [];
     renderBoard();
     setTimeout(() => checkGameOver(), 100);
     return;
   }
 
   isAnimating = true;
-  const container = document.getElementById('boardContainer');
-  const gap = 6;
-  const containerH = container.clientHeight;
-  const tileH = (containerH - gap * (ROWS - 1)) / ROWS;
+  const board = document.getElementById('board');
+  const wrapper = document.getElementById('boardWrapper');
+  const container = document.querySelector('.board-container');
 
-  // Append new rows to grid (never shift)
-  for (let i = 0; i < newRows.length; i++) {
+  const containerH = container.clientHeight;
+  const gap = 6;
+  const tileH = (containerH - gap * (ROWS - 1)) / ROWS;
+  const totalRows = ROWS + scrollAmount;
+
+  const oldGrid = grid.map(row => [...row]);
+
+  for (let i = 0; i < scrollAmount; i++) {
+    grid.shift();
     grid.push(newRows[i]);
   }
 
-  // Render the full board at the old scroll position
-  selected = [];
-  renderBoard(true); // skipScroll = true
+  const extendedGrid = [...oldGrid, ...newRows];
 
-  // Mark new tiles for appear animation
-  const board = document.getElementById('board');
-  const newStartRow = grid.length - newRows.length;
-  const tiles = board.querySelectorAll('.tile');
-  tiles.forEach(tile => {
-    const r = parseInt(tile.dataset.row);
-    const c = parseInt(tile.dataset.col);
-    if (r >= newStartRow) {
-      tile.classList.add('new-tile');
-      tile.style.animationDelay = `${(r - newStartRow) * 0.04 + c * 0.02}s`;
+  board.style.gridTemplateRows = `repeat(${totalRows}, ${tileH}px)`;
+  board.innerHTML = '';
+  wrapper.classList.remove('scrolling');
+  wrapper.style.transform = 'translateY(0)';
+
+  // Use old danger row position for the extended grid during animation
+  const animDanger = oldDangerRow !== undefined ? oldDangerRow : dangerRow;
+
+  for (let r = 0; r < totalRows; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.textContent = extendedGrid[r][c];
+
+      if (r < scrollAmount) {
+        tile.classList.add('consumed');
+        tile.classList.add('advance-zone');
+      }
+
+      // Danger zone on extended grid
+      if (r >= animDanger) {
+        tile.classList.add('danger');
+        if (r === animDanger) tile.classList.add('danger-edge');
+      }
+
+      if (r >= ROWS) {
+        tile.classList.add('new-tile');
+        tile.style.animationDelay = `${(r - ROWS) * 0.04 + c * 0.02}s`;
+      }
+
+      board.appendChild(tile);
     }
+  }
+
+  // Trigger the scroll animation on next frame
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      wrapper.classList.add('scrolling');
+      const scrollPx = scrollAmount * (tileH + gap);
+      wrapper.style.transform = `translateY(-${scrollPx}px)`;
+    });
   });
 
-  // Smooth scroll upward to the new viewStart
-  const totalRows = grid.length;
-  const scrollTarget = Math.max(0, (totalRows - viewStart - ROWS) * (tileH + gap));
-  container.scrollTo({ top: scrollTarget, behavior: 'smooth' });
-
-  // Wait for scroll to finish
-  const onScrollEnd = () => {
-    container.removeEventListener('scrollend', onScrollEnd);
+  // After animation completes, snap to the clean new board
+  const onEnd = () => {
+    wrapper.removeEventListener('transitionend', onEnd);
     isAnimating = false;
+    mustStartRow = 0;
+    selected = [];
     renderBoard();
     setTimeout(() => checkGameOver(), 100);
   };
-  container.addEventListener('scrollend', onScrollEnd);
+  wrapper.addEventListener('transitionend', onEnd);
 
-  // Fallback in case scrollend doesn't fire
+  // Fallback in case transitionend doesn't fire
   setTimeout(() => {
     if (isAnimating) {
-      container.removeEventListener('scrollend', onScrollEnd);
       isAnimating = false;
+      mustStartRow = 0;
+      selected = [];
       renderBoard();
       setTimeout(() => checkGameOver(), 100);
     }
@@ -668,6 +679,7 @@ function isAdjacent(a, b) {
 
 function onTilePointer(row, col) {
   if (gameOver || isAnimating) return;
+  if (row < mustStartRow) return; // locked
   if (row >= dangerRow) return;   // in danger zone
 
   // If tapping the second-to-last tile, undo last
@@ -683,8 +695,8 @@ function onTilePointer(row, col) {
   const existingIdx = selected.findIndex(s => s.row === row && s.col === col);
   if (existingIdx >= 0) return;
 
-  // First tile must be on the start line (viewStart)
-  if (selected.length === 0 && row !== viewStart) {
+  // First tile must be on mustStartRow
+  if (selected.length === 0 && row !== mustStartRow) {
     showStatus('Start from the highlighted row', true);
     return;
   }
@@ -696,19 +708,19 @@ function onTilePointer(row, col) {
   }
 
   selected.push({ row, col });
-  renderBoard(true); // skipScroll to keep user's scroll position
+  renderBoard();
 }
 
 function undoLast() {
   if (selected.length > 0) {
     selected.pop();
-    renderBoard(true);
+    renderBoard();
   }
 }
 
 function clearSelection() {
   selected = [];
-  renderBoard(true);
+  renderBoard();
 }
 
 // ============================================================
@@ -733,17 +745,12 @@ function submitWord() {
   // Find the lowest row in the selection
   const maxRow = Math.max(...selected.map(s => s.row));
 
-  // Calculate advancement relative to current viewport
-  const scrollAmount = Math.max(0, maxRow - viewStart);
+  // Advance: scroll up so that maxRow becomes the new top (row 0)
+  const scrollAmount = maxRow; // number of rows to remove from top
 
   depth += scrollAmount;
 
-  // Advance viewport
-  if (scrollAmount > 0) {
-    viewStart = maxRow;
-  }
-
-  // Generate new rows to append at bottom
+  // Generate new rows
   const newRows = [];
   for (let i = 0; i < scrollAmount; i++) {
     const row = [];
@@ -752,11 +759,12 @@ function submitWord() {
   }
 
   // Push back danger and restart timer
+  const oldDangerRow = dangerRow;
   pushBackDanger(scrollAmount, gained);
   startDangerTimer();
 
-  // Animate the scroll
-  animateScroll(scrollAmount, newRows);
+  // Animate the scroll (pass old danger row for visual continuity)
+  animateScroll(scrollAmount, newRows, oldDangerRow);
 }
 
 // ============================================================
@@ -771,15 +779,16 @@ function checkGameOver() {
 }
 
 function canFormAnyWord() {
+  // DFS from each cell in mustStartRow
   for (let c = 0; c < COLS; c++) {
     const visited = new Set();
-    if (dfsSearch(viewStart, c, '', visited)) return true;
+    if (dfsSearch(mustStartRow, c, '', visited)) return true;
   }
   return false;
 }
 
 function dfsSearch(row, col, prefix, visited) {
-  if (row < 0 || row >= grid.length || col < 0 || col >= COLS) return false;
+  if (row < 0 || row >= ROWS || col < 0 || col >= COLS) return false;
   if (row >= dangerRow) return false; // in danger zone
   const key = `${row},${col}`;
   if (visited.has(key)) return false;
@@ -819,7 +828,7 @@ function endGame() {
   gameOver = true;
   stopDangerTimer();
   document.getElementById('finalScore').textContent = score;
-  document.getElementById('finalWords').textContent = `${wordCount} word${wordCount !== 1 ? 's' : ''} found · Height ${depth}`;
+  document.getElementById('finalWords').textContent = `${wordCount} word${wordCount !== 1 ? 's' : ''} found · Depth ${depth}`;
 
   const logEl = document.getElementById('wordLog');
   logEl.innerHTML = '';
@@ -861,9 +870,9 @@ function stopDangerTimer() {
 function riseDanger() {
   if (gameOver || isAnimating) return;
   dangerRow--;
-  if (dangerRow <= viewStart) {
-    // Danger reached the viewport top — game over
-    dangerRow = viewStart;
+  if (dangerRow <= mustStartRow) {
+    // Danger reached the playable area — game over
+    dangerRow = mustStartRow;
     renderBoard();
     updateDangerUI();
     endGame();
@@ -871,22 +880,23 @@ function riseDanger() {
   }
   // Clear any selection on tiles that are now in the danger zone
   selected = selected.filter(s => s.row < dangerRow);
-  renderBoard(true);
+  renderBoard();
   updateDangerUI();
 }
 
 function pushBackDanger(scrollAmount, gained) {
-  // First, advance danger with the viewport so it stays in the same relative position
-  dangerRow += scrollAmount;
-  // Then push back further based on score
+  // Push danger back: depth-based scroll + score-based bonus
+  // Net from scroll: (scrollAmount - 1) rows
+  // Score bonus: every 150 points pushes back an extra row
+  const scrollPush = Math.max(0, scrollAmount - 1);
   const scorePush = Math.floor(gained / 150);
-  dangerRow = Math.min(viewStart + ROWS, dangerRow + scorePush);
+  dangerRow = Math.min(ROWS, dangerRow + scrollPush + scorePush);
   updateDangerUI();
 }
 
 function updateDangerUI() {
   const container = document.getElementById('boardContainer');
-  const isHot = dangerRow <= viewStart + 3;
+  const isHot = dangerRow <= mustStartRow + 3;
   container.classList.toggle('warning', isHot);
 }
 
@@ -894,7 +904,6 @@ function restartGame() {
   score = 0;
   wordCount = 0;
   depth = 0;
-  viewStart = 0;
   wordsFound = [];
   mustStartRow = 0;
   selected = [];
@@ -922,7 +931,41 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 1200);
 }
 
-// Touch: no drag selection, allow native scroll
+// ============================================================
+// TOUCH DRAG SYSTEM
+// ============================================================
+let isDragging = false;
+
+function getTileFromPoint(x, y) {
+  const el = document.elementFromPoint(x, y);
+  if (!el) return null;
+  const tile = el.closest('.tile');
+  if (!tile) return null;
+  const row = parseInt(tile.dataset.row);
+  const col = parseInt(tile.dataset.col);
+  if (isNaN(row) || isNaN(col)) return null;
+  return { row, col };
+}
+
+document.addEventListener('pointerdown', (e) => {
+  if (!e.target.closest('.board')) return;
+  isDragging = true;
+});
+
+document.addEventListener('pointermove', (e) => {
+  if (!isDragging) return;
+  e.preventDefault();
+  const hit = getTileFromPoint(e.clientX, e.clientY);
+  if (hit) onTilePointer(hit.row, hit.col);
+}, { passive: false });
+
+document.addEventListener('pointerup', () => { isDragging = false; });
+document.addEventListener('pointercancel', () => { isDragging = false; });
+
+// Prevent scrolling on touch over the board
+document.addEventListener('touchmove', (e) => {
+  if (e.target.closest('.board') || isDragging) e.preventDefault();
+}, { passive: false });
 
 // ============================================================
 // BOOT
@@ -938,7 +981,7 @@ initGrid();
 window.canFormAnyWord = function() {
   for (let c = 0; c < COLS; c++) {
     const visited = new Set();
-    if (dfsSearchFast(viewStart, c, '', visited)) return true;
+    if (dfsSearchFast(mustStartRow, c, '', visited)) return true;
   }
   return false;
 };
@@ -953,7 +996,7 @@ if (lo) lo.remove();
 }
 
 function dfsSearchFast(row, col, prefix, visited) {
-  if (row < 0 || row >= grid.length || col < 0 || col >= COLS) return false;
+  if (row < 0 || row >= ROWS || col < 0 || col >= COLS) return false;
   if (row >= dangerRow) return false;
   const key = `${row},${col}`;
   if (visited.has(key)) return false;
