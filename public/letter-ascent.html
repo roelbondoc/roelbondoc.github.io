@@ -1,13 +1,13 @@
 ---
 layout: null
-permalink: /letter-descent/
+permalink: /letter-ascent/
 ---
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Letter Descent</title>
+<title>Letter Ascent</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -139,7 +139,7 @@ permalink: /letter-descent/
     opacity: 1;
   }
   .tile.advance-cutline {
-    box-shadow: 0 3px 0 0 rgba(255, 230, 109, 0.4);
+    box-shadow: 0 -3px 0 0 rgba(255, 230, 109, 0.4);
   }
 
   .tile {
@@ -345,7 +345,7 @@ permalink: /letter-descent/
     pointer-events: none;
   }
   .tile.danger-edge {
-    box-shadow: 0 -3px 0 0 rgba(255, 80, 60, 0.6);
+    box-shadow: 0 3px 0 0 rgba(255, 80, 60, 0.6);
   }
   .board-container.warning {
     animation: warningPulse 1s ease-in-out infinite;
@@ -360,7 +360,7 @@ permalink: /letter-descent/
 <div id="loadingOverlay" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;font-family:var(--font);color:var(--tile-text);font-size:1.2rem;font-weight:600">Loading dictionary&hellip;</div>
 
 <div class="header">
-  <h1>Letter Descent</h1>
+  <h1>Letter Ascent</h1>
   <div class="stats">
     <div class="stat">
       <span class="stat-label">Score</span>
@@ -371,7 +371,7 @@ permalink: /letter-descent/
       <span class="stat-val" id="wordCount">0</span>
     </div>
     <div class="stat">
-      <span class="stat-label">Depth</span>
+      <span class="stat-label">Height</span>
       <span class="stat-val" id="depth">0</span>
     </div>
   </div>
@@ -394,7 +394,7 @@ permalink: /letter-descent/
 </div>
 
 <div class="overlay" id="overlay">
-  <h2>Descent Over</h2>
+  <h2>Ascent Over</h2>
   <div class="final-score" id="finalScore">0</div>
   <div class="final-words" id="finalWords">0 words found</div>
   <div class="word-log" id="wordLog"></div>
@@ -501,7 +501,8 @@ function renderBoard() {
   // Determine advance zone: rows 0 to maxRow-1 will scroll off
   const maxSelectedRow = selected.length > 0 ? Math.max(...selected.map(s => s.row)) : -1;
 
-  for (let r = 0; r < ROWS; r++) {
+  // Render rows in reverse order (highest row at top, row 0 at bottom)
+  for (let r = ROWS - 1; r >= 0; r--) {
     for (let c = 0; c < COLS; c++) {
       const tile = document.createElement('div');
       tile.className = 'tile';
@@ -578,12 +579,15 @@ function animateScroll(scrollAmount, newRows, oldDangerRow) {
   board.style.gridTemplateRows = `repeat(${totalRows}, ${tileH}px)`;
   board.innerHTML = '';
   wrapper.classList.remove('scrolling');
-  wrapper.style.transform = 'translateY(0)';
+  // Start offset so new rows are hidden above, old rows visible
+  const scrollPx = scrollAmount * (tileH + gap);
+  wrapper.style.transform = `translateY(-${scrollPx}px)`;
 
   // Use old danger row position for the extended grid during animation
   const animDanger = oldDangerRow !== undefined ? oldDangerRow : dangerRow;
 
-  for (let r = 0; r < totalRows; r++) {
+  // Render reversed: highest extended row at top, row 0 at bottom
+  for (let r = totalRows - 1; r >= 0; r--) {
     for (let c = 0; c < COLS; c++) {
       const tile = document.createElement('div');
       tile.className = 'tile';
@@ -609,12 +613,11 @@ function animateScroll(scrollAmount, newRows, oldDangerRow) {
     }
   }
 
-  // Trigger the scroll animation on next frame
+  // Trigger the scroll animation downward (reveals new rows at top)
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       wrapper.classList.add('scrolling');
-      const scrollPx = scrollAmount * (tileH + gap);
-      wrapper.style.transform = `translateY(-${scrollPx}px)`;
+      wrapper.style.transform = 'translateY(0)';
     });
   });
 
@@ -828,7 +831,7 @@ function endGame() {
   gameOver = true;
   stopDangerTimer();
   document.getElementById('finalScore').textContent = score;
-  document.getElementById('finalWords').textContent = `${wordCount} word${wordCount !== 1 ? 's' : ''} found · Depth ${depth}`;
+  document.getElementById('finalWords').textContent = `${wordCount} word${wordCount !== 1 ? 's' : ''} found · Height ${depth}`;
 
   const logEl = document.getElementById('wordLog');
   logEl.innerHTML = '';
