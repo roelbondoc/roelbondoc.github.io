@@ -7,7 +7,7 @@ permalink: /letter-descent/
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Letter Descent</title>
+<title>Letter Ascent</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -140,7 +140,7 @@ permalink: /letter-descent/
     opacity: 1;
   }
   .tile.advance-cutline {
-    box-shadow: 0 3px 0 0 rgba(255, 230, 109, 0.4);
+    box-shadow: 0 -3px 0 0 rgba(255, 230, 109, 0.4);
   }
 
   .tile {
@@ -346,7 +346,7 @@ permalink: /letter-descent/
     pointer-events: none;
   }
   .tile.danger-edge {
-    box-shadow: 0 -3px 0 0 rgba(255, 80, 60, 0.6);
+    box-shadow: 0 3px 0 0 rgba(255, 80, 60, 0.6);
   }
   .board-container.warning {
     animation: warningPulse 1s ease-in-out infinite;
@@ -361,7 +361,7 @@ permalink: /letter-descent/
 <div id="loadingOverlay" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;font-family:var(--font);color:var(--tile-text);font-size:1.2rem;font-weight:600">Loading dictionary&hellip;</div>
 
 <div class="header">
-  <h1>Letter Descent</h1>
+  <h1>Letter Ascent</h1>
   <div class="stats">
     <div class="stat">
       <span class="stat-label">Score</span>
@@ -372,7 +372,7 @@ permalink: /letter-descent/
       <span class="stat-val" id="wordCount">0</span>
     </div>
     <div class="stat">
-      <span class="stat-label">Depth</span>
+      <span class="stat-label">Height</span>
       <span class="stat-val" id="depth">0</span>
     </div>
   </div>
@@ -504,7 +504,8 @@ function renderBoard(skipScroll) {
   // Determine advance zone: rows between viewStart and maxSelectedRow
   const maxSelectedRow = selected.length > 0 ? Math.max(...selected.map(s => s.row)) : -1;
 
-  for (let r = 0; r < totalRows; r++) {
+  // Render rows in reverse order (highest row at top, row 0 at bottom)
+  for (let r = totalRows - 1; r >= 0; r--) {
     for (let c = 0; c < COLS; c++) {
       const tile = document.createElement('div');
       tile.className = 'tile';
@@ -517,7 +518,7 @@ function renderBoard(skipScroll) {
         tile.classList.add('must-start');
       }
 
-      // Dim rows above viewport (old rows)
+      // Dim rows below viewport (old rows — visually below)
       if (r < viewStart) {
         tile.style.opacity = '0.45';
       }
@@ -525,7 +526,7 @@ function renderBoard(skipScroll) {
       // Highlight rows that will advance on submit
       if (selected.length > 0 && maxSelectedRow > viewStart && r >= viewStart && r < maxSelectedRow) {
         tile.classList.add('advance-zone');
-        if (r === maxSelectedRow - 1) tile.classList.add('advance-cutline');
+        if (r === viewStart) tile.classList.add('advance-cutline');
       }
 
       const idx = selected.findIndex(s => s.row === r && s.col === c);
@@ -545,7 +546,7 @@ function renderBoard(skipScroll) {
         tile.appendChild(badge);
       }
 
-      // Danger zone
+      // Danger zone (visually at top — higher row indices)
       if (r >= dangerRow) {
         tile.classList.add('danger');
         if (r === dangerRow) tile.classList.add('danger-edge');
@@ -557,9 +558,9 @@ function renderBoard(skipScroll) {
     }
   }
 
-  // Scroll to viewStart position
+  // Scroll to show viewport (viewStart at bottom, new rows at top)
   if (!skipScroll) {
-    const scrollTarget = viewStart * (tileH + gap);
+    const scrollTarget = Math.max(0, (totalRows - viewStart - ROWS) * (tileH + gap));
     container.scrollTop = scrollTarget;
   }
 
@@ -604,8 +605,9 @@ function animateScroll(scrollAmount, newRows) {
     }
   });
 
-  // Smooth scroll to the new viewStart
-  const scrollTarget = viewStart * (tileH + gap);
+  // Smooth scroll upward to the new viewStart
+  const totalRows = grid.length;
+  const scrollTarget = Math.max(0, (totalRows - viewStart - ROWS) * (tileH + gap));
   container.scrollTo({ top: scrollTarget, behavior: 'smooth' });
 
   // Wait for scroll to finish
@@ -827,7 +829,7 @@ function endGame() {
   gameOver = true;
   stopDangerTimer();
   document.getElementById('finalScore').textContent = score;
-  document.getElementById('finalWords').textContent = `${wordCount} word${wordCount !== 1 ? 's' : ''} found · Depth ${depth}`;
+  document.getElementById('finalWords').textContent = `${wordCount} word${wordCount !== 1 ? 's' : ''} found · Height ${depth}`;
 
   const logEl = document.getElementById('wordLog');
   logEl.innerHTML = '';
