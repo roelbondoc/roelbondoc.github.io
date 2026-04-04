@@ -124,6 +124,8 @@ permalink: /letter-ascent/
     grid-template-columns: repeat(5, 1fr);
     gap: 6px;
     width: 100%;
+    position: relative;
+    z-index: 1;
   }
   /* During scroll animation, the board has more rows than visible — overflow hidden on container clips it */
 
@@ -146,7 +148,7 @@ permalink: /letter-ascent/
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(1rem, 4vw, 1.6rem);
+    font-size: clamp(1.2rem, 5vw, 2rem);
     font-weight: 700;
     text-transform: uppercase;
     background: var(--tile);
@@ -173,9 +175,15 @@ permalink: /letter-ascent/
     box-shadow: 0 0 12px rgba(247, 108, 94, 0.25);
     z-index: 1;
   }
-  .tile.must-start {
-    border-color: var(--accent3);
-    box-shadow: 0 0 8px rgba(255, 230, 109, 0.2);
+  .start-row-bg {
+    position: absolute;
+    left: -4px;
+    right: -4px;
+    border-radius: 14px;
+    background: rgba(255, 230, 109, 0.18);
+    box-shadow: 0 0 20px rgba(255, 230, 109, 0.15);
+    pointer-events: none;
+    z-index: 0;
   }
   .tile.locked {
     opacity: 0.25;
@@ -498,6 +506,19 @@ function renderBoard() {
   wrapper.classList.remove('scrolling');
   wrapper.style.transform = 'translateY(0)';
 
+  // Add start row background highlight behind the tiles
+  let startBg = wrapper.querySelector('.start-row-bg');
+  if (!startBg) {
+    startBg = document.createElement('div');
+    startBg.className = 'start-row-bg';
+    wrapper.insertBefore(startBg, board);
+  }
+  // mustStartRow is at visual bottom (reversed), so position from bottom
+  const visualRow = ROWS - 1 - mustStartRow;
+  startBg.style.top = `${visualRow * (tileH + gap) - 4}px`;
+  startBg.style.height = `${tileH + 8}px`;
+  startBg.style.display = selected.length === 0 ? '' : 'none';
+
   // Determine advance zone: rows 0 to maxRow-1 will scroll off
   const maxSelectedRow = selected.length > 0 ? Math.max(...selected.map(s => s.row)) : -1;
 
@@ -511,7 +532,6 @@ function renderBoard() {
       tile.dataset.col = c;
 
       if (r < mustStartRow) tile.classList.add('locked');
-      if (r === mustStartRow && selected.length === 0) tile.classList.add('must-start');
 
       // Highlight rows that will scroll off on submit
       if (selected.length > 0 && maxSelectedRow > 0 && r < maxSelectedRow) {
