@@ -746,7 +746,17 @@ a.pagination-item:hover { background: var(--surface); border-bottom-color: var(-
  * ============================================ */
 
 .newsletter-signup { margin-top: 2rem; }
-.newsletter-signup label { color: var(--text-dim); }
+.newsletter-signup label {
+  display: block;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+.newsletter-signup p {
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
 
 .newsletter-signup input[type="email"] {
   background: var(--input-bg);

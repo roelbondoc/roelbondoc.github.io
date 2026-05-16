@@ -27,12 +27,19 @@
       <hr>
 
       <aside class="newsletter-signup">
-        <form action="https://buttondown.email/api/emails/embed-subscribe/rb" method="post" target="popupwindow" onsubmit="window.open('https://buttondown.email/rb', 'popupwindow')" class="embeddable-buttondown-form">
-          <input type="hidden" value="1" name="embed" />
-          <label for="bd-email"><small>Subscribe to my newsletter:</small></label><br>
-          <input type="email" name="email" id="bd-email" placeholder="Email address" required aria-describedby="newsletter-desc" />
+        <form
+          action="https://buttondown.com/api/emails/embed-subscribe/roelbondoc"
+          method="post"
+          class="embeddable-buttondown-form"
+        >
+          <label for="bd-email">Enter your email</label>
+          <input type="email" name="email" id="bd-email" />
           <input type="submit" value="Subscribe" />
-          <div id="newsletter-desc" class="sr-only">Get updates on new technical articles and projects</div>
+          <p>
+            <a href="https://buttondown.com/refer/roelbondoc" target="_blank">
+              Powered by Buttondown.
+            </a>
+          </p>
         </form>
       </aside>
 
