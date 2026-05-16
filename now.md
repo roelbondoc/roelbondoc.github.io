@@ -7,7 +7,7 @@ Find out what I'm up to!
 
 ## Work
 
-I'm currently looking for my next opportunity!
+I'm currently a software engineer at Phoenix Health.
 
 ## Fun
 
@@ -24,6 +24,6 @@ if you ever want to play!
 
 ## Family
 
-My wife and I have 3 kids, ages 11, 8, and 3. Time has just been flying
+My wife and I have 3 kids, ages 12, 8, and 4. Time has just been flying
 by so fast, so I've been trying to be more mindful of the moment and enjoy
 every second I have with them.
