@@ -694,7 +694,16 @@ function onTilePointer(row, col) {
     }
   }
 
-  // Already selected? ignore if it's the last one
+  // Tapping the last selected tile deselects it
+  if (selected.length > 0) {
+    const last = selected[selected.length - 1];
+    if (last.row === row && last.col === col) {
+      undoLast();
+      return;
+    }
+  }
+
+  // Already selected? ignore
   const existingIdx = selected.findIndex(s => s.row === row && s.col === col);
   if (existingIdx >= 0) return;
 
