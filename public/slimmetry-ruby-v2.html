@@ -1,0 +1,1605 @@
+---
+layout: null
+permalink: /slimmetry-ruby-v2/
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V2_PLAN.md</title>
+<style>
+/* ===== Phoenix Theme (dark, deep navy + flame orange) ===== */
+:root,
+[data-theme="phoenix"] {
+  --bg: #0b1238;
+  --bg-surface: #1c2349;
+  --bg-gutter: #0d1540;
+  --text: #f8f2ee;
+  --text-dim: rgba(248, 242, 238, 0.5);
+  --text-bright: #ffffff;
+  --accent: #f8991d;
+  --accent-dim: #334487;
+  --border: rgba(51, 68, 135, 0.4);
+  --heading1: #f8991d;
+  --heading2: #e0af68;
+  --heading3: #9ece6a;
+  --heading4: #7dcfff;
+  --heading5: #bb9af7;
+  --heading6: rgba(248, 242, 238, 0.7);
+  --bullet-color: #f8991d;
+  --code-bg: rgba(51, 68, 135, 0.3);
+  --code-text: #f8f2ee;
+  --link-color: #f8991d;
+  --blockquote-border: #334487;
+  --blockquote-text: rgba(248, 242, 238, 0.6);
+  --toolbar-bg: #0b1238;
+  --strong: #ffffff;
+  --em: rgba(248, 242, 238, 0.85);
+  --hr-color: rgba(51, 68, 135, 0.5);
+  --inline-code-bg: rgba(51, 68, 135, 0.4);
+  --inline-code-text: #f8f2ee;
+  --welcome-icon: #f8991d;
+  --recent-hover: rgba(51, 68, 135, 0.3);
+  --recent-path: rgba(248, 242, 238, 0.35);
+  --theme-toggle-bg: rgba(51, 68, 135, 0.4);
+  --theme-toggle-active: #f8991d;
+  --theme-toggle-text: rgba(248, 242, 238, 0.5);
+  --theme-toggle-active-text: #0b1238;
+  --hl-keyword: #bb9af7;
+  --hl-string: #9ece6a;
+  --hl-number: #ff9e64;
+  --hl-comment: rgba(248, 242, 238, 0.35);
+  --hl-function: #7dcfff;
+  --hl-type: #e0af68;
+  --hl-literal: #ff9e64;
+  --hl-variable: #c0caf5;
+  --hl-attr: #73daca;
+  --hl-tag: #f7768e;
+  --hl-operator: #89ddff;
+  --hl-punctuation: rgba(248, 242, 238, 0.5);
+}
+
+/* ===== Dark Theme (pure black, minimal) ===== */
+[data-theme="dark"] {
+  --bg: #000000;
+  --bg-surface: #111111;
+  --bg-gutter: #000000;
+  --text: #d4d4d4;
+  --text-dim: rgba(212, 212, 212, 0.4);
+  --text-bright: #ffffff;
+  --accent: #f8991d;
+  --accent-dim: #1a1a1a;
+  --border: rgba(255, 255, 255, 0.1);
+  --heading1: #f8991d;
+  --heading2: #e0af68;
+  --heading3: #9ece6a;
+  --heading4: #7dcfff;
+  --heading5: #bb9af7;
+  --heading6: rgba(212, 212, 212, 0.6);
+  --bullet-color: #f8991d;
+  --code-bg: rgba(255, 255, 255, 0.06);
+  --code-text: #d4d4d4;
+  --link-color: #f8991d;
+  --blockquote-border: #333333;
+  --blockquote-text: rgba(212, 212, 212, 0.55);
+  --toolbar-bg: #000000;
+  --strong: #ffffff;
+  --em: rgba(212, 212, 212, 0.85);
+  --hr-color: rgba(255, 255, 255, 0.1);
+  --inline-code-bg: rgba(255, 255, 255, 0.08);
+  --inline-code-text: #d4d4d4;
+  --welcome-icon: #f8991d;
+  --recent-hover: rgba(255, 255, 255, 0.06);
+  --recent-path: rgba(212, 212, 212, 0.35);
+  --theme-toggle-bg: rgba(255, 255, 255, 0.08);
+  --theme-toggle-active: #f8991d;
+  --theme-toggle-text: rgba(212, 212, 212, 0.4);
+  --theme-toggle-active-text: #000000;
+  --hl-keyword: #c586c0;
+  --hl-string: #6a9955;
+  --hl-number: #b5cea8;
+  --hl-comment: rgba(212, 212, 212, 0.35);
+  --hl-function: #dcdcaa;
+  --hl-type: #4ec9b0;
+  --hl-literal: #569cd6;
+  --hl-variable: #9cdcfe;
+  --hl-attr: #9cdcfe;
+  --hl-tag: #569cd6;
+  --hl-operator: #d4d4d4;
+  --hl-punctuation: rgba(212, 212, 212, 0.5);
+}
+
+/* ===== Raven Theme (warm light, tan + plum + lilac) ===== */
+[data-theme="raven"] {
+  --bg: #f8f2ee;
+  --bg-surface: #ebe1e1;
+  --bg-gutter: #f8f2ee;
+  --text: #381e1e;
+  --text-dim: rgba(56, 30, 30, 0.45);
+  --text-bright: #381e1e;
+  --accent: #9a9fd8;
+  --accent-dim: rgba(154, 159, 216, 0.25);
+  --border: rgba(56, 30, 30, 0.12);
+  --heading1: #381e1e;
+  --heading2: #666b8e;
+  --heading3: #ff9a68;
+  --heading4: #9a9fd8;
+  --heading5: #ff8082;
+  --heading6: rgba(56, 30, 30, 0.6);
+  --bullet-color: #ff9a68;
+  --code-bg: rgba(56, 30, 30, 0.06);
+  --code-text: #381e1e;
+  --link-color: #9a9fd8;
+  --blockquote-border: #9a9fd8;
+  --blockquote-text: rgba(56, 30, 30, 0.6);
+  --toolbar-bg: #ebe1e1;
+  --strong: #381e1e;
+  --em: rgba(56, 30, 30, 0.8);
+  --hr-color: rgba(56, 30, 30, 0.12);
+  --inline-code-bg: rgba(56, 30, 30, 0.08);
+  --inline-code-text: #381e1e;
+  --welcome-icon: #ff9a68;
+  --recent-hover: rgba(56, 30, 30, 0.06);
+  --recent-path: rgba(56, 30, 30, 0.4);
+  --theme-toggle-bg: rgba(56, 30, 30, 0.08);
+  --theme-toggle-active: #381e1e;
+  --theme-toggle-text: rgba(56, 30, 30, 0.4);
+  --theme-toggle-active-text: #f8f2ee;
+  --hl-keyword: #7c4dff;
+  --hl-string: #558b2f;
+  --hl-number: #f57c00;
+  --hl-comment: rgba(56, 30, 30, 0.4);
+  --hl-function: #6a1b9a;
+  --hl-type: #00695c;
+  --hl-literal: #0d47a1;
+  --hl-variable: #381e1e;
+  --hl-attr: #00838f;
+  --hl-tag: #c62828;
+  --hl-operator: #666b8e;
+  --hl-punctuation: rgba(56, 30, 30, 0.5);
+}
+
+/* ===== Light Theme (pure white, minimal) ===== */
+[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-surface: #f5f5f5;
+  --bg-gutter: #ffffff;
+  --text: #1a1a1a;
+  --text-dim: rgba(26, 26, 26, 0.4);
+  --text-bright: #000000;
+  --accent: #9a9fd8;
+  --accent-dim: rgba(154, 159, 216, 0.15);
+  --border: rgba(0, 0, 0, 0.1);
+  --heading1: #1a1a1a;
+  --heading2: #666b8e;
+  --heading3: #ff9a68;
+  --heading4: #9a9fd8;
+  --heading5: #ff8082;
+  --heading6: rgba(26, 26, 26, 0.55);
+  --bullet-color: #ff9a68;
+  --code-bg: rgba(0, 0, 0, 0.04);
+  --code-text: #1a1a1a;
+  --link-color: #9a9fd8;
+  --blockquote-border: #9a9fd8;
+  --blockquote-text: rgba(26, 26, 26, 0.55);
+  --toolbar-bg: #ffffff;
+  --strong: #000000;
+  --em: rgba(26, 26, 26, 0.8);
+  --hr-color: rgba(0, 0, 0, 0.1);
+  --inline-code-bg: rgba(0, 0, 0, 0.06);
+  --inline-code-text: #1a1a1a;
+  --welcome-icon: #ff9a68;
+  --recent-hover: rgba(0, 0, 0, 0.04);
+  --recent-path: rgba(26, 26, 26, 0.4);
+  --theme-toggle-bg: rgba(0, 0, 0, 0.06);
+  --theme-toggle-active: #1a1a1a;
+  --theme-toggle-text: rgba(26, 26, 26, 0.4);
+  --theme-toggle-active-text: #ffffff;
+  --hl-keyword: #7c4dff;
+  --hl-string: #558b2f;
+  --hl-number: #f57c00;
+  --hl-comment: rgba(26, 26, 26, 0.35);
+  --hl-function: #6a1b9a;
+  --hl-type: #00695c;
+  --hl-literal: #0d47a1;
+  --hl-variable: #1a1a1a;
+  --hl-attr: #00838f;
+  --hl-tag: #c62828;
+  --hl-operator: #1a1a1a;
+  --hl-punctuation: rgba(26, 26, 26, 0.5);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ===== Toolbar ===== */
+#toolbar {
+  display: flex;
+  align-items: center;
+  height: 42px;
+  padding: 0 12px;
+  padding-left: 80px;
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 8px;
+  -webkit-app-region: drag;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+#toolbar button, #toolbar .theme-toggle {
+  -webkit-app-region: no-drag;
+}
+
+#toolbar-left {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+#toolbar-center {
+  flex: 1;
+  text-align: center;
+  overflow: hidden;
+}
+
+#source-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#toolbar-right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+#toolbar button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 1px solid transparent;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-family: inherit;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+#toolbar button:hover {
+  background: var(--bg-surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+/* ===== Theme Toggle ===== */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  background: var(--theme-toggle-bg);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 0;
+  height: 26px;
+}
+
+.theme-toggle button {
+  all: unset;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--theme-toggle-text);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.theme-toggle button.active {
+  background: var(--theme-toggle-active);
+  color: var(--theme-toggle-active-text);
+}
+
+.theme-toggle button:not(.active):hover {
+  color: var(--text);
+}
+
+/* ===== Tab bar ===== */
+#tab-bar {
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding-left: 12px;
+  padding-right: 4px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+#tab-bar.hidden {
+  display: none;
+}
+
+#tab-list {
+  display: flex;
+  flex: 1;
+  overflow-x: auto;
+  gap: 1px;
+  -webkit-app-region: no-drag;
+  scrollbar-width: none;
+}
+
+#tab-list::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  max-width: 180px;
+  min-width: 0;
+  background: transparent;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.tab:hover {
+  background: var(--bg-surface);
+}
+
+.tab.active {
+  background: var(--bg-surface);
+}
+
+.tab-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab.active .tab-label {
+  color: var(--text);
+}
+
+.tab-close {
+  font-size: 14px;
+  line-height: 1;
+  color: var(--text-dim);
+  opacity: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.tab:hover .tab-close,
+.tab.active .tab-close {
+  opacity: 0.6;
+}
+
+.tab-close:hover {
+  opacity: 1 !important;
+  color: var(--text);
+}
+
+#tab-new {
+  all: unset;
+  font-family: inherit;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--text-dim);
+  padding: 2px 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+  -webkit-app-region: no-drag;
+}
+
+#tab-new:hover {
+  background: var(--bg-surface);
+  color: var(--text);
+}
+
+/* ===== URL bar ===== */
+#url-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+#url-bar.hidden {
+  display: none;
+}
+
+#url-input {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+#url-input:focus {
+  border-color: var(--accent);
+}
+
+#url-bar button {
+  background: var(--accent-dim);
+  border: none;
+  color: var(--text-bright);
+  font-family: inherit;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+#url-bar button:hover {
+  background: var(--accent);
+}
+
+#btn-cancel-url {
+  background: transparent !important;
+  color: var(--text-dim) !important;
+  border: 1px solid var(--border) !important;
+}
+
+#btn-cancel-url:hover {
+  color: var(--text) !important;
+}
+
+/* ===== Find bar ===== */
+/* ===== PDF export layout override ===== */
+body.pdf-preparing {
+  overflow: visible !important;
+  height: auto !important;
+}
+
+body.pdf-preparing #toolbar,
+body.pdf-preparing #tab-bar,
+body.pdf-preparing #file-changed-banner,
+body.pdf-preparing #find-bar,
+body.pdf-preparing #url-bar,
+body.pdf-preparing #sticky-heading,
+body.pdf-preparing #viewer-shadow,
+body.pdf-preparing #welcome {
+  display: none !important;
+}
+
+body.pdf-preparing #viewer {
+  overflow: visible !important;
+  height: auto !important;
+  flex: none !important;
+}
+
+/* ===== File changed banner ===== */
+#file-changed-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px;
+  background: var(--accent-dim);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+#file-changed-banner.hidden {
+  display: none;
+}
+
+#file-changed-banner span {
+  flex: 1;
+}
+
+#btn-reload {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+#btn-reload:hover {
+  opacity: 0.85;
+}
+
+#btn-dismiss-change {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+#btn-dismiss-change:hover {
+  color: var(--text);
+}
+
+#find-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+#find-bar.hidden {
+  display: none;
+}
+
+#find-input {
+  flex: 1;
+  max-width: 300px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+#find-input:focus {
+  border-color: var(--accent);
+}
+
+#find-count {
+  font-size: 12px;
+  color: var(--text-dim);
+  min-width: 80px;
+}
+
+#find-bar button {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+#find-bar button:hover {
+  color: var(--text);
+  border-color: var(--text-dim);
+}
+
+mark.find-highlight {
+  background: rgba(248, 153, 29, 0.3);
+  color: inherit;
+  border-radius: 2px;
+}
+
+mark.find-highlight.find-current {
+  background: rgba(248, 153, 29, 0.7);
+  color: var(--bg);
+}
+
+/* ===== Welcome screen ===== */
+#welcome {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+#welcome.hidden {
+  display: none;
+}
+
+#welcome-content {
+  text-align: center;
+  max-width: 480px;
+  padding: 40px 24px;
+}
+
+#welcome-content h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+
+#welcome-content > p {
+  color: var(--text-dim);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+#welcome-content .hint {
+  font-size: 12px;
+  margin-top: 12px;
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+
+#welcome-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+#welcome-actions button {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+#welcome-actions button:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--text-bright);
+}
+
+/* ===== Recent Files ===== */
+#recent-files {
+  text-align: left;
+  width: 100%;
+}
+
+#recent-files.hidden {
+  display: none;
+}
+
+#recent-files h2 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  padding-left: 12px;
+}
+
+#recent-list {
+  list-style: none;
+}
+
+#recent-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  font-size: 13px;
+}
+
+#recent-list li:hover {
+  background: var(--recent-hover);
+}
+
+#recent-list li .recent-icon {
+  color: var(--text-dim);
+  flex-shrink: 0;
+  width: 16px;
+  text-align: center;
+}
+
+#recent-list li .recent-info {
+  min-width: 0;
+  flex: 1;
+}
+
+#recent-list li .recent-name {
+  color: var(--text);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#recent-list li .recent-path {
+  color: var(--recent-path);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#recent-list li .recent-remove {
+  color: var(--text-dim);
+  opacity: 0;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 4px;
+  flex-shrink: 0;
+  transition: opacity 0.1s;
+}
+
+#recent-list li:hover .recent-remove {
+  opacity: 1;
+}
+
+#recent-list li .recent-remove:hover {
+  color: var(--accent);
+}
+
+/* ===== Viewer ===== */
+#viewer {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 40px;
+  position: relative;
+}
+
+#viewer.hidden {
+  display: none;
+}
+
+#viewer-shadow {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  pointer-events: none;
+  background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+  z-index: 20;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+#viewer-shadow.hidden,
+#viewer-shadow.at-bottom {
+  opacity: 0;
+}
+
+#viewer::-webkit-scrollbar {
+  width: 8px;
+}
+
+#viewer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#viewer::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+#viewer::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
+}
+
+/* ===== Sticky heading stack ===== */
+#sticky-heading {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 4px 16px 4px 96px;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+#sticky-heading.hidden {
+  display: none;
+}
+
+.sticky-entry {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+.sticky-entry.sticky-h1 { font-size: 14px; color: var(--heading1); }
+.sticky-entry.sticky-h2 { font-size: 13px; color: var(--heading2); padding-left: 8px; }
+.sticky-entry.sticky-h3 { font-size: 12px; color: var(--heading3); padding-left: 16px; }
+.sticky-entry.sticky-h4 { font-size: 12px; color: var(--heading4); padding-left: 24px; }
+.sticky-entry.sticky-h5 { font-size: 11px; color: var(--heading5); padding-left: 32px; }
+.sticky-entry.sticky-h6 { font-size: 11px; color: var(--heading6); padding-left: 40px; }
+
+/* Dim all but the deepest (current) entry */
+.sticky-entry:not(:last-child) {
+  opacity: 0.45;
+}
+
+#lines-container {
+  padding: 24px 0;
+}
+
+/* ===== Line layout ===== */
+.md-line {
+  display: flex;
+  align-items: baseline;
+  min-height: 1.7em;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.md-line.empty-line {
+  min-height: 1.2em;
+}
+
+.gutter {
+  width: 80px;
+  min-width: 80px;
+  text-align: right;
+  padding-right: 16px;
+  color: var(--text-dim);
+  user-select: none;
+  flex-shrink: 0;
+  font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+  font-size: inherit;
+  opacity: 0.55;
+}
+
+.gutter-content {
+  display: inline-block;
+}
+
+.content {
+  flex: 1;
+  padding-right: 32px;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
+}
+
+/* ===== Heading styles ===== */
+.md-line.heading-1 {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.md-line.heading-1 .content {
+  color: var(--heading1);
+  padding-top: 16px;
+  padding-bottom: 4px;
+}
+
+.md-line.heading-1 .gutter {
+  color: var(--heading1);
+  opacity: 0.3;
+  padding-top: 16px;
+}
+
+.md-line.heading-2 {
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.md-line.heading-2 .content {
+  color: var(--heading2);
+  padding-top: 12px;
+  padding-bottom: 2px;
+}
+
+.md-line.heading-2 .gutter {
+  color: var(--heading2);
+  opacity: 0.3;
+  padding-top: 12px;
+}
+
+.md-line.heading-3 {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.md-line.heading-3 .content {
+  color: var(--heading3);
+  padding-top: 8px;
+}
+
+.md-line.heading-3 .gutter {
+  color: var(--heading3);
+  opacity: 0.3;
+  padding-top: 8px;
+}
+
+.md-line.heading-4 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.md-line.heading-4 .content {
+  color: var(--heading4);
+  padding-top: 6px;
+}
+
+.md-line.heading-4 .gutter {
+  color: var(--heading4);
+  opacity: 0.3;
+  padding-top: 6px;
+}
+
+.md-line.heading-5 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.md-line.heading-5 .content {
+  color: var(--heading5);
+}
+
+.md-line.heading-5 .gutter {
+  color: var(--heading5);
+  opacity: 0.3;
+}
+
+.md-line.heading-6 {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.md-line.heading-6 .content {
+  color: var(--heading6);
+}
+
+.md-line.heading-6 .gutter {
+  color: var(--heading6);
+  opacity: 0.3;
+}
+
+/* ===== Bullet & list styles ===== */
+.gutter .bullet {
+  color: var(--bullet-color);
+}
+
+.gutter .number {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== Blockquote ===== */
+.md-line.blockquote .content {
+  color: var(--blockquote-text);
+  font-style: italic;
+  border-left: 3px solid var(--blockquote-border);
+  padding-left: 14px;
+}
+
+.md-line.blockquote .gutter {
+  color: var(--blockquote-border);
+}
+
+/* ===== Code block (single element) ===== */
+.md-line.code-block-single {
+  align-items: flex-start;
+  min-height: auto;
+  position: relative;
+}
+
+.copy-code-btn,
+.toggle-mermaid-btn {
+  position: absolute;
+  top: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+  z-index: 5;
+}
+
+.copy-code-btn {
+  right: 40px;
+}
+
+.toggle-mermaid-btn {
+  right: 100px;
+}
+
+.md-line.code-block-single:hover .copy-code-btn,
+.md-line.code-block-single:hover .toggle-mermaid-btn {
+  opacity: 1;
+}
+
+.copy-code-btn:hover,
+.toggle-mermaid-btn:hover {
+  background: var(--accent-dim);
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.copy-code-btn.copied {
+  color: var(--accent);
+}
+
+.mermaid-diagram {
+  padding: 16px;
+  background: #fafafa;
+  color: #333;
+  overflow-x: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60px;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.mermaid-diagram.mermaid-error {
+  color: #c0392b;
+  background: #fdecea;
+  white-space: pre-wrap;
+  justify-content: flex-start;
+  font-family: inherit;
+}
+
+.md-line.code-block-single .gutter {
+  padding-top: 14px;
+  opacity: 0.55;
+}
+
+.code-lang {
+  font-size: 11px;
+  text-transform: lowercase;
+  letter-spacing: 0.3px;
+}
+
+.md-line.code-block-single .content {
+  background: var(--code-bg);
+  color: var(--code-text);
+  font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+  font-size: 13px;
+  padding: 14px 16px;
+  margin-right: 32px;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.md-line.code-block-single pre {
+  margin: 0;
+  white-space: pre;
+}
+
+.md-line.code-block-single code {
+  font-family: inherit;
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  line-height: 1.6;
+}
+
+/* ===== Syntax highlighting tokens ===== */
+.hljs-keyword,
+.hljs-selector-tag { color: var(--hl-keyword); }
+
+.hljs-string,
+.hljs-doctag,
+.hljs-regexp { color: var(--hl-string); }
+
+.hljs-number,
+.hljs-literal { color: var(--hl-number); }
+
+.hljs-comment { color: var(--hl-comment); font-style: italic; }
+
+.hljs-title.function_,
+.hljs-title.class_ { color: var(--hl-function); }
+
+.hljs-type,
+.hljs-built_in { color: var(--hl-type); }
+
+.hljs-variable,
+.hljs-template-variable { color: var(--hl-variable); }
+
+.hljs-attr,
+.hljs-attribute { color: var(--hl-attr); }
+
+.hljs-tag { color: var(--hl-tag); }
+
+.hljs-operator,
+.hljs-symbol { color: var(--hl-operator); }
+
+.hljs-punctuation { color: var(--hl-punctuation); }
+
+.hljs-meta { color: var(--hl-comment); }
+
+.hljs-name { color: var(--hl-tag); }
+
+.hljs-section { color: var(--hl-function); font-weight: 600; }
+
+.hljs-addition { color: var(--hl-string); }
+.hljs-deletion { color: var(--hl-keyword); }
+
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 700; }
+
+/* ===== Horizontal rule ===== */
+.md-line.hr .content {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.md-line.hr .content::after {
+  content: '';
+  display: block;
+  border-top: 1px solid var(--hr-color);
+  margin-top: 4px;
+}
+
+/* ===== Inline formatting ===== */
+.content strong {
+  color: var(--strong);
+  font-weight: 700;
+}
+
+.content em {
+  color: var(--em);
+  font-style: italic;
+}
+
+.content code {
+  background: var(--inline-code-bg);
+  color: var(--inline-code-text);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.92em;
+  font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace;
+}
+
+.content a {
+  color: var(--link-color);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+
+.content a:hover {
+  border-bottom-color: var(--link-color);
+}
+
+.content img {
+  max-width: 100%;
+  border-radius: 6px;
+  margin: 4px 0;
+}
+
+/* ===== Syntax markers ===== */
+.syntax {
+  color: inherit;
+  opacity: 0.55;
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ===== Task lists (GFM) ===== */
+.task-checkbox {
+  font-size: 0.9em;
+  color: var(--text-dim);
+}
+
+.task-checked .task-checkbox {
+  color: var(--accent);
+}
+
+.task-checked .content {
+  color: var(--text-dim);
+}
+
+/* ===== Tables (GFM) ===== */
+.md-line.table-block {
+  align-items: flex-start;
+  padding: 8px 0;
+}
+
+.md-line.table-block .content {
+  overflow-x: auto;
+}
+
+.md-table {
+  border-collapse: collapse;
+  width: auto;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+}
+
+.md-table th,
+.md-table td {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.md-table th {
+  font-weight: 600;
+  color: var(--text-bright);
+  background: var(--bg-surface);
+}
+
+.md-table td {
+  color: var(--text);
+}
+
+.md-table tbody tr:hover td {
+  background: var(--recent-hover);
+}
+
+/* ===== GFM Alerts ===== */
+.md-line.alert .content {
+  font-style: normal;
+}
+
+.alert-title {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85em;
+  letter-spacing: 0.5px;
+}
+
+.alert-icon {
+  font-weight: 700;
+  font-size: 0.85em;
+}
+
+.md-line.alert-note .content { border-left-color: var(--accent); }
+.md-line.alert-note .alert-title,
+.md-line.alert-note .alert-icon { color: var(--accent); }
+
+.md-line.alert-tip .content { border-left-color: #9ece6a; }
+.md-line.alert-tip .alert-title,
+.md-line.alert-tip .alert-icon { color: #9ece6a; }
+
+.md-line.alert-important .content { border-left-color: #bb9af7; }
+.md-line.alert-important .alert-title,
+.md-line.alert-important .alert-icon { color: #bb9af7; }
+
+.md-line.alert-warning .content { border-left-color: #e0af68; }
+.md-line.alert-warning .alert-title,
+.md-line.alert-warning .alert-icon { color: #e0af68; }
+
+.md-line.alert-caution .content { border-left-color: #f7768e; }
+.md-line.alert-caution .alert-title,
+.md-line.alert-caution .alert-icon { color: #f7768e; }
+
+/* ===== Footnotes (GFM) ===== */
+.footnote-ref {
+  color: var(--accent);
+  font-size: 0.85em;
+  vertical-align: super;
+  line-height: 0;
+}
+
+.md-line.footnote-def {
+  font-size: 13px;
+}
+
+.md-line.footnote-def .gutter {
+  opacity: 0.6;
+}
+
+.footnote-label {
+  color: var(--accent);
+  font-size: 0.9em;
+}
+
+/* ===== HTML comments (rendered faintly) ===== */
+.md-line.html-comment .content {
+  opacity: 0.15;
+  font-style: italic;
+}
+
+/* ===== Mentions & issue refs (GFM) ===== */
+.mention {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.issue-ref {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ===== Emoji ===== */
+.emoji {
+  font-style: normal;
+}
+
+/* ===== Autolinks ===== */
+a.autolink {
+  color: var(--link-color);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+
+a.autolink:hover {
+  border-bottom-color: var(--link-color);
+}
+
+/* ===== List indentation ===== */
+.content.indent-1 { padding-left: 20px; }
+.content.indent-2 { padding-left: 40px; }
+.content.indent-3 { padding-left: 60px; }
+.content.indent-4 { padding-left: 80px; }
+
+/* ===== Frontmatter card ===== */
+.frontmatter-card {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  min-height: auto;
+  padding: 4px 0;
+}
+
+.frontmatter-card .gutter {
+  padding-top: 12px;
+  opacity: 0.3;
+}
+
+.frontmatter-label {
+  font-size: 12px;
+  font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Menlo, Monaco, monospace;
+  color: var(--text-dim);
+}
+
+.frontmatter-content {
+  background: var(--code-bg);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-right: 32px;
+  margin-top: 4px;
+}
+
+.frontmatter-row {
+  display: flex;
+  gap: 12px;
+  padding: 3px 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.frontmatter-key {
+  color: var(--text-dim);
+  font-weight: 500;
+  min-width: 80px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.frontmatter-value {
+  color: var(--text);
+}
+
+.frontmatter-tag {
+  display: inline-block;
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-size: 12px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  margin-right: 4px;
+}
+
+/* ===== Print stylesheet ===== */
+@media print {
+  /* Hide app chrome */
+  #toolbar, #tab-bar, #url-bar, #find-bar, #viewer-shadow,
+  #sticky-heading, #file-changed-banner, #welcome {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  #viewer {
+    overflow: visible !important;
+    height: auto !important;
+    flex: none !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Gutter: keep visible at reduced opacity */
+  .gutter {
+    opacity: 0.3 !important;
+  }
+
+  .gutter .gutter-content {
+    color: #999 !important;
+  }
+
+  /* Content: readable black text */
+  .content,
+  .content strong,
+  .content em,
+  .content code {
+    color: black !important;
+  }
+
+  .content a {
+    color: #333 !important;
+    text-decoration: underline !important;
+  }
+
+  /* Show URL after links */
+  .content a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #666;
+    word-break: break-all;
+  }
+
+  /* Code blocks */
+  .md-line.code-block-single .content {
+    background: #f5f5f5 !important;
+    border: 1px solid #ddd !important;
+  }
+
+  .md-line.code-block-single .content pre,
+  .md-line.code-block-single .content code {
+    color: #333 !important;
+  }
+
+  .md-line.code-block-single {
+    break-inside: avoid;
+  }
+
+  /* Syntax markers: lighter in print */
+  .syntax {
+    color: #bbb !important;
+  }
+
+  /* Headings */
+  .md-line[class*="heading-"] .content {
+    color: black !important;
+  }
+
+  /* Tables */
+  .md-table th, .md-table td {
+    border-color: #ccc !important;
+    color: black !important;
+  }
+
+  .md-table th {
+    background: #f0f0f0 !important;
+  }
+
+  /* Blockquotes */
+  .md-line.blockquote .content {
+    color: #444 !important;
+  }
+
+  /* HR */
+  .md-line.hr .content {
+    border-color: #ccc !important;
+  }
+
+  /* Task list checkboxes */
+  .task-checkbox {
+    color: #666 !important;
+  }
+
+  /* Hide copy buttons (from copy code block feature) */
+  .copy-code-btn,
+  .toggle-mermaid-btn {
+    display: none !important;
+  }
+}
+
+
+/* ===== HTML export overrides ===== */
+html, body { overflow: visible !important; height: auto !important; }
+body { display: block !important; }
+#toolbar, #tab-bar, #url-bar, #find-bar, #viewer-shadow,
+#sticky-heading, #file-changed-banner, #welcome { display: none !important; }
+.copy-code-btn, .toggle-mermaid-btn { display: none !important; }
+#lines-container { padding: 24px 0; max-width: 1100px; margin: 0 auto; }
+
+</style>
+</head>
+<body data-theme="raven">
+<div id="lines-container">
+<div class="md-line heading-1" id="slimmetry-ruby-v20-wide-events-revamp"><div class="gutter"><span class="gutter-content">#</span></div><div class="content">Slimmetry-Ruby v2.0 — Wide Events Revamp</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-2" id="context"><div class="gutter"><span class="gutter-content">##</span></div><div class="content">Context</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">Slimmetry-Ruby today emits a firehose: every <span class="syntax">`</span><code>trace</code><span class="syntax">`</span>d method emits its own event, <span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>and</strong><span class="syntax"></span></em><span class="syntax">*</span>* the Rails subscribers (<span class="syntax">`</span><code>EventSubscriber</code><span class="syntax">`</span>, <span class="syntax">`</span><code>NotificationsSubscriber</code><span class="syntax">`</span>) emit a separate event for each AS::Notifications fire — <span class="syntax">`</span><code>sql.active_record</code><span class="syntax">`</span>, <span class="syntax">`</span><code>render_template.action_view</code><span class="syntax">`</span>, <span class="syntax">`</span><code>cache_read.active_support</code><span class="syntax">`</span>, etc. A single web request can produce dozens-to-hundreds of narrow events, all linked only by <span class="syntax">`</span><code>_request_id</code><span class="syntax">`</span> and <span class="syntax">`</span><code>_parent_trace_id</code><span class="syntax">`</span>. Server-side queries have to JOIN events together to reconstruct what one request actually did, and there's no single record that says "this request, this controller, ran this SQL, took this long."</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">The revamp adopts the <span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>wide events</strong><span class="syntax"></span></em><span class="syntax">*</span>* philosophy: one fat self-contained event per unit of work. Specifically:</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">1.</span></span></div><div class="content"><span class="syntax">`</span><code>web_request</code><span class="syntax">`</span> — emitted once per HTTP request, contains everything that happened during it.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">2.</span></span></div><div class="content"><span class="syntax">`</span><code>job_perform</code><span class="syntax">`</span> — emitted once per ActiveJob run, same idea.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">3.</span></span></div><div class="content"><span class="syntax">`</span><code>trace</code><span class="syntax">`</span> — emitted once per <span class="syntax">`</span><code>trace</code><span class="syntax">`</span>d method call, same idea.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">AS::Notifications fires no longer emit events of their own. Instead, they <span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>accumulate into the active frame's context</strong><span class="syntax"></span></em><span class="syntax">*</span>* and ship with that frame's wide event when the frame closes.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">This is a clean v2.0 break — no compatibility shim. Downstream consumers (<span class="syntax">`</span><code>discode2</code><span class="syntax">`</span>, <span class="syntax">`</span><code>games</code><span class="syntax">`</span>) will need to be updated.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-2" id="design"><div class="gutter"><span class="gutter-content">##</span></div><div class="content">Design</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-3" id="core-abstraction-frames"><div class="gutter"><span class="gutter-content">###</span></div><div class="content">Core abstraction: Frames</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">A <span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>frame</strong><span class="syntax"></span></em><span class="syntax">*</span>* is a unit of work that:</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content">Opens on entry (HTTP request received, job perform start, traced method called).</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content">Has a <span class="syntax">`</span><code>trace_id</code><span class="syntax">`</span> (UUID) and optional <span class="syntax">`</span><code>parent_trace_id</code><span class="syntax">`</span>.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content">Accumulates context during its lifetime (timing, notifications, custom fields).</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content">Emits exactly one wide event on close.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">Frames form a thread-local stack: <span class="syntax">`</span><code>Thread.current[:slimmetry_frame_stack]</code><span class="syntax">`</span>. The current <span class="syntax">`</span><code>Slimmetry::Context</code><span class="syntax">`</span> module handles trace_id propagation today; it gets generalized into a frame stack.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-3" id="notification-cascade"><div class="gutter"><span class="gutter-content">###</span></div><div class="content">Notification cascade</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">When an AS::Notifications event fires, the gem walks <span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>every frame in the active stack</strong><span class="syntax"></span></em><span class="syntax">*</span>* and appends the (filtered) notification to each frame's notification buffer. Each frame's emitted event is fully self-contained — the <span class="syntax">`</span><code>web_request</code><span class="syntax">`</span> event contains every SQL query that happened under it, even those inside nested traced methods. The same SQL row appears in multiple events (request, trace_A, trace_B). Server-side dedup/reconstruction is possible via <span class="syntax">`</span><code>_trace_id</code><span class="syntax">`</span> linkage if desired, but each event stands on its own.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">Notifications that fire when <span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>no frame is active</strong><span class="syntax"></span></em><span class="syntax">*</span>* are dropped silently. Manual <span class="syntax">`</span><code>Slimmetry.frame("name") { ... }</code><span class="syntax">`</span> is the escape hatch for Rake tasks, scripts, REPL sessions.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-3" id="event-taxonomy"><div class="gutter"><span class="gutter-content">###</span></div><div class="content">Event taxonomy</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">All three event types share the same envelope keys (current <span class="syntax">`</span><code>_name</code><span class="syntax">`</span>, <span class="syntax">`</span><code>_ts</code><span class="syntax">`</span>, <span class="syntax">`</span><code>_trace_id</code><span class="syntax">`</span>, <span class="syntax">`</span><code>_parent_trace_id</code><span class="syntax">`</span>, <span class="syntax">`</span><code>_request_id</code><span class="syntax">`</span> convention preserved). Additions:</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line table-block"><div class="gutter"></div><div class="content"><table class="md-table"><thead><tr><th>Key</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><span class="syntax">`</span><code>_name</code><span class="syntax">`</span></td><td>String</td><td><span class="syntax">`</span><code>web_request</code><span class="syntax">`</span>, <span class="syntax">`</span><code>job_perform</code><span class="syntax">`</span>, or <span class="syntax">`</span><code>trace</code><span class="syntax">`</span></td></tr><tr><td><span class="syntax">`</span><code>_trace_id</code><span class="syntax">`</span></td><td>UUID</td><td>Frame ID</td></tr><tr><td><span class="syntax">`</span><code>_parent_trace_id</code><span class="syntax">`</span></td><td>UUID?</td><td>Enclosing frame's id</td></tr><tr><td><span class="syntax">`</span><code>_started_at</code><span class="syntax">`</span></td><td>ISO 8601</td><td>Frame open time</td></tr><tr><td><span class="syntax">`</span><code>_completed_at</code><span class="syntax">`</span></td><td>ISO 8601</td><td>Frame close time</td></tr><tr><td><span class="syntax">`</span><code>duration_ms</code><span class="syntax">`</span></td><td>Float</td><td><span class="syntax">`</span><code>_completed_at - _started_at</code><span class="syntax">`</span></td></tr><tr><td><span class="syntax">`</span><code>notifications</code><span class="syntax">`</span></td><td>Array&lt;Hash&gt;</td><td>All AS::Notifications captured under this frame (filtered)</td></tr><tr><td><span class="syntax">`</span><code>fields</code><span class="syntax">`</span></td><td>Hash</td><td>Custom fields added via <span class="syntax">`</span><code>Slimmetry.add_field</code><span class="syntax">`</span></td></tr><tr><td><span class="syntax">`</span><code>exception</code><span class="syntax">`</span></td><td>Hash?</td><td><span class="syntax">`</span><code>{ class:, message:, backtrace: }</code><span class="syntax">`</span> if the frame raised</td></tr></tbody></table></div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">Type-specific keys:</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong><span class="syntax">`</span><code>web_request</code><span class="syntax">`</span></strong><span class="syntax"></span></em><span class="syntax">*</span>*</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>controller</code><span class="syntax">`</span>, <span class="syntax">`</span><code>action</code><span class="syntax">`</span>, <span class="syntax">`</span><code>method</code><span class="syntax">`</span>, <span class="syntax">`</span><code>path</code><span class="syntax">`</span>, <span class="syntax">`</span><code>status</code><span class="syntax">`</span>, <span class="syntax">`</span><code>format</code><span class="syntax">`</span></div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content">Sourced from <span class="syntax">`</span><code>start_processing.action_controller</code><span class="syntax">`</span> (open) and <span class="syntax">`</span><code>process_action.action_controller</code><span class="syntax">`</span> (close).</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong><span class="syntax">`</span><code>job_perform</code><span class="syntax">`</span></strong><span class="syntax"></span></em><span class="syntax">*</span>*</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>job_class</code><span class="syntax">`</span>, <span class="syntax">`</span><code>job_id</code><span class="syntax">`</span>, <span class="syntax">`</span><code>queue</code><span class="syntax">`</span>, <span class="syntax">`</span><code>adapter</code><span class="syntax">`</span>, <span class="syntax">`</span><code>executions</code><span class="syntax">`</span></div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content">Sourced from <span class="syntax">`</span><code>perform_start.active_job</code><span class="syntax">`</span> (open) and <span class="syntax">`</span><code>perform.active_job</code><span class="syntax">`</span> (close).</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong><span class="syntax">`</span><code>trace</code><span class="syntax">`</span></strong><span class="syntax"></span></em><span class="syntax">*</span>*</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>class</code><span class="syntax">`</span>, <span class="syntax">`</span><code>method</code><span class="syntax">`</span> (e.g. <span class="syntax">`</span><code>"#create"</code><span class="syntax">`</span> for instance, <span class="syntax">`</span><code>".find"</code><span class="syntax">`</span> for class)</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>arguments</code><span class="syntax">`</span>, <span class="syntax">`</span><code>result</code><span class="syntax">`</span> when configured per-method (current <span class="syntax">`</span><code>args:</code><span class="syntax">`</span>/<span class="syntax">`</span><code>result:</code><span class="syntax">`</span> knobs preserved).</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">Each <span class="syntax">`</span><code>notifications[]</code><span class="syntax">`</span> entry preserves the AS event shape after filtering:</div></div><div class="md-line code-block-single"><div class="gutter"><span class="gutter-content code-lang">ruby</span></div><div class="content"><pre><code>{ <span class="hljs-symbol">name:</span> <span class="hljs-string">"sql.active_record"</span>, <span class="hljs-symbol">started_at:</span>, <span class="hljs-symbol">duration_ms:</span>, <span class="hljs-symbol">payload:</span> {...filtered...} }</code></pre></div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-3" id="filterignore-pipeline-retained-repurposed"><div class="gutter"><span class="gutter-content">###</span></div><div class="content">Filter/ignore pipeline — retained, repurposed</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">The current <span class="syntax">`</span><code>EventSubscriber</code><span class="syntax">`</span> filter/ignore registry (SQL obfuscation, params sanitization, exclusion of <span class="syntax">`</span><code>:request</code><span class="syntax">`</span>/<span class="syntax">`</span><code>:response</code><span class="syntax">`</span>/<span class="syntax">`</span><code>:headers</code><span class="syntax">`</span>, SolidQueue/SolidCable polling drops, etc.) is <span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>kept verbatim</strong><span class="syntax"></span></em><span class="syntax">*</span>* but its terminal action changes: instead of <span class="syntax">`</span><code>Slimmetry.emit(name, payload)</code><span class="syntax">`</span>, it appends to the active frames' notification arrays via the new <span class="syntax">`</span><code>Slimmetry::Frame::Accumulator</code><span class="syntax">`</span>.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-3" id="global-context"><div class="gutter"><span class="gutter-content">###</span></div><div class="content">Global context</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">Every emitted event (all three types) is merged with a process-wide <span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>global context</strong><span class="syntax"></span></em><span class="syntax">*</span>* hash. This is where service identity, environment, hostname, deployment SHA, etc. live so they don't have to be re-added per frame.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line code-block-single"><div class="gutter"><span class="gutter-content code-lang">ruby</span></div><div class="content"><pre><code><span class="hljs-title class_">Slimmetry</span>.configure <span class="hljs-keyword">do</span> |<span class="hljs-params">c</span>|
+  c.global_fields = {
+    <span class="hljs-symbol">service:</span> <span class="hljs-string">"discode2"</span>,
+    <span class="hljs-symbol">environment:</span> <span class="hljs-title class_">Rails</span>.env,
+    <span class="hljs-symbol">hostname:</span> <span class="hljs-title class_">Socket</span>.gethostname,
+    <span class="hljs-symbol">deployment_sha:</span> <span class="hljs-variable constant_">ENV</span>[<span class="hljs-string">"DEPLOY_SHA"</span>]
+  }
+<span class="hljs-keyword">end</span>
+
+<span class="hljs-comment"># Mutable at runtime</span>
+<span class="hljs-title class_">Slimmetry</span>.add_global_field(<span class="hljs-symbol">:deployment_sha</span>, <span class="hljs-string">"abc123"</span>)
+<span class="hljs-title class_">Slimmetry</span>.add_global_field(<span class="hljs-symbol">region:</span> <span class="hljs-string">"us-east-1"</span>, <span class="hljs-symbol">instance_id:</span> <span class="hljs-variable constant_">ENV</span>[<span class="hljs-string">"INSTANCE_ID"</span>])</code></pre></div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Merge order at emit time</strong><span class="syntax"></span></em><span class="syntax">*</span>* (later wins on key collision):</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">1.</span></span></div><div class="content"><span class="syntax">`</span><code>Slimmetry.configuration.global_fields</code><span class="syntax">`</span> (process-wide constants)</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">2.</span></span></div><div class="content">Frame envelope keys (<span class="syntax">`</span><code>_name</code><span class="syntax">`</span>, <span class="syntax">`</span><code>_trace_id</code><span class="syntax">`</span>, <span class="syntax">`</span><code>_started_at</code><span class="syntax">`</span>, etc.)</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">3.</span></span></div><div class="content">Frame-type keys (<span class="syntax">`</span><code>controller</code><span class="syntax">`</span>, <span class="syntax">`</span><code>action</code><span class="syntax">`</span>, <span class="syntax">`</span><code>job_class</code><span class="syntax">`</span>, ...)</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">4.</span></span></div><div class="content">Per-frame custom fields from <span class="syntax">`</span><code>Slimmetry.add_field</code><span class="syntax">`</span></div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">So a custom <span class="syntax">`</span><code>add_field(:environment, "staging")</code><span class="syntax">`</span> overrides a global <span class="syntax">`</span><code>environment: Rails.env</code><span class="syntax">`</span>. The reserved <span class="syntax">`</span><code>_*</code><span class="syntax">`</span> keys cannot be overridden.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">Implemented in <span class="syntax">`</span><code>Slimmetry::Frame#to_event</code><span class="syntax">`</span> (single merge point) — backend layer stays oblivious. Values may be procs/lambdas; they're evaluated lazily on emit so things like <span class="syntax">`</span><code>-&gt; { Time.current.hour }</code><span class="syntax">`</span> work.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-3" id="public-api-additions"><div class="gutter"><span class="gutter-content">###</span></div><div class="content">Public API additions</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line code-block-single"><div class="gutter"><span class="gutter-content code-lang">ruby</span></div><div class="content"><pre><code><span class="hljs-comment"># Add a custom field to the current (innermost) frame</span>
+<span class="hljs-title class_">Slimmetry</span>.add_field(<span class="hljs-symbol">:user_id</span>, current_user.id)
+<span class="hljs-title class_">Slimmetry</span>.add_field(<span class="hljs-symbol">feature_flag:</span> <span class="hljs-string">"experiment_a"</span>, <span class="hljs-symbol">tenant:</span> <span class="hljs-string">"acme"</span>)
+
+<span class="hljs-comment"># Wrap arbitrary code in a frame (for Rake/scripts/REPL)</span>
+<span class="hljs-title class_">Slimmetry</span>.frame(<span class="hljs-string">"import_users"</span>) <span class="hljs-keyword">do</span>
+  <span class="hljs-comment"># AS notifications fired here will be captured</span>
+<span class="hljs-keyword">end</span>
+
+<span class="hljs-comment"># Global fields (see "Global context" above)</span>
+<span class="hljs-title class_">Slimmetry</span>.add_global_field(<span class="hljs-symbol">:deployment_sha</span>, <span class="hljs-string">"abc123"</span>)
+<span class="hljs-title class_">Slimmetry</span>.configuration.global_fields  <span class="hljs-comment"># read access</span></code></pre></div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-3" id="backend-interface-unchanged"><div class="gutter"><span class="gutter-content">###</span></div><div class="content">Backend interface — unchanged</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">Backends still implement <span class="syntax">`</span><code>emit(event_name, payload)</code><span class="syntax">`</span> / <span class="syntax">`</span><code>with_context</code><span class="syntax">`</span> / <span class="syntax">`</span><code>current_context</code><span class="syntax">`</span>. They just receive fewer, fatter events. <span class="syntax">`</span><code>SlimmetryBackend</code><span class="syntax">`</span>'s buffer + flush thread continues to work; we'll bump the default <span class="syntax">`</span><code>buffer_size</code><span class="syntax">`</span> down (100 → 25) since each event is heavier, and document the tradeoff. <span class="syntax">`</span><code>Logger</code><span class="syntax">`</span>, <span class="syntax">`</span><code>EventReporter</code><span class="syntax">`</span>, <span class="syntax">`</span><code>Honeybadger</code><span class="syntax">`</span>, <span class="syntax">`</span><code>Null</code><span class="syntax">`</span> need no changes.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-3" id="what-gets-deleted"><div class="gutter"><span class="gutter-content">###</span></div><div class="content">What gets deleted</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content">The <span class="syntax">`</span><code>tracer.&lt;class&gt;.&lt;method&gt;</code><span class="syntax">`</span> event-name scheme — replaced by flat <span class="syntax">`</span><code>trace</code><span class="syntax">`</span> name with <span class="syntax">`</span><code>class</code><span class="syntax">`</span>/<span class="syntax">`</span><code>method</code><span class="syntax">`</span> in payload.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>config.rails_event_subscriber_enabled</code><span class="syntax">`</span> and <span class="syntax">`</span><code>config.rails_notifications_subscriber_enabled</code><span class="syntax">`</span> — subscribers are no longer optional in Rails environments; they only feed frames. We add <span class="syntax">`</span><code>config.rails_integration_enabled</code><span class="syntax">`</span> (default <span class="syntax">`</span><code>true</code><span class="syntax">`</span>) as the single switch.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content">The notion that AS notifications can emit standalone events.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-2" id="critical-files"><div class="gutter"><span class="gutter-content">##</span></div><div class="content">Critical files</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-3" id="new-files"><div class="gutter"><span class="gutter-content">###</span></div><div class="content">New files</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>lib/slimmetry/frame.rb</code><span class="syntax">`</span> — Frame class (open/close/accumulate, trace_id, notification array, custom fields).</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>lib/slimmetry/frame/stack.rb</code><span class="syntax">`</span> — Thread-local frame stack with push/pop/current/each.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>lib/slimmetry/frame/accumulator.rb</code><span class="syntax">`</span> — Receives filtered notifications, cascades into stack.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>lib/slimmetry/plugins/rails/request_frame_subscriber.rb</code><span class="syntax">`</span> — Subscribes to <span class="syntax">`</span><code>start_processing.action_controller</code><span class="syntax">`</span> (open frame) and <span class="syntax">`</span><code>process_action.action_controller</code><span class="syntax">`</span> (close + emit). Captures controller/action/status/etc.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>lib/slimmetry/plugins/rails/job_frame_subscriber.rb</code><span class="syntax">`</span> — Same for <span class="syntax">`</span><code>perform_start.active_job</code><span class="syntax">`</span> / <span class="syntax">`</span><code>perform.active_job</code><span class="syntax">`</span>.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-3" id="substantially-rewritten"><div class="gutter"><span class="gutter-content">###</span></div><div class="content">Substantially rewritten</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>lib/slimmetry.rb</code><span class="syntax">`</span> — Add <span class="syntax">`</span><code>Slimmetry.add_field</code><span class="syntax">`</span>, <span class="syntax">`</span><code>Slimmetry.frame</code><span class="syntax">`</span>. Wire up frame stack.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>lib/slimmetry/context.rb</code><span class="syntax">`</span> — Generalize from "parent trace id" to "frame stack head". Keep <span class="syntax">`</span><code>with_trace_id</code><span class="syntax">`</span> as a thin shim during the rewrite, then remove.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>lib/slimmetry/tracer.rb</code><span class="syntax">`</span> — <span class="syntax">`</span><code>trace_method_execution</code><span class="syntax">`</span> (lines 142-187) opens a <span class="syntax">`</span><code>trace</code><span class="syntax">`</span> frame, runs method, closes frame, emits wide event. Notifications fire into this frame's accumulator via cascade.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>lib/slimmetry/plugins/rails/notifications_subscriber.rb</code><span class="syntax">`</span> — Becomes a pure feeder for the accumulator. No longer calls <span class="syntax">`</span><code>Slimmetry.emit</code><span class="syntax">`</span>.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>lib/slimmetry/plugins/rails/event_subscriber.rb</code><span class="syntax">`</span> — Filter/ignore registry preserved; terminal action becomes <span class="syntax">`</span><code>Accumulator.append</code><span class="syntax">`</span>.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>lib/slimmetry/plugins/rails/railtie.rb</code><span class="syntax">`</span> — Replace per-subscriber toggles with <span class="syntax">`</span><code>rails_integration_enabled</code><span class="syntax">`</span>. Wire new subscribers.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>lib/slimmetry/configuration.rb</code><span class="syntax">`</span> — Drop <span class="syntax">`</span><code>rails_event_subscriber_enabled</code><span class="syntax">`</span> / <span class="syntax">`</span><code>rails_notifications_subscriber_enabled</code><span class="syntax">`</span>; add <span class="syntax">`</span><code>rails_integration_enabled</code><span class="syntax">`</span>. Add <span class="syntax">`</span><code>global_fields</code><span class="syntax">`</span> (Hash, default <span class="syntax">`</span><code>{}</code><span class="syntax">`</span>) and <span class="syntax">`</span><code>add_global_field</code><span class="syntax">`</span> helper. Add <span class="syntax">`</span><code>default_notification_filters</code><span class="syntax">`</span> if we want to expose tuning.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>lib/slimmetry/backends/slimmetry_backend.rb</code><span class="syntax">`</span> — Bump <span class="syntax">`</span><code>MAX_BUFFER_SIZE</code><span class="syntax">`</span> default downward; keep everything else.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-3" id="tests"><div class="gutter"><span class="gutter-content">###</span></div><div class="content">Tests</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>test/frame_test.rb</code><span class="syntax">`</span> (new) — frame open/close, stack semantics, cascade behavior.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>test/slimmetry_test.rb</code><span class="syntax">`</span> — exercise <span class="syntax">`</span><code>Slimmetry.add_field</code><span class="syntax">`</span> / <span class="syntax">`</span><code>Slimmetry.frame</code><span class="syntax">`</span>.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>test/tracer_test.rb</code><span class="syntax">`</span> — assert traces now emit a single <span class="syntax">`</span><code>trace</code><span class="syntax">`</span> event with <span class="syntax">`</span><code>notifications</code><span class="syntax">`</span> array.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>test/plugins/rails/notifications_subscriber_test.rb</code><span class="syntax">`</span> — assert notifications no longer emit, instead populate active frame.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>test/plugins/rails/request_frame_subscriber_test.rb</code><span class="syntax">`</span> (new) — synthesize controller AS events, assert one <span class="syntax">`</span><code>web_request</code><span class="syntax">`</span> emission with accumulated notifications.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>test/plugins/rails/job_frame_subscriber_test.rb</code><span class="syntax">`</span> (new) — same for jobs.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>test/support/test_backend.rb</code><span class="syntax">`</span> — unchanged.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-3" id="docs"><div class="gutter"><span class="gutter-content">###</span></div><div class="content">Docs</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>README.md</code><span class="syntax">`</span> — rewrite the "Event Payload" and "Rails event subscription" sections. Add migration note pointing v1 users at the upgrade path.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>CHANGELOG.md</code><span class="syntax">`</span> — v2.0.0 entry: "Wide events redesign — see README for migration."</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax">`</span><code>lib/slimmetry/version.rb</code><span class="syntax">`</span> — bump to <span class="syntax">`</span><code>2.0.0</code><span class="syntax">`</span>.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-2" id="implementation-order"><div class="gutter"><span class="gutter-content">##</span></div><div class="content">Implementation order</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">1.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Frame infrastructure</strong><span class="syntax"></span></em><span class="syntax">*</span>* (<span class="syntax">`</span><code>Frame</code><span class="syntax">`</span>, <span class="syntax">`</span><code>Frame::Stack</code><span class="syntax">`</span>, <span class="syntax">`</span><code>Frame::Accumulator</code><span class="syntax">`</span>) + tests with synthetic notifications, no Rails dependency. Land this first so the rest can build on it.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">2.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Tracer rewrite</strong><span class="syntax"></span></em><span class="syntax">*</span>* — convert <span class="syntax">`</span><code>trace_method_execution</code><span class="syntax">`</span> to open/close a frame. Confirm existing tracer tests pass (with payload-shape updates).</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">3.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Global context + <span class="syntax">`</span><code>Slimmetry.add_field</code><span class="syntax">`</span> + <span class="syntax">`</span><code>Slimmetry.frame</code><span class="syntax">`</span></strong><span class="syntax"></span></em><span class="syntax">*</span>* — <span class="syntax">`</span><code>Configuration#global_fields</code><span class="syntax">`</span>, <span class="syntax">`</span><code>Slimmetry.add_global_field</code><span class="syntax">`</span>, frame-level field accumulator, and the <span class="syntax">`</span><code>Frame#to_event</code><span class="syntax">`</span> merge. Lazy proc evaluation for global values.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">4.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong><span class="syntax">`</span><code>NotificationsSubscriber</code><span class="syntax">`</span> retarget</strong><span class="syntax"></span></em><span class="syntax">*</span>* — feed the accumulator instead of emitting. Confirm filter/ignore pipeline still scrubs SQL, params, etc.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">5.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong><span class="syntax">`</span><code>RequestFrameSubscriber</code><span class="syntax">`</span></strong><span class="syntax"></span></em><span class="syntax">*</span>* — handle controller open/close + emit.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">6.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong><span class="syntax">`</span><code>JobFrameSubscriber</code><span class="syntax">`</span></strong><span class="syntax"></span></em><span class="syntax">*</span>* — handle job open/close + emit.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">7.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Configuration cleanup</strong><span class="syntax"></span></em><span class="syntax">*</span>* — drop old toggles, add <span class="syntax">`</span><code>rails_integration_enabled</code><span class="syntax">`</span>.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">8.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>README + CHANGELOG + version bump.</strong><span class="syntax"></span></em><span class="syntax">*</span>*</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">Each step can ship as its own commit; the gem is usable after step 2 even if Rails integration is mid-rewrite.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-2" id="verification"><div class="gutter"><span class="gutter-content">##</span></div><div class="content">Verification</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line"><div class="gutter"></div><div class="content">End-to-end checks before tagging v2.0:</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">1.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Unit tests</strong><span class="syntax"></span></em><span class="syntax">*</span>*: <span class="syntax">`</span><code>rake test</code><span class="syntax">`</span> — all green. New frame/accumulator tests included.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">2.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Rubocop</strong><span class="syntax"></span></em><span class="syntax">*</span>*: <span class="syntax">`</span><code>bundle exec rubocop</code><span class="syntax">`</span> clean.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">3.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Trace-only smoke test</strong><span class="syntax"></span></em><span class="syntax">*</span>* (no Rails):</div></div><div class="md-line code-block-single"><div class="gutter"><span class="gutter-content code-lang">ruby</span></div><div class="content"><pre><code>   <span class="hljs-keyword">class</span> <span class="hljs-title class_">Foo</span>; <span class="hljs-keyword">extend</span> <span class="hljs-title class_">Slimmetry</span>; <span class="hljs-keyword">def</span> <span class="hljs-title function_">bar</span>; <span class="hljs-keyword">end</span>; trace <span class="hljs-symbol">:bar</span>; <span class="hljs-keyword">end</span>
+   <span class="hljs-title class_">Slimmetry</span>.configure <span class="hljs-keyword">do</span> |<span class="hljs-params">c</span>|
+     c.backend = <span class="hljs-title class_">Slimmetry::Backends::Logger</span>.new(<span class="hljs-title class_">Logger</span>.new(<span class="hljs-variable">$stdout</span>))
+     c.global_fields = { <span class="hljs-symbol">service:</span> <span class="hljs-string">"test"</span>, <span class="hljs-symbol">env:</span> <span class="hljs-string">"dev"</span> }
+   <span class="hljs-keyword">end</span>
+   <span class="hljs-title class_">Slimmetry</span>.add_field(<span class="hljs-symbol">:request_path</span>, <span class="hljs-string">"/foo"</span>)  <span class="hljs-comment"># should be ignored — no active frame</span>
+   <span class="hljs-title class_">Foo</span>.new.bar
+   <span class="hljs-comment"># Expect: one JSON line, _name="trace", class="Foo", method="#bar",</span>
+   <span class="hljs-comment"># notifications=[], service="test", env="dev"</span></code></pre></div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">4.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Rails request smoke test</strong><span class="syntax"></span></em><span class="syntax">*</span>*: install the gem in <span class="syntax">`</span><code>slimmetry</code><span class="syntax">`</span> (server) or <span class="syntax">`</span><code>games</code><span class="syntax">`</span>, hit a real endpoint, confirm one <span class="syntax">`</span><code>web_request</code><span class="syntax">`</span> event hits <span class="syntax">`</span><code>POST /api/v1/events</code><span class="syntax">`</span> carrying the full SQL/render array in <span class="syntax">`</span><code>notifications[]</code><span class="syntax">`</span>. Use <span class="syntax">`</span><code>bin/rails server</code><span class="syntax">`</span> in the Rails project's Docker container.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">5.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Nested cascade</strong><span class="syntax"></span></em><span class="syntax">*</span>*: in the same Rails app, trace a service-object method that runs SQL. Confirm three resulting events (<span class="syntax">`</span><code>web_request</code><span class="syntax">`</span>, <span class="syntax">`</span><code>trace</code><span class="syntax">`</span>, plus any others) and that the SQL row appears in both the <span class="syntax">`</span><code>web_request</code><span class="syntax">`</span> and the nested <span class="syntax">`</span><code>trace</code><span class="syntax">`</span> event.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">6.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Job smoke test</strong><span class="syntax"></span></em><span class="syntax">*</span>*: enqueue and run an ActiveJob (Solid Queue). Confirm one <span class="syntax">`</span><code>job_perform</code><span class="syntax">`</span> event with the job's notifications.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">7.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Out-of-frame drop</strong><span class="syntax"></span></em><span class="syntax">*</span>*: from <span class="syntax">`</span><code>rails runner</code><span class="syntax">`</span>, run code that triggers a SQL query without wrapping in <span class="syntax">`</span><code>Slimmetry.frame</code><span class="syntax">`</span>. Confirm <span class="syntax">`</span><code>TestBackend</code><span class="syntax">`</span> (or Logger) receives zero events.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">8.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Manual frame</strong><span class="syntax"></span></em><span class="syntax">*</span>*: wrap the same <span class="syntax">`</span><code>runner</code><span class="syntax">`</span> snippet in <span class="syntax">`</span><code>Slimmetry.frame("rake")</code><span class="syntax">`</span> and confirm one event emitted with the SQL captured.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="number">9.</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Global context + override</strong><span class="syntax"></span></em><span class="syntax">*</span>*: configure <span class="syntax">`</span><code>global_fields = { environment: "prod" }</code><span class="syntax">`</span>, then in a frame call <span class="syntax">`</span><code>Slimmetry.add_field(:environment, "test")</code><span class="syntax">`</span>. Confirm the emitted event has <span class="syntax">`</span><code>environment: "test"</code><span class="syntax">`</span> (frame wins). Confirm a sibling frame without the override has <span class="syntax">`</span><code>environment: "prod"</code><span class="syntax">`</span>.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line heading-2" id="open-questions-deferred-to-implementation"><div class="gutter"><span class="gutter-content">##</span></div><div class="content">Open questions deferred to implementation</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Notification array hard cap</strong><span class="syntax"></span></em><span class="syntax">*</span>*: do we cap <span class="syntax">`</span><code>notifications[]</code><span class="syntax">`</span> at e.g. 5000 entries to bound payload size? Default to uncapped, add <span class="syntax">`</span><code>config.max_notifications_per_frame = nil</code><span class="syntax">`</span>. Decide during step 1.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Async ActiveJob over multiple threads</strong><span class="syntax"></span></em><span class="syntax">*</span>*: confirm Solid Queue's worker model — each perform happens on a dedicated thread, so thread-local frame stack is correct. Validate during step 6.</div></div><div class="md-line list-item"><div class="gutter"><span class="gutter-content"><span class="bullet">-</span></span></div><div class="content"><span class="syntax"><span class="syntax">*</span><em>*</em></span><em><strong>Exception path</strong><span class="syntax"></span></em><span class="syntax">*</span>*: ensure frame closes and emits even when the wrapped method/controller/job raises. <span class="syntax">`</span><code>ensure</code><span class="syntax">`</span> block around frame body. Covered in step 2.</div></div><div class="md-line empty-line"><div class="gutter"></div><div class="content">&nbsp;</div></div>
+</div>
+</body>
+</html>
