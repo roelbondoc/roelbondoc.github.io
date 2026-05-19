@@ -80,8 +80,12 @@
 
         updateButtons();
 
-        // Extract language from code blocks and set data-lang for gutter display
+        // Extract language from code blocks and set data-lang for gutter display.
+        // Skip inline <code> — Kramdown wraps inline backticks as
+        // <code class="language-plaintext highlighter-rouge">, which would otherwise
+        // render a "plaintext" tag next to inline code.
         document.querySelectorAll('.highlighter-rouge').forEach(function(el) {
+          if (el.tagName === 'CODE') return;
           var classes = el.className.split(/\s+/);
           for (var i = 0; i < classes.length; i++) {
             if (classes[i].indexOf('language-') === 0) {
