@@ -103,8 +103,8 @@
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="21" data-marpit-fragments="4" lang="en-US">
 <h1 id="wide-events">Wide Events</h1>
 <ul>
-<li data-marpit-fragment="1">Structured logs that let you shed light on the &quot;unknown unknowns&quot;.</li>
-<li data-marpit-fragment="2">Emphasis on:
+<li data-marpit-fragment="1">Shed light on the &quot;unknown unknowns&quot;</li>
+<li data-marpit-fragment="2">Structured logs that emphasize:
 <ul>
 <li data-marpit-fragment="3">High cardinality fields</li>
 <li data-marpit-fragment="4">Multiple dimensions</li>
@@ -659,8 +659,9 @@ observability products, tools and infrastructure. Then moving on to Phoenix
 and becoming and end user of those products gave me a fresh perspective on
 how to best leverage o11y.</p></div><div class="bespoke-marp-note" data-index="10" tabindex="0"><p>Satisficing from Chapter 2 about how wrong our assumptions are about user behavior</p></div><div class="bespoke-marp-note" data-index="12" tabindex="0"><p>Slips vs Mistakes from Chapter 5 about errors
 slips: plan was right, execution was wrong
-mistakes: plan was wrong, execution was right</p></div><div class="bespoke-marp-note" data-index="15" tabindex="0"><p>These questions all require knowing how your system is performing at any given moment.</p></div><div class="bespoke-marp-note" data-index="17" tabindex="0"><p>Metrics: cheap aggregated numbers that tell you something changed, but not why.</p></div><div class="bespoke-marp-note" data-index="18" tabindex="0"><p>Logs: a free-form story of what happened, easy to write and hard to query.</p></div><div class="bespoke-marp-note" data-index="19" tabindex="0"><p>Traces: a nested group of data, which provides really good insights into
-debugging slow code.</p></div><div class="bespoke-marp-note" data-index="20" tabindex="0"><p>Unknown unknowns: questions you never thought to ask when you wrote the code.
+mistakes: plan was wrong, execution was right</p></div><div class="bespoke-marp-note" data-index="15" tabindex="0"><p>These questions all require knowing how your system is performing at any given moment.</p></div><div class="bespoke-marp-note" data-index="16" tabindex="0"><p>For the long time these were the basic pieces of data when people talked about observability.</p></div><div class="bespoke-marp-note" data-index="17" tabindex="0"><p>Metrics: cheap aggregated numbers that tell you something changed, but not why.</p></div><div class="bespoke-marp-note" data-index="18" tabindex="0"><p>Logs: a free-form story of what happened, easy to write and hard to query.</p></div><div class="bespoke-marp-note" data-index="19" tabindex="0"><p>Traces: a nested group of data, which provides really good insights into
+debugging slow code.</p></div><div class="bespoke-marp-note" data-index="20" tabindex="0"><p>Known unknowns: recording response time so you can know when requests are slow
+Unknown unknowns: recording more data so you can know why requests are slow
 High cardinality: fields with many unique values like user_id or order_id, so you can find the exact request.
 Multiple dimensions: many fields on one event like plan, region, and app version, so you can slice by any combination.</p></div><div class="bespoke-marp-note" data-index="24" tabindex="0"><p>Same method, same single log line, but now it's a wide event.
 High cardinality: user_id, order_id, request_id. Every value is unique, so you can find the exact request.
